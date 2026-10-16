@@ -1,0 +1,82 @@
+# /config/dashboard.yaml (placeholder data only)
+version: 1
+title: Iris
+defaultGroup: Other
+groups:
+  - { name: Media, icon: 'lucide:clapperboard' }
+  - { name: Automation, icon: 'lucide:workflow' }
+  - { name: Downloads, icon: 'lucide:download' }
+  - { name: Infrastructure, icon: 'lucide:server' }
+  - { name: Home, icon: 'lucide:house' }
+cron:
+  timezone: Europe/London
+  staleAfterMinutes: 60 # used when a job has no schedule
+  graceMinutes: 10 # default grace for every job
+  jobs: # optional per-job overrides; schedules normally come from the host status file
+    - match: 'feed-sync' # the name cron-status returns
+      schedule: '*/15 * * * *' # optional; wins over the host status file
+      label: Every 15 minutes # optional plain-words schedule; the expression alone is shown without it
+      graceMinutes: 10 # optional
+maintenance: # schedules here are the fallback when the host status file has none
+  - {
+      id: backup,
+      name: System backup,
+      schedule: '30 2 * * *',
+      label: 'Daily at 02:30',
+      graceMinutes: 60,
+    }
+  - {
+      id: updater,
+      name: Image updater,
+      schedule: '19 4 * * *',
+      label: 'Daily at 04:19',
+      graceMinutes: 90,
+    }
+system: # System panel
+  url: http://sysmon:61208
+  interface: auto # or an interface name as Glances reports it
+  sensor: auto # or one sensor label as Glances reports it; auto is the hottest CPU sensor
+  disks: # mount points exactly as Glances reports them; only these are shown
+    - { mount: /example/apps, label: Apps disk }
+    - { mount: /example/media, label: Media disk }
+  thresholds: { warn: 80, bad: 90 } # for CPU, memory and disks; the temperature uses the sensor's own levels
+streams: # Now playing panel
+  url: http://watchlog:8181
+  showUsers: true
+phone:
+  maxLiveFrames: 3 # 8 on wider screens
+weather: # Open-Meteo, no key. Leave the block out to show no weather.
+  label: Hometown # the place name shown
+  latitude: 0.0 # placeholder; sent to Open-Meteo rounded to two decimals, never to the browser
+  longitude: 0.0
+  timezone: Europe/London
+  units: metric
+  refreshMinutes: 10
+links: # http or https only; always opened in a new browser tab
+  - { name: Example Forum, abbr: EF, url: 'https://forum.example.invalid/' }
+  - { name: Example Wiki, abbr: EW, url: 'https://wiki.example.invalid/' }
+  - { name: Project Staging, abbr: PS, url: 'https://staging.{zone}/' } # {zone} is replaced from DASHBOARD_ZONE
+widgets: # service integrations
+  refreshSeconds:
+    {
+      default: 60,
+      qbittorrent: 10,
+      tautulli: 15,
+      radarr: 300,
+      prowlarr: 300,
+      gotify: 300,
+      cloudflared: 300,
+      coinmarketcap: 1800,
+    }
+  standalone: # tiles on the Overview that belong to no container
+    - id: markets
+      name: Markets
+      group: Home
+      icon: 'lucide:chart-line'
+      type: coinmarketcap
+      currency: GBP
+      coins: # placeholders; the name is shown as written here
+        - { symbol: AAA, name: Alphacoin }
+        - { symbol: BBB, name: Betacoin }
+        - { symbol: CCC, name: Gammacoin }
+      interval: 24h # the change shown first: 1h, 24h, 7d or 30d

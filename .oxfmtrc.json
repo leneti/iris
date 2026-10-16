@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "singleQuote": true,
+  "printWidth": 100,
+  "ignorePatterns": [
+    ".llms",
+    ".superpowers",
+    ".tmp",
+    ".next",
+    "node_modules",
+    "coverage",
+    "yarn.lock"
+  ]
+}

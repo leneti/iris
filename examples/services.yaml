@@ -1,0 +1,24 @@
+# /config/services.yaml (fallback only; placeholder data)
+version: 1
+services:
+  - id: vpn-gateway
+    name: VPN Gateway
+    group: Infrastructure
+    icon: gluetun
+    container: vpn-gateway # health from Docker; the container needs no label
+    url: none
+  - id: edge-tunnel
+    name: Edge Tunnel
+    group: Infrastructure
+    icon: cloudflare
+    description: Tunnel dashboard
+    container: edge-tunnel
+    url: 'https://dash.example.invalid/'
+    embed: false # that site refuses to be framed; open it in a new browser tab
+    widget: { type: cloudflared } # shows the tunnel's status; ids and token come from the environment
+  - id: example-link
+    name: Example link
+    group: Home
+    icon: 'lucide:link'
+    url: 'https://example.{zone}/' # {zone} is replaced from DASHBOARD_ZONE
+    embed: false

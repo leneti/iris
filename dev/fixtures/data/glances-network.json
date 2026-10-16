@@ -1,0 +1,20 @@
+[
+  {
+    "interface_name": "lo",
+    "bytes_recv_rate_per_sec": 90000000,
+    "bytes_sent_rate_per_sec": 90000000,
+    "time_since_update": 3
+  },
+  {
+    "interface_name": "docker0",
+    "bytes_recv_rate_per_sec": 60000000,
+    "bytes_sent_rate_per_sec": 60000000,
+    "time_since_update": 3
+  },
+  {
+    "interface_name": "eth-example0",
+    "bytes_recv_rate_per_sec": 5262500,
+    "bytes_sent_rate_per_sec": 400000,
+    "time_since_update": 3
+  }
+]

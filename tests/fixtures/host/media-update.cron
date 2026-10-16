@@ -1,0 +1,4 @@
+# Invented /etc/cron.d entry.
+SHELL=/bin/sh
+PATH=/usr/sbin:/usr/bin:/sbin:/bin
+19 4 * * * root /usr/local/sbin/media-update --quiet

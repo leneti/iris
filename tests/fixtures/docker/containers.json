@@ -1,0 +1,1091 @@
+[
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1",
+    "Names": ["/moviebox"],
+    "Image": "example/moviebox:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa2",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/moviebox.yml",
+    "Created": 1760000002,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 7878,
+        "PublicPort": 7878,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 7878,
+        "PublicPort": 7878,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "moviebox",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.name": "Moviebox",
+      "dashboard.group": "Automation",
+      "dashboard.description": "Movie Manager",
+      "dashboard.icon": "radarr",
+      "dashboard.widget": "radarr",
+      "dashboard.health.path": "/ping",
+      "dashboard.order": "10",
+      "traefik.http.routers.moviebox.rule": "Host(`moviebox.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    },
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.3",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::3",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa3",
+    "Names": ["/showtrack"],
+    "Image": "example/showtrack:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa4",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/showtrack.yml",
+    "Created": 1760000004,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 8989,
+        "PublicPort": 8989,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 8989,
+        "PublicPort": 8989,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "showtrack",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.group": "Automation",
+      "dashboard.order": "20",
+      "traefik.http.routers.showtrack.rule": "Host(`showtrack.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (unhealthy)",
+    "Health": {
+      "Status": "unhealthy",
+      "FailingStreak": 3
+    },
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.5",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::5",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa5",
+    "Names": ["/profile-kit"],
+    "Image": "example/profile-kit:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa6",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/profile-kit.yml",
+    "Created": 1760000006,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 6868,
+        "PublicPort": 6868,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 6868,
+        "PublicPort": 6868,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "profile-kit",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.group": "Automation",
+      "dashboard.keywords": "profiles, quality",
+      "traefik.http.routers.profile-kit.rule": "Host(`profile-kit.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 5 seconds (health: starting)",
+    "Health": {
+      "Status": "starting",
+      "FailingStreak": 0
+    },
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.7",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::7",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa7",
+    "Names": ["/indexer-hub"],
+    "Image": "example/indexer-hub:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa8",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/indexer-hub.yml",
+    "Created": 1760000008,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 9696,
+        "PublicPort": 9696,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 9696,
+        "PublicPort": 9696,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      },
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 9697,
+        "PublicPort": 9697,
+        "Type": "udp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "indexer-hub",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.group": "Automation",
+      "dashboard.widget": "prowlarr",
+      "traefik.http.routers.indexer-hub.rule": "Host(`indexer-hub.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    },
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.9",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::9",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa9",
+    "Names": ["/streamhouse"],
+    "Image": "example/streamhouse:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/streamhouse.yml",
+    "Created": 1760000010,
+    "Ports": [
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "streamhouse",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.name": "Streamhouse",
+      "dashboard.group": "Media",
+      "dashboard.url": "https://streamhouse.example.invalid/web",
+      "dashboard.lan.port": "47485",
+      "dashboard.lan.path": "/web",
+      "dashboard.widget": "tautulli",
+      "dashboard.widget.url": "http://watchlog:8181",
+      "dashboard.health.url": "http://streamhouse:47485/web"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.11",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::11",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab",
+    "Names": ["/watchlog"],
+    "Image": "example/watchlog:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaac",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/watchlog.yml",
+    "Created": 1760000012,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 8181,
+        "PublicPort": 8181,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 8181,
+        "PublicPort": 8181,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "watchlog",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.group": "Media",
+      "dashboard.url": "none",
+      "dashboard.health.url": "http://watchlog:8181/status"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.13",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::13",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaad",
+    "Names": ["/request-desk"],
+    "Image": "example/request-desk:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaae",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/request-desk.yml",
+    "Created": 1760000014,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 5055,
+        "PublicPort": 5055,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 5055,
+        "PublicPort": 5055,
+        "Type": "tcp"
+      },
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 5056,
+        "PublicPort": 5056,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 5056,
+        "PublicPort": 5056,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "request-desk",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.name": "Request Desk",
+      "dashboard.group": "Media",
+      "dashboard.widget": "seerr",
+      "dashboard.lan.port": "5055",
+      "traefik.http.routers.request-desk.rule": "Host(`request-desk.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.15",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::15",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaf",
+    "Names": ["/vpn-gateway"],
+    "Image": "example/vpn-gateway:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa10",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/vpn-gateway.yml",
+    "Created": 1760000016,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 8080,
+        "PublicPort": 8080,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 8080,
+        "PublicPort": 8080,
+        "Type": "tcp"
+      },
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 8888,
+        "PublicPort": 8888,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 8888,
+        "PublicPort": 8888,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "vpn-gateway",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "traefik.http.routers.torrent-client.rule": "Host(`torrent-client.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    },
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.17",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::17",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa11",
+    "Names": ["/torrent-client"],
+    "Image": "example/torrent-client:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa12",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/torrent-client.yml",
+    "Created": 1760000018,
+    "Ports": [
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "torrent-client",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.name": "Torrent Client",
+      "dashboard.group": "Downloads",
+      "dashboard.router": "torrent-client",
+      "dashboard.lan.port": "8080",
+      "dashboard.embed": "false",
+      "dashboard.widget": "qbittorrent",
+      "dashboard.health.path": "/api/v2/app/version"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    },
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.19",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::19",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa13",
+    "Names": ["/release-grabber"],
+    "Image": "example/release-grabber:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa14",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/release-grabber.yml",
+    "Created": 1760000020,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 7474,
+        "PublicPort": 7474,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 7474,
+        "PublicPort": 7474,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "release-grabber",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.group": "Downloads",
+      "dashboard.widget": "autobrr",
+      "traefik.http.routers.release-grabber.rule": "Host(`release-grabber.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.21",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::21",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa15",
+    "Names": ["/subtitle-sync"],
+    "Image": "example/subtitle-sync:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa16",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/subtitle-sync.yml",
+    "Created": 1760000022,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 8191,
+        "PublicPort": 8191,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 8191,
+        "PublicPort": 8191,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "subtitle-sync",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.group": "Automation",
+      "dashboard.router": "subtitle-sync",
+      "dashboard.url": "none",
+      "dashboard.lan.port": "none",
+      "traefik.http.routers.subtitle-sync.rule": "Host(`subtitle-sync.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.23",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::23",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa17",
+    "Names": ["/sysmon"],
+    "Image": "example/sysmon:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa18",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/sysmon.yml",
+    "Created": 1760000024,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 61208,
+        "PublicPort": 61208,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 61208,
+        "PublicPort": 61208,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "sysmon",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.name": "Sysmon",
+      "dashboard.group": "Infrastructure",
+      "dashboard.url": "none",
+      "dashboard.health.url": "http://sysmon:61208/api/4/status"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.25",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::25",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa19",
+    "Names": ["/notify"],
+    "Image": "example/notify:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1a",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/notify.yml",
+    "Created": 1760000026,
+    "Ports": [
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "notify",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.group": "Infrastructure",
+      "dashboard.widget": "gotify",
+      "traefik.http.routers.notify.rule": "Host(`notify.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    },
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.27",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::27",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1b",
+    "Names": ["/self-heal"],
+    "Image": "example/self-heal:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1c",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/self-heal.yml",
+    "Created": 1760000028,
+    "Ports": [
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "self-heal",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.name": "Self-Heal",
+      "dashboard.group": "Infrastructure",
+      "dashboard.url": "none"
+    },
+    "State": "exited",
+    "Status": "Exited (0) 2 hours ago",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.29",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::29",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1d",
+    "Names": ["/recipe-book"],
+    "Image": "example/recipe-book:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1e",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/recipe-book.yml",
+    "Created": 1760000030,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 9925,
+        "PublicPort": 9925,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 9925,
+        "PublicPort": 9925,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "recipe-book",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "true",
+      "dashboard.group": "Home",
+      "dashboard.description": "Recipes",
+      "traefik.http.routers.recipe-book.rule": "Host(`recipe-book.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.31",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::31",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1f",
+    "Names": ["/iris"],
+    "Image": "example/dashboard:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa20",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/dashboard.yml",
+    "Created": 1760000032,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 3000,
+        "PublicPort": 3000,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 3000,
+        "PublicPort": 3000,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "dashboard",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "dashboard.enable": "false",
+      "dashboard.name": "Iris"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.33",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::33",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa21",
+    "Names": ["/edge-tunnel"],
+    "Image": "example/edge-tunnel:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa22",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/edge-tunnel.yml",
+    "Created": 1760000034,
+    "Ports": [
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "edge-tunnel",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    },
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.35",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::35",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  },
+  {
+    "Id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa23",
+    "Names": ["/cron-status"],
+    "Image": "example/cron-status:latest",
+    "ImageID": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa24",
+    "Command": "/entrypoint.sh --token=not-a-real-token --config /config/cron-status.yml",
+    "Created": 1760000036,
+    "Ports": [
+      {
+        "IP": "0.0.0.0",
+        "PrivatePort": 9876,
+        "PublicPort": 9876,
+        "Type": "tcp"
+      },
+      {
+        "IP": "::",
+        "PrivatePort": 9876,
+        "PublicPort": 9876,
+        "Type": "tcp"
+      },
+      {
+        "PrivatePort": 9999,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "cron-status",
+      "traefik.enable": "true",
+      "org.example.build": "unrelated label that must be dropped",
+      "traefik.http.routers.cron-status.rule": "Host(`cron-status.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours",
+    "HostConfig": {
+      "NetworkMode": "example_default"
+    },
+    "NetworkSettings": {
+      "Networks": {
+        "example_default": {
+          "IPAddress": "203.0.113.37",
+          "Gateway": "203.0.113.1",
+          "GlobalIPv6Address": "2001:db8::37",
+          "MacAddress": "00:00:5e:00:53:01"
+        }
+      }
+    },
+    "Mounts": [
+      {
+        "Type": "bind",
+        "Source": "/srv/example/config",
+        "Destination": "/config",
+        "Mode": "rw",
+        "RW": true
+      }
+    ]
+  }
+]

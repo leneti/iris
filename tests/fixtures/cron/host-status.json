@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-16T12:55:00+01:00",
+  "timezone": "Europe/London",
+  "userJobs": [
+    { "folder": "feed-sync", "name": "feed-sync", "schedule": "*/15 * * * *" },
+    { "folder": "price-watch", "name": "price-watch", "schedule": "*/30 * * * *" },
+    { "folder": "photo-index", "name": "photo-index", "schedule": "0 7 * * *" },
+    { "folder": "report-digest", "name": "report-digest", "schedule": "0 9 * * *" },
+    { "folder": "cert-check", "name": "cert-check", "schedule": "0 4 * * *" }
+  ],
+  "unmatchedCrontabLines": 0,
+  "backup": {
+    "schedule": "30 2 * * *",
+    "lastStart": "2026-10-16T02:30:00+01:00",
+    "lastEnd": "2026-10-16T02:45:00+01:00",
+    "result": "success",
+    "nextRun": "2026-10-17T02:30:00+01:00"
+  },
+  "updater": {
+    "schedule": "19 4 * * *",
+    "lastRun": "2026-10-16T04:19:00+01:00",
+    "result": "succeeded",
+    "paused": false,
+    "nextRun": null
+  }
+}

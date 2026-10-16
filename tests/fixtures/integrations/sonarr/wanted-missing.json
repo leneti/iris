@@ -1,0 +1,15 @@
+{
+  "page": 1,
+  "pageSize": 1,
+  "sortKey": "airDateUtc",
+  "sortDirection": "descending",
+  "totalRecords": 9,
+  "records": [
+    {
+      "id": 1,
+      "seriesId": 4,
+      "title": "Pilot",
+      "monitored": true
+    }
+  ]
+}

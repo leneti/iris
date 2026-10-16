@@ -1,0 +1,45 @@
+{
+  "indexers": [
+    {
+      "indexerId": 1,
+      "indexerName": "Indexer A",
+      "averageResponseTime": 420,
+      "numberOfQueries": 5100,
+      "numberOfGrabs": 200,
+      "numberOfRssQueries": 900,
+      "numberOfAuthQueries": 0,
+      "numberOfFailedQueries": 14,
+      "numberOfFailedGrabs": 3
+    },
+    {
+      "indexerId": 2,
+      "indexerName": "Indexer B",
+      "averageResponseTime": 310,
+      "numberOfQueries": 3004,
+      "numberOfGrabs": 100,
+      "numberOfRssQueries": 400,
+      "numberOfAuthQueries": 0,
+      "numberOfFailedQueries": 6,
+      "numberOfFailedGrabs": 1
+    },
+    {
+      "indexerId": 3,
+      "indexerName": "Indexer C",
+      "averageResponseTime": 880,
+      "numberOfQueries": 1100,
+      "numberOfGrabs": 18,
+      "numberOfRssQueries": 0,
+      "numberOfAuthQueries": 0,
+      "numberOfFailedQueries": 0,
+      "numberOfFailedGrabs": 0
+    }
+  ],
+  "userAgents": [
+    {
+      "userAgent": "Sample/1.0",
+      "numberOfQueries": 9204,
+      "numberOfGrabs": 318
+    }
+  ],
+  "hosts": []
+}

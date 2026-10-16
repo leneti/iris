@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "app-1",
+    "description": "",
+    "internal": false
+  },
+  {
+    "id": 2,
+    "name": "app-2",
+    "description": "",
+    "internal": false
+  },
+  {
+    "id": 3,
+    "name": "app-3",
+    "description": "",
+    "internal": false
+  },
+  {
+    "id": 4,
+    "name": "app-4",
+    "description": "",
+    "internal": false
+  },
+  {
+    "id": 5,
+    "name": "app-5",
+    "description": "",
+    "internal": false
+  }
+]

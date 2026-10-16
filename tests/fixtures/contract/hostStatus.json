@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "generatedAt": "2026-10-10T04:25:00+01:00",
+  "timezone": "Europe/London",
+  "userJobs": [{ "folder": "example-job", "name": "Example job", "schedule": "*/15 * * * *" }],
+  "unmatchedCrontabLines": 0,
+  "backup": {
+    "schedule": "30 2 * * *",
+    "lastStart": "2026-10-10T01:30:00+01:00",
+    "lastEnd": "2026-10-10T01:45:00+01:00",
+    "result": "success",
+    "nextRun": "2026-10-11T02:30:00+01:00"
+  },
+  "updater": {
+    "schedule": "19 4 * * *",
+    "lastRun": "2026-10-10T04:19:00+01:00",
+    "result": "succeeded",
+    "paused": false,
+    "nextRun": "2026-10-11T04:19:00+01:00"
+  }
+}

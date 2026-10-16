@@ -1,0 +1,20 @@
+{
+  "generatedAt": "2026-10-11T10:26:05.000Z",
+  "source": { "state": "ok", "fetchedAt": "2026-10-11T10:26:00.000Z" },
+  "streamCount": 2,
+  "transcodeCount": 1,
+  "totalBitsPerSec": 14200000,
+  "sessions": [
+    {
+      "id": "1",
+      "title": "Example Show · S02 E05",
+      "mediaType": "episode",
+      "user": "alex",
+      "player": "Living room TV",
+      "state": "playing",
+      "progressPercent": 42,
+      "decision": "direct-play",
+      "location": "lan"
+    }
+  ]
+}

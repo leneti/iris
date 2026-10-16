@@ -1,0 +1,67 @@
+# Development config for the fixture upstreams (placeholder data only). See dev/fixtures/server.ts.
+version: 1
+title: Iris
+defaultGroup: Other
+groups:
+  - { name: Media, icon: 'lucide:clapperboard' }
+  - { name: Automation, icon: 'lucide:workflow' }
+  - { name: Downloads, icon: 'lucide:download' }
+  - { name: Infrastructure, icon: 'lucide:server' }
+  - { name: Home, icon: 'lucide:house' }
+cron:
+  timezone: Europe/London
+  staleAfterMinutes: 60
+  graceMinutes: 10
+maintenance:
+  - {
+      id: backup,
+      name: System backup,
+      schedule: '30 2 * * *',
+      label: 'Daily at 02:30',
+      graceMinutes: 60,
+    }
+  - {
+      id: updater,
+      name: Image updater,
+      schedule: '19 4 * * *',
+      label: 'Daily at 04:19',
+      graceMinutes: 90,
+    }
+system:
+  url: http://127.0.0.1:47483
+  interface: auto
+  sensor: 'Package id 0'
+  disks:
+    - { mount: /example/apps, label: Apps disk }
+    - { mount: /example/media, label: Media disk }
+  thresholds: { warn: 80, bad: 90 }
+streams:
+  url: http://127.0.0.1:47484
+  showUsers: true
+phone:
+  maxLiveFrames: 3
+weather:
+  label: Hometown
+  latitude: 0.0
+  longitude: 0.0
+  timezone: Europe/London
+  units: metric
+  refreshMinutes: 10
+links:
+  - { name: Example Forum, abbr: EF, url: 'https://forum.example.invalid/' }
+  - { name: Example Wiki, abbr: EW, url: 'https://wiki.example.invalid/' }
+  - { name: Project Staging, abbr: PS, url: 'https://staging.{zone}/' }
+  - { name: Project Live, abbr: PL, url: 'https://project.example.invalid/' }
+widgets:
+  standalone:
+    - id: markets
+      name: Markets
+      group: Home
+      icon: 'lucide:chart-line'
+      type: coinmarketcap
+      currency: GBP
+      coins:
+        - { symbol: AAA, name: Alphacoin }
+        - { symbol: BBB, name: Betacoin }
+        - { symbol: CCC, name: Gammacoin }
+      interval: 24h

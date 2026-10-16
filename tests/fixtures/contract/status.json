@@ -1,0 +1,31 @@
+{
+  "generatedAt": "2026-10-10T00:15:05.000Z",
+  "docker": "ok",
+  "services": {
+    "radarr": {
+      "status": "healthy",
+      "docker": {
+        "state": "running",
+        "health": "none",
+        "failingStreak": 0,
+        "statusText": "Up 3 days"
+      },
+      "http": {
+        "ok": true,
+        "code": 200,
+        "latencyMs": 41,
+        "reason": null,
+        "checkedAt": "2026-10-10T00:14:50.000Z"
+      },
+      "changedAt": "2026-10-07T01:00:00.000Z"
+    }
+  },
+  "summary": {
+    "healthy": 17,
+    "starting": 0,
+    "degraded": 1,
+    "unhealthy": 0,
+    "stopped": 0,
+    "unknown": 1
+  }
+}

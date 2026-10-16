@@ -1,0 +1,10 @@
+.llms
+.superpowers
+.git
+node_modules
+.next
+.tmp
+.yarn/cache
+tests
+dev
+.env*

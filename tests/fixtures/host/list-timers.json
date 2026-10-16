@@ -1,0 +1,10 @@
+[
+  {
+    "next": 1792200600000000,
+    "left": 0,
+    "last": 1792114200000000,
+    "passed": 0,
+    "unit": "media-backup.timer",
+    "activates": "media-backup.service"
+  }
+]

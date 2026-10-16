@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-10-10T00:15:00.000Z",
+  "sources": { "docker": "ok", "manual": "ok" },
+  "groups": [
+    {
+      "name": "Automation",
+      "icon": "lucide:workflow",
+      "services": [
+        {
+          "id": "radarr",
+          "name": "Radarr",
+          "group": "Automation",
+          "description": "Movies",
+          "keywords": ["movies"],
+          "order": 100,
+          "icon": { "kind": "dashboard-icons", "slug": "radarr", "src": "/api/icons/di/radarr" },
+          "url": "https://radarr.example.invalid/",
+          "urlSource": "traefik-router",
+          "lan": { "port": 7878, "path": "/", "source": "published-port" },
+          "embed": {
+            "mode": "auto",
+            "verdict": "allowed",
+            "reason": null,
+            "checkedAt": "2026-10-10T00:10:00.000Z"
+          },
+          "container": "radarr",
+          "discovery": "label"
+        }
+      ]
+    }
+  ],
+  "links": [{ "name": "Example Forum", "abbr": "EF", "url": "https://forum.example.invalid/" }],
+  "warnings": [
+    { "code": "ROUTER_NOT_FOUND", "serviceId": "example", "message": "No router rule found" }
+  ]
+}

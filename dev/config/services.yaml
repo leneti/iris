@@ -1,0 +1,14 @@
+# Development services.yaml: the one manual entry (Edge Tunnel). Everything else is discovered
+# from the labels in dev/fixtures/data/containers.json.
+version: 1
+services:
+  - id: edge-tunnel
+    name: Edge Tunnel
+    group: Infrastructure
+    icon: cloudflare
+    description: Tunnel dashboard
+    order: 20
+    container: edge-tunnel
+    url: 'https://dash.example.invalid/'
+    embed: false
+    widget: { type: cloudflared }

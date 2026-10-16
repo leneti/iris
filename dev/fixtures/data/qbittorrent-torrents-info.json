@@ -1,0 +1,762 @@
+[
+  {
+    "hash": "h0",
+    "name": "d0",
+    "state": "downloading"
+  },
+  {
+    "hash": "h1",
+    "name": "d1",
+    "state": "stalledDL"
+  },
+  {
+    "hash": "s0",
+    "name": "s0",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s1",
+    "name": "s1",
+    "state": "uploading"
+  },
+  {
+    "hash": "s2",
+    "name": "s2",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s3",
+    "name": "s3",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s4",
+    "name": "s4",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s5",
+    "name": "s5",
+    "state": "uploading"
+  },
+  {
+    "hash": "s6",
+    "name": "s6",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s7",
+    "name": "s7",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s8",
+    "name": "s8",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s9",
+    "name": "s9",
+    "state": "uploading"
+  },
+  {
+    "hash": "s10",
+    "name": "s10",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s11",
+    "name": "s11",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s12",
+    "name": "s12",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s13",
+    "name": "s13",
+    "state": "uploading"
+  },
+  {
+    "hash": "s14",
+    "name": "s14",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s15",
+    "name": "s15",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s16",
+    "name": "s16",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s17",
+    "name": "s17",
+    "state": "uploading"
+  },
+  {
+    "hash": "s18",
+    "name": "s18",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s19",
+    "name": "s19",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s20",
+    "name": "s20",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s21",
+    "name": "s21",
+    "state": "uploading"
+  },
+  {
+    "hash": "s22",
+    "name": "s22",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s23",
+    "name": "s23",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s24",
+    "name": "s24",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s25",
+    "name": "s25",
+    "state": "uploading"
+  },
+  {
+    "hash": "s26",
+    "name": "s26",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s27",
+    "name": "s27",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s28",
+    "name": "s28",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s29",
+    "name": "s29",
+    "state": "uploading"
+  },
+  {
+    "hash": "s30",
+    "name": "s30",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s31",
+    "name": "s31",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s32",
+    "name": "s32",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s33",
+    "name": "s33",
+    "state": "uploading"
+  },
+  {
+    "hash": "s34",
+    "name": "s34",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s35",
+    "name": "s35",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s36",
+    "name": "s36",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s37",
+    "name": "s37",
+    "state": "uploading"
+  },
+  {
+    "hash": "s38",
+    "name": "s38",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s39",
+    "name": "s39",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s40",
+    "name": "s40",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s41",
+    "name": "s41",
+    "state": "uploading"
+  },
+  {
+    "hash": "s42",
+    "name": "s42",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s43",
+    "name": "s43",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s44",
+    "name": "s44",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s45",
+    "name": "s45",
+    "state": "uploading"
+  },
+  {
+    "hash": "s46",
+    "name": "s46",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s47",
+    "name": "s47",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s48",
+    "name": "s48",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s49",
+    "name": "s49",
+    "state": "uploading"
+  },
+  {
+    "hash": "s50",
+    "name": "s50",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s51",
+    "name": "s51",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s52",
+    "name": "s52",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s53",
+    "name": "s53",
+    "state": "uploading"
+  },
+  {
+    "hash": "s54",
+    "name": "s54",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s55",
+    "name": "s55",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s56",
+    "name": "s56",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s57",
+    "name": "s57",
+    "state": "uploading"
+  },
+  {
+    "hash": "s58",
+    "name": "s58",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s59",
+    "name": "s59",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s60",
+    "name": "s60",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s61",
+    "name": "s61",
+    "state": "uploading"
+  },
+  {
+    "hash": "s62",
+    "name": "s62",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s63",
+    "name": "s63",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s64",
+    "name": "s64",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s65",
+    "name": "s65",
+    "state": "uploading"
+  },
+  {
+    "hash": "s66",
+    "name": "s66",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s67",
+    "name": "s67",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s68",
+    "name": "s68",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s69",
+    "name": "s69",
+    "state": "uploading"
+  },
+  {
+    "hash": "s70",
+    "name": "s70",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s71",
+    "name": "s71",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s72",
+    "name": "s72",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s73",
+    "name": "s73",
+    "state": "uploading"
+  },
+  {
+    "hash": "s74",
+    "name": "s74",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s75",
+    "name": "s75",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s76",
+    "name": "s76",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s77",
+    "name": "s77",
+    "state": "uploading"
+  },
+  {
+    "hash": "s78",
+    "name": "s78",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s79",
+    "name": "s79",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s80",
+    "name": "s80",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s81",
+    "name": "s81",
+    "state": "uploading"
+  },
+  {
+    "hash": "s82",
+    "name": "s82",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s83",
+    "name": "s83",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s84",
+    "name": "s84",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s85",
+    "name": "s85",
+    "state": "uploading"
+  },
+  {
+    "hash": "s86",
+    "name": "s86",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s87",
+    "name": "s87",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s88",
+    "name": "s88",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s89",
+    "name": "s89",
+    "state": "uploading"
+  },
+  {
+    "hash": "s90",
+    "name": "s90",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s91",
+    "name": "s91",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s92",
+    "name": "s92",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s93",
+    "name": "s93",
+    "state": "uploading"
+  },
+  {
+    "hash": "s94",
+    "name": "s94",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s95",
+    "name": "s95",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s96",
+    "name": "s96",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s97",
+    "name": "s97",
+    "state": "uploading"
+  },
+  {
+    "hash": "s98",
+    "name": "s98",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s99",
+    "name": "s99",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s100",
+    "name": "s100",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s101",
+    "name": "s101",
+    "state": "uploading"
+  },
+  {
+    "hash": "s102",
+    "name": "s102",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s103",
+    "name": "s103",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s104",
+    "name": "s104",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s105",
+    "name": "s105",
+    "state": "uploading"
+  },
+  {
+    "hash": "s106",
+    "name": "s106",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s107",
+    "name": "s107",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s108",
+    "name": "s108",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s109",
+    "name": "s109",
+    "state": "uploading"
+  },
+  {
+    "hash": "s110",
+    "name": "s110",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s111",
+    "name": "s111",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s112",
+    "name": "s112",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s113",
+    "name": "s113",
+    "state": "uploading"
+  },
+  {
+    "hash": "s114",
+    "name": "s114",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s115",
+    "name": "s115",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s116",
+    "name": "s116",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s117",
+    "name": "s117",
+    "state": "uploading"
+  },
+  {
+    "hash": "s118",
+    "name": "s118",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s119",
+    "name": "s119",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s120",
+    "name": "s120",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s121",
+    "name": "s121",
+    "state": "uploading"
+  },
+  {
+    "hash": "s122",
+    "name": "s122",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s123",
+    "name": "s123",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s124",
+    "name": "s124",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s125",
+    "name": "s125",
+    "state": "uploading"
+  },
+  {
+    "hash": "s126",
+    "name": "s126",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s127",
+    "name": "s127",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s128",
+    "name": "s128",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s129",
+    "name": "s129",
+    "state": "uploading"
+  },
+  {
+    "hash": "s130",
+    "name": "s130",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s131",
+    "name": "s131",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s132",
+    "name": "s132",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s133",
+    "name": "s133",
+    "state": "uploading"
+  },
+  {
+    "hash": "s134",
+    "name": "s134",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s135",
+    "name": "s135",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s136",
+    "name": "s136",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s137",
+    "name": "s137",
+    "state": "uploading"
+  },
+  {
+    "hash": "s138",
+    "name": "s138",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s139",
+    "name": "s139",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s140",
+    "name": "s140",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s141",
+    "name": "s141",
+    "state": "uploading"
+  },
+  {
+    "hash": "s142",
+    "name": "s142",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s143",
+    "name": "s143",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "s144",
+    "name": "s144",
+    "state": "stalledUP"
+  },
+  {
+    "hash": "s145",
+    "name": "s145",
+    "state": "uploading"
+  },
+  {
+    "hash": "s146",
+    "name": "s146",
+    "state": "forcedUP"
+  },
+  {
+    "hash": "s147",
+    "name": "s147",
+    "state": "queuedUP"
+  },
+  {
+    "hash": "x1",
+    "name": "x1",
+    "state": "error"
+  },
+  {
+    "hash": "x2",
+    "name": "x2",
+    "state": "missingFiles"
+  }
+]

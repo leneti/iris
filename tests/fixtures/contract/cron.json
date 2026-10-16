@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-10-10T00:15:00.000Z",
+  "timezone": "Europe/London",
+  "sources": [
+    { "id": "cron-status", "state": "ok", "fetchedAt": "2026-10-10T00:14:30.000Z" },
+    { "id": "host-status", "state": "ok", "fetchedAt": "2026-10-10T00:14:30.000Z" }
+  ],
+  "jobs": [
+    {
+      "id": "example-job",
+      "name": "Example job",
+      "kind": "user",
+      "schedule": {
+        "expr": "*/15 * * * *",
+        "label": "Every 15 minutes",
+        "configured": true,
+        "source": "host-status"
+      },
+      "lastRun": "2026-10-10T00:00:03.000Z",
+      "result": "success",
+      "summary": "Nothing to do.",
+      "link": "https://example.invalid/",
+      "previousDue": "2026-10-10T00:00:00.000Z",
+      "nextDue": "2026-10-10T00:15:00.000Z",
+      "flag": "ok"
+    }
+  ],
+  "summary": { "ok": 5, "warning": 0, "overdue": 0, "failed": 0, "unknown": 2 }
+}

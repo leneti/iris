@@ -1,0 +1,29 @@
+[
+  {
+    "device_name": "/dev/example-root",
+    "fs_type": "ext4",
+    "mnt_point": "/",
+    "size": 59000000000,
+    "used": 20000000000,
+    "free": 39000000000,
+    "percent": 33.9
+  },
+  {
+    "device_name": "/dev/example-apps",
+    "fs_type": "ext4",
+    "mnt_point": "/example/apps",
+    "size": 998579896320,
+    "used": 479318350000,
+    "free": 519261546320,
+    "percent": 48
+  },
+  {
+    "device_name": "/dev/example-media",
+    "fs_type": "ext4",
+    "mnt_point": "/example/media",
+    "size": 20010900000000,
+    "used": 17152800000000,
+    "free": 2858100000000,
+    "percent": 85.7
+  }
+]

@@ -1,0 +1,8 @@
+[Unit]
+Description=Write the host status file that Iris reads
+
+[Service]
+Type=oneshot
+ExecStart=@NODE@ --disable-warning=ExperimentalWarning @EXPORTER@ --jobs-dir @JOBS_DIR@ --out /var/lib/media-status/status.json
+NoNewPrivileges=yes
+Nice=10

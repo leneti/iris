@@ -1,0 +1,27 @@
+{
+  "success": true,
+  "errors": [],
+  "messages": [],
+  "result": {
+    "id": "11111111-2222-3333-4444-555555555555",
+    "name": "example-tunnel",
+    "status": "healthy",
+    "created_at": "2026-01-01T00:00:00Z",
+    "conns": [
+      {
+        "colo_name": "XXX01",
+        "id": "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
+        "is_pending_reconnect": false,
+        "origin_ip": "198.51.100.7",
+        "opened_at": "2026-10-01T00:00:00Z"
+      },
+      {
+        "colo_name": "XXX02",
+        "id": "bbbbbbbb-cccc-dddd-eeee-ffffffffffff",
+        "is_pending_reconnect": false,
+        "origin_ip": "2001:db8::7",
+        "opened_at": "2026-10-01T00:00:01Z"
+      }
+    ]
+  }
+}

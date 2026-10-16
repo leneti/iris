@@ -1,0 +1,532 @@
+[
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000001",
+    "Names": ["/streamhouse"],
+    "Image": "example/streamhouse:latest",
+    "Created": 1760000001,
+    "Ports": [],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "streamhouse",
+      "dashboard.enable": "true",
+      "dashboard.name": "Streamhouse",
+      "dashboard.group": "Media",
+      "dashboard.icon": "plex",
+      "dashboard.description": "Watch TV series and films",
+      "dashboard.order": "10",
+      "dashboard.url": "https://streamhouse.example.invalid/web",
+      "dashboard.lan.port": "47485",
+      "dashboard.lan.path": "/web",
+      "dashboard.widget": "tautulli",
+      "dashboard.widget.url": "http://localhost:47484",
+      "dashboard.health.path": "/web"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000002",
+    "Names": ["/watchlog"],
+    "Image": "example/watchlog:latest",
+    "Created": 1760000002,
+    "Ports": [],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "watchlog",
+      "dashboard.enable": "true",
+      "dashboard.name": "Watchlog",
+      "dashboard.group": "Media",
+      "dashboard.icon": "tautulli",
+      "dashboard.description": "Playback tracker",
+      "dashboard.order": "20",
+      "dashboard.url": "none",
+      "dashboard.health.url": "http://localhost:47484/status"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000003",
+    "Names": ["/request-desk"],
+    "Image": "example/request-desk:latest",
+    "Created": 1760000003,
+    "Ports": [
+      {
+        "PrivatePort": 5055,
+        "PublicPort": 47486,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "request-desk",
+      "dashboard.enable": "true",
+      "dashboard.name": "Request Desk",
+      "dashboard.group": "Media",
+      "dashboard.icon": "overseerr",
+      "dashboard.description": "Request TV series or films to be added",
+      "dashboard.order": "30",
+      "dashboard.widget": "seerr",
+      "dashboard.health.path": "/",
+      "traefik.http.routers.request-desk.rule": "Host(`request-desk.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000004",
+    "Names": ["/moviebox"],
+    "Image": "example/moviebox:latest",
+    "Created": 1760000004,
+    "Ports": [
+      {
+        "PrivatePort": 7878,
+        "PublicPort": 47487,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "moviebox",
+      "dashboard.enable": "true",
+      "dashboard.name": "Moviebox",
+      "dashboard.group": "Automation",
+      "dashboard.icon": "radarr",
+      "dashboard.description": "Movie Manager",
+      "dashboard.order": "10",
+      "dashboard.widget": "radarr",
+      "dashboard.health.path": "/ping",
+      "traefik.http.routers.moviebox.rule": "Host(`moviebox.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000005",
+    "Names": ["/showtrack"],
+    "Image": "example/showtrack:latest",
+    "Created": 1760000005,
+    "Ports": [
+      {
+        "PrivatePort": 8989,
+        "PublicPort": 47488,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "showtrack",
+      "dashboard.enable": "true",
+      "dashboard.name": "Showtrack",
+      "dashboard.group": "Automation",
+      "dashboard.icon": "sonarr",
+      "dashboard.description": "TV Show Manager",
+      "dashboard.order": "20",
+      "dashboard.widget": "sonarr",
+      "dashboard.health.path": "/ping",
+      "traefik.http.routers.showtrack.rule": "Host(`showtrack.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000006",
+    "Names": ["/indexer-hub"],
+    "Image": "example/indexer-hub:latest",
+    "Created": 1760000006,
+    "Ports": [
+      {
+        "PrivatePort": 9696,
+        "PublicPort": 47489,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "indexer-hub",
+      "dashboard.enable": "true",
+      "dashboard.name": "Indexer Hub",
+      "dashboard.group": "Automation",
+      "dashboard.icon": "prowlarr",
+      "dashboard.description": "Indexer Manager for Moviebox and Showtrack",
+      "dashboard.order": "30",
+      "dashboard.widget": "prowlarr",
+      "dashboard.health.path": "/ping",
+      "traefik.http.routers.indexer-hub.rule": "Host(`indexer-hub.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000007",
+    "Names": ["/subtitle-sync"],
+    "Image": "example/subtitle-sync:latest",
+    "Created": 1760000007,
+    "Ports": [
+      {
+        "PrivatePort": 6767,
+        "PublicPort": 47490,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "subtitle-sync",
+      "dashboard.enable": "true",
+      "dashboard.name": "Subtitle Sync",
+      "dashboard.group": "Automation",
+      "dashboard.icon": "bazarr",
+      "dashboard.description": "Subtitle management",
+      "dashboard.order": "40",
+      "dashboard.health.path": "/",
+      "traefik.http.routers.subtitle-sync.rule": "Host(`subtitle-sync.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000008",
+    "Names": ["/profile-kit"],
+    "Image": "example/profile-kit:latest",
+    "Created": 1760000008,
+    "Ports": [
+      {
+        "PrivatePort": 6868,
+        "PublicPort": 47491,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "profile-kit",
+      "dashboard.enable": "true",
+      "dashboard.name": "Profile Kit",
+      "dashboard.group": "Automation",
+      "dashboard.icon": "profilarr",
+      "dashboard.description": "Profile Manager for Moviebox and Showtrack",
+      "dashboard.order": "50",
+      "dashboard.health.path": "/",
+      "traefik.http.routers.profile-kit.rule": "Host(`profile-kit.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 12 seconds (health: starting)",
+    "Health": {
+      "Status": "starting",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000009",
+    "Names": ["/library-keeper"],
+    "Image": "example/library-keeper:latest",
+    "Created": 1760000009,
+    "Ports": [
+      {
+        "PrivatePort": 6246,
+        "PublicPort": 47492,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "library-keeper",
+      "dashboard.enable": "true",
+      "dashboard.name": "Library Keeper",
+      "dashboard.group": "Automation",
+      "dashboard.icon": "maintainerr",
+      "dashboard.description": "Maintenance tasks for your media server",
+      "dashboard.order": "60",
+      "dashboard.health.path": "/",
+      "traefik.http.routers.library-keeper.rule": "Host(`library-keeper.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000010",
+    "Names": ["/torrent-client"],
+    "Image": "example/torrent-client:latest",
+    "Created": 1760000010,
+    "Ports": [],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "torrent-client",
+      "dashboard.enable": "true",
+      "dashboard.name": "Torrent Client",
+      "dashboard.group": "Downloads",
+      "dashboard.icon": "qbittorrent",
+      "dashboard.description": "Torrent Client",
+      "dashboard.order": "10",
+      "dashboard.router": "torrent",
+      "dashboard.lan.port": "47493",
+      "dashboard.widget": "qbittorrent",
+      "dashboard.health.path": "/api/v2/app/version"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000011",
+    "Names": ["/release-grabber"],
+    "Image": "example/release-grabber:latest",
+    "Created": 1760000011,
+    "Ports": [
+      {
+        "PrivatePort": 7474,
+        "PublicPort": 47494,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "release-grabber",
+      "dashboard.enable": "true",
+      "dashboard.name": "Release Grabber",
+      "dashboard.group": "Downloads",
+      "dashboard.icon": "autobrr",
+      "dashboard.description": "Automate your torrent downloads",
+      "dashboard.order": "20",
+      "dashboard.widget": "autobrr",
+      "dashboard.health.path": "/",
+      "traefik.http.routers.release-grabber.rule": "Host(`release-grabber.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000012",
+    "Names": ["/sweeper"],
+    "Image": "example/sweeper:latest",
+    "Created": 1760000012,
+    "Ports": [
+      {
+        "PrivatePort": 11011,
+        "PublicPort": 47495,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "sweeper",
+      "dashboard.enable": "true",
+      "dashboard.name": "Sweeper",
+      "dashboard.group": "Downloads",
+      "dashboard.icon": "cleanuperr",
+      "dashboard.description": "Clean up your media library",
+      "dashboard.order": "30",
+      "dashboard.health.path": "/health",
+      "traefik.http.routers.sweeper.rule": "Host(`sweeper.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000013",
+    "Names": ["/vpn-gateway"],
+    "Image": "example/vpn-gateway:latest",
+    "Created": 1760000013,
+    "Ports": [],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "vpn-gateway",
+      "dashboard.enable": "true",
+      "dashboard.name": "VPN Gateway",
+      "dashboard.group": "Infrastructure",
+      "dashboard.icon": "gluetun",
+      "dashboard.description": "VPN gateway for the download clients",
+      "dashboard.order": "10",
+      "dashboard.url": "none",
+      "dashboard.lan.port": "none",
+      "traefik.http.routers.torrent.rule": "Host(`torrent.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000014",
+    "Names": ["/notify"],
+    "Image": "example/notify:latest",
+    "Created": 1760000014,
+    "Ports": [],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "notify",
+      "dashboard.enable": "true",
+      "dashboard.name": "Notify",
+      "dashboard.group": "Infrastructure",
+      "dashboard.icon": "gotify",
+      "dashboard.description": "Receive notifications from your media server",
+      "dashboard.order": "30",
+      "dashboard.lan.port": "47496",
+      "dashboard.widget": "gotify",
+      "dashboard.health.path": "/",
+      "traefik.http.routers.notify.rule": "Host(`notify.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000015",
+    "Names": ["/sysmon"],
+    "Image": "example/sysmon:latest",
+    "Created": 1760000015,
+    "Ports": [],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "sysmon",
+      "dashboard.enable": "true",
+      "dashboard.name": "Sysmon",
+      "dashboard.group": "Infrastructure",
+      "dashboard.icon": "glances",
+      "dashboard.description": "System monitor",
+      "dashboard.order": "40",
+      "dashboard.url": "none",
+      "dashboard.health.url": "http://localhost:47483/api/4/status"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000016",
+    "Names": ["/self-heal"],
+    "Image": "example/self-heal:latest",
+    "Created": 1760000016,
+    "Ports": [],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "self-heal",
+      "dashboard.enable": "true",
+      "dashboard.name": "Self-Heal",
+      "dashboard.group": "Infrastructure",
+      "dashboard.icon": "docker",
+      "dashboard.description": "Restarts unhealthy containers",
+      "dashboard.order": "50",
+      "dashboard.url": "none"
+    },
+    "State": "exited",
+    "Status": "Exited (0) 2 hours ago"
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000018",
+    "Names": ["/recipe-book"],
+    "Image": "example/recipe-book:latest",
+    "Created": 1760000018,
+    "Ports": [
+      {
+        "PrivatePort": 9925,
+        "PublicPort": 47497,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "recipe-book",
+      "dashboard.enable": "true",
+      "dashboard.name": "Recipe Book",
+      "dashboard.group": "Home",
+      "dashboard.icon": "mealie",
+      "dashboard.description": "Recipe manager and meal planner",
+      "dashboard.order": "10",
+      "dashboard.health.path": "/api/app/about",
+      "traefik.http.routers.recipe-book.rule": "Host(`recipe-book.example.invalid`)"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000019",
+    "Names": ["/edge-tunnel"],
+    "Image": "example/edge-tunnel:latest",
+    "Created": 1760000100,
+    "Ports": [],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "edge-tunnel"
+    },
+    "State": "running",
+    "Status": "Up 3 hours (healthy)",
+    "Health": {
+      "Status": "healthy",
+      "FailingStreak": 0
+    }
+  },
+  {
+    "Id": "0000000000000000000000000000000000000000000000000000000000000020",
+    "Names": ["/media-traefik"],
+    "Image": "example/proxy:latest",
+    "Created": 1760000101,
+    "Ports": [
+      {
+        "PrivatePort": 443,
+        "PublicPort": 443,
+        "Type": "tcp"
+      }
+    ],
+    "Labels": {
+      "com.docker.compose.project": "example",
+      "com.docker.compose.service": "media-traefik"
+    },
+    "State": "running",
+    "Status": "Up 3 hours"
+  }
+]

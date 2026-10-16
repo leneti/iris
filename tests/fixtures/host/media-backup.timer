@@ -1,0 +1,9 @@
+[Unit]
+Description=Invented nightly backup timer
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 Europe/London
+Persistent=true
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,51 @@
+{
+  "generatedAt": "2026-10-11T10:26:05.000Z",
+  "services": {
+    "radarr": {
+      "type": "radarr",
+      "state": "ok",
+      "fetchedAt": "2026-10-11T10:25:40.000Z",
+      "stats": [
+        { "key": "wanted", "label": "Wanted", "value": 14, "unit": null },
+        { "key": "movies", "label": "Movies", "value": 1482, "unit": null }
+      ]
+    },
+    "sonarr": { "type": "sonarr", "state": "unreachable", "fetchedAt": null, "stats": [] },
+    "cloudflared": {
+      "type": "cloudflared",
+      "state": "ok",
+      "fetchedAt": "2026-10-11T10:22:00.000Z",
+      "stats": [{ "key": "status", "label": "Tunnel status", "value": "healthy", "unit": null }]
+    }
+  },
+  "standalone": [
+    {
+      "id": "markets",
+      "name": "Markets",
+      "group": "Home",
+      "icon": { "kind": "lucide", "name": "chart-line" },
+      "type": "coinmarketcap",
+      "state": "ok",
+      "fetchedAt": "2026-10-11T10:20:00.000Z",
+      "interval": "24h",
+      "stats": [
+        {
+          "key": "AAA",
+          "label": "Alphacoin",
+          "value": 61240,
+          "unit": "GBP",
+          "changePercent": { "1h": 0.1, "24h": 1.2, "7d": -3.4, "30d": 8.0 }
+        }
+      ]
+    }
+  ],
+  "weather": {
+    "state": "ok",
+    "fetchedAt": "2026-10-11T10:20:00.000Z",
+    "label": "Hometown",
+    "temperature": 15.2,
+    "unit": "celsius",
+    "condition": "cloudy",
+    "isDay": true
+  }
+}

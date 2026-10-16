@@ -1,0 +1,12 @@
+# Invented crontab for the exporter tests. Every value here is made up.
+MAILTO=ops@example.invalid
+GOTIFY_TOKEN=abc123secretvalue
+CRON_TZ=Europe/London
+
+*/15 * * * * /opt/node/bin/node /srv/cron/__cron/jobs/feed-sync/script.ts >> /srv/cron/__cron/jobs/feed-sync/output.log 2>&1
+*/30 * * * * GOTIFY_URL="https://gotify.example.invalid/message?token=x" /opt/node/bin/node /srv/cron/__cron/jobs/price-watch/script.ts
+  0 7 * * *  /opt/node/bin/node /srv/cron/__cron/jobs/photo-index/script.ts --api-key @TOKEN@
+0 9 * * mon-fri /opt/node/bin/node /srv/cron/__cron/jobs/report-digest/script.ts
+# 0 5 * * * /opt/node/bin/node /srv/cron/__cron/jobs/old-job/script.ts
+@daily /opt/node/bin/node /srv/cron/__cron/jobs/cert-check/script.ts
+*/10 * * * * curl -fsS https://example.invalid/?token=x

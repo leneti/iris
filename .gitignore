@@ -1,2 +1,18 @@
 # Local agent ledgers stay untracked
 .llms/
+.superpowers/
+
+node_modules/
+.next/
+.tmp/
+coverage/
+next-env.d.ts
+*.tsbuildinfo
+
+# Yarn comes from corepack via packageManager
+.yarn/
+
+# Environment files; the fixtures placeholder is committed
+.env*
+!dev/.env.fixtures
+.playwright-mcp/

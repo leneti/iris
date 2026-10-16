@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-10-11T10:26:05.000Z",
+  "source": { "state": "ok", "fetchedAt": "2026-10-11T10:26:00.000Z" },
+  "cpu": {
+    "percent": 23,
+    "name": "Example X4",
+    "cores": 4,
+    "load": [1.8, 2.1, 2.4],
+    "level": "ok"
+  },
+  "memory": {
+    "percent": 61,
+    "usedBytes": 20937965568,
+    "freeBytes": 13421772800,
+    "totalBytes": 34359738368,
+    "level": "ok"
+  },
+  "disks": [
+    {
+      "label": "Media disk",
+      "percent": 86,
+      "usedBytes": 17152800000000,
+      "freeBytes": 2858100000000,
+      "totalBytes": 20010900000000,
+      "level": "warn"
+    }
+  ],
+  "network": { "rxBitsPerSec": 42100000, "txBitsPerSec": 3200000 },
+  "temperature": {
+    "label": "CPU",
+    "celsius": 54,
+    "warnCelsius": 95,
+    "critCelsius": 105,
+    "level": "ok"
+  },
+  "uptimeSeconds": 1051200
+}
