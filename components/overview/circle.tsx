@@ -144,9 +144,11 @@ export function Circle({
     <section id="ov-circle" tabIndex={-1} className={REGION}>
       <Heading>
         The circle{' '}
-        <em className="ml-[2px] font-serif text-[15px] font-normal tracking-normal text-faint normal-case italic">
-          {circle.shown} shown
-        </em>
+        {circle.shown !== null && (
+          <em className="ml-[2px] font-serif text-[15px] font-normal tracking-normal text-faint normal-case italic">
+            {circle.shown} shown
+          </em>
+        )}
       </Heading>
       {circle.rows.map((row, i) =>
         row.kind === 'group' ? (

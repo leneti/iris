@@ -69,7 +69,7 @@ export type Reading = {
   colour: string;
   meters: { cpu: Meter; memory: Meter };
   ball: BallState;
-  circle: { shown: number; rows: CircleRow[] } | { unavailable: true };
+  circle: { shown: number | null; rows: CircleRow[] } | { unavailable: true };
   hours: { rows: HourRow[] } | { unavailable: true };
   omens: {
     markets:
@@ -188,18 +188,25 @@ function figuresOf(system: SystemResponse | undefined): Figures | null {
 function strainParts(f: Figures | null): string[] {
   if (!f) return [];
   const parts: string[] = [];
-  if (f.cpu !== null && f.cpu > 70) parts.push(`CPU at ${Math.round(f.cpu)}%`);
-  if (f.memory !== null && f.memory > 80) parts.push(`memory at ${Math.round(f.memory)}%`);
-  if (f.temp !== null && f.temp > 80) parts.push(`running at ${Math.round(f.temp)}°`);
+  // Compare the figure as it is printed, so "straining: CPU at 70%" can never happen.
+  if (f.cpu !== null && Math.round(f.cpu) > 70) parts.push(`CPU at ${Math.round(f.cpu)}%`);
+  if (f.memory !== null && Math.round(f.memory) > 80)
+    parts.push(`memory at ${Math.round(f.memory)}%`);
+  if (f.temp !== null && Math.round(f.temp) > 80) parts.push(`running at ${Math.round(f.temp)}°`);
   for (const d of f.disks)
-    if (d.percent > 90) parts.push(`${d.label} at ${Math.round(d.percent)}% full`);
+    if (Math.round(d.percent) > 90) parts.push(`${d.label} at ${Math.round(d.percent)}% full`);
   return parts;
 }
 
 function meterOf(label: string, value: number | null, limit: number): Meter {
   return value === null
     ? { label, value: DASH, percent: null, hot: false }
-    : { label, value: `${Math.round(value)}%`, percent: clamp(value, 0, 100), hot: value > limit };
+    : {
+        label,
+        value: `${Math.round(value)}%`,
+        percent: clamp(value, 0, 100),
+        hot: Math.round(value) > limit,
+      };
 }
 
 function ballFor(f: Figures | null, wrong: boolean): BallState {
@@ -498,8 +505,9 @@ function hours(
 // ---- omens ----
 
 function markets(widgets: WidgetsResponse | undefined, down: boolean): Reading['omens']['markets'] {
-  if (down) return { unavailable: true };
-  const mine = widgets?.standalone.filter((w) => w.type === 'coinmarketcap') ?? [];
+  // No widgets data: whether markets are configured is unknown, so show no section.
+  if (down || !widgets) return null;
+  const mine = widgets.standalone.filter((w) => w.type === 'coinmarketcap') ?? [];
   if (mine.length === 0) return null;
   const lines = mine
     .filter((w) => !isFailed(w.state))
@@ -599,7 +607,7 @@ export function deriveReading(input: ReadingInput): Reading {
       long: false,
       segments: [plain('Reading the signs…')],
       colour: DASH,
-      circle: { shown: 0, rows: [] },
+      circle: { shown: null, rows: [] },
     };
   }
 

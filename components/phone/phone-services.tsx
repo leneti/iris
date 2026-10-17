@@ -95,7 +95,7 @@ export function PhoneServices({
   onOpenService: (id: string) => void;
 }) {
   const { data: widgets } = useWidgets();
-  // The same remembered choice as the desktop sidebar's groups.
+  // The same remembered choice as the desktop Services tab's groups.
   const collapsedGroups = usePref<string[]>(COLLAPSED_GROUPS_PREF, []);
 
   function setGroupOpen(name: string, open: boolean) {

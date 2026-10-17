@@ -570,6 +570,20 @@ describe('omens', () => {
     expect(read(i).omens.markets).toBeNull();
   });
 
+  test('a widgets outage shows no markets section', () => {
+    expect(read({ ...calm(), unavailable: new Set(['widgets']) }).omens.markets).toBeNull();
+  });
+
+  test('cpu is compared as printed: 70.4 calm, 70.6 straining at 71%', () => {
+    const calmR = read(withSystem(calm(), { cpu: 70.4 }));
+    expect(calmR.straining).toBe(false);
+    expect(calmR.meters.cpu.hot).toBe(false);
+    const hotR = read(withSystem(calm(), { cpu: 70.6 }));
+    expect(hotR.straining).toBe(true);
+    expect(hotR.meters.cpu.hot).toBe(true);
+    expect(text(hotR)).toContain('CPU at 71%');
+  });
+
   test('failed markets state is unavailable', () => {
     const i = calm();
     const w = i.widgets?.standalone[0];
@@ -637,7 +651,7 @@ describe('resilience', () => {
     expect(r.hours).toEqual({ unavailable: true });
     expect(r.omens.host).toEqual({ unavailable: true });
     expect(r.omens.sky).toEqual({ unavailable: true });
-    expect(r.omens.markets).toEqual({ unavailable: true });
+    expect(r.omens.markets).toBeNull();
     expect(r.meters.cpu).toMatchObject({ value: '—', percent: null });
   });
 

@@ -22,8 +22,8 @@ export function Omens({ touch: _touch = false }: { touch?: boolean }) {
           {'unavailable' in markets ? (
             <Quiet>not answering</Quiet>
           ) : (
-            markets.lines.map((line) => (
-              <div key={line.name} className={OMEN}>
+            markets.lines.map((line, i) => (
+              <div key={`${line.name}-${i}`} className={OMEN}>
                 {line.name}{' '}
                 {line.move && (
                   <span

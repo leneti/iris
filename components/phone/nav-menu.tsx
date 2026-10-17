@@ -42,8 +42,8 @@ export function MenuButton({ jobs, onClick }: { jobs: JobsBadge; onClick: () => 
 }
 
 /**
- * The menu button's sheet: the four built-in views, the current one marked, Jobs with the
- * sidebar's own count. It drops from the top, like the tabs sheet: Firefox for Android does not
+ * The menu button's sheet: the four built-in views, the current one marked, Jobs with its
+ * own count. It drops from the top, like the tabs sheet: Firefox for Android does not
  * keep fixed elements on the bottom edge of the screen, so nothing on a phone sits there.
  */
 export function NavMenu({

@@ -166,6 +166,7 @@ describe('the reading', () => {
   test('pending shows "Reading the signs…"', () => {
     show(read(calm({ services: undefined })));
     expect(screen.getByText('Reading the signs…')).toBeTruthy();
+    expect(screen.queryByText(/\d+ shown/)).toBeNull();
   });
 });
 
@@ -333,12 +334,11 @@ describe('unavailable sources', () => {
     expect(screen.getByText('The circle — not answering')).toBeTruthy();
   });
 
-  test('hours, host, sky and markets', () => {
+  test('hours, host and sky (no markets section without widgets data)', () => {
     show(read(calm({ unavailable: new Set(['cron', 'system', 'widgets']) })));
     expect(screen.getByText("the schedule isn't answering")).toBeTruthy();
     expect(screen.getByText('The sky — not answering')).toBeTruthy();
-    expect(screen.getByText('not answering')).toBeTruthy();
-    expect(screen.getByText('Markets · 24h')).toBeTruthy();
+    expect(screen.queryByText('Markets · 24h')).toBeNull();
     expect(document.getElementById('ov-host')?.textContent).toContain('—');
   });
 });
@@ -393,7 +393,7 @@ describe('focus', () => {
     expect(broken).toEqual([]);
     // And the interactive ones do ask for a visible ring.
     for (const el of document.querySelectorAll(
-      '#ov-circle button, [data-slot="reading"] a, [data-slot="reading"] button, #ov-hours',
+      '#ov-circle button, [data-slot="reading"] a, [data-slot="reading"] button, [data-slot="reading"] [role="button"], #ov-hours',
     )) {
       expect(el.getAttribute('class')).toContain('focus-visible:outline-2');
     }
