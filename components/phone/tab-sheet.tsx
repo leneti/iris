@@ -30,8 +30,10 @@ function Action({ icon, children }: { icon: ReactNode; children: ReactNode }) {
 }
 
 /**
- * The tabs button's bottom sheet: the open tabs with close buttons, then what the current tab
- * can do. A shadcn Sheet with `side="bottom"`: nothing here depends on hover.
+ * The tabs button's sheet: the open tabs with close buttons, then what the current tab can do.
+ * A shadcn Sheet with `side="top"`, dropping from the edge the tabs button sits on: Firefox for
+ * Android lays fixed elements out past the bottom of the screen while its toolbar shows, so a
+ * bottom sheet can open out of sight there. Nothing here depends on hover.
  */
 export function TabSheet({
   open,
@@ -58,9 +60,9 @@ export function TabSheet({
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
-        side="bottom"
+        side="top"
         showCloseButton={false}
-        className="max-h-[85dvh] gap-0 overflow-y-auto overscroll-contain pb-[max(env(safe-area-inset-bottom),0.5rem)]"
+        className="max-h-[80svh] gap-0 overflow-y-auto overscroll-contain rounded-b-sheet pt-[env(safe-area-inset-top)] pb-2"
       >
         <SheetDescription className="sr-only">
           Switch between the open services, or act on the current one.

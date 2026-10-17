@@ -43,12 +43,14 @@ beforeEach(() => {
 afterEach(() => vi.restoreAllMocks());
 
 describe('tab sheet', () => {
-  test('is a bottom sheet with a grab handle, 12 px top corners and no close corner button', () => {
+  test('drops from the top, where the tabs button is, with 12 px bottom corners and no close button', () => {
+    // A bottom sheet can open below the visible screen in Firefox for Android.
     open('Alpha');
     fireEvent.click(tabsButton());
     const content = sheet();
-    expect(content.className).toContain('rounded-t-sheet');
-    expect(content.querySelector('[data-slot="sheet-handle"]')).not.toBeNull();
+    expect(content.className).toContain('top-0');
+    expect(content.className).not.toContain('bottom-0');
+    expect(content.className).toContain('rounded-b-sheet');
     expect(within(content).queryByRole('button', { name: 'Close' })).toBeNull();
   });
 
