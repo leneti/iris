@@ -1,6 +1,8 @@
 'use client';
 
+import { Search } from 'lucide-react';
 import type { ReactNode } from 'react';
+import { Wordmark } from '@/components/shell/wordmark';
 import { cn } from '@/lib/utils';
 
 /** 48 px bar plus the top safe-area inset (`viewport-fit=cover`). */
@@ -8,7 +10,7 @@ export function TopBar({ children, className }: { children: ReactNode; className
   return (
     <header
       className={cn(
-        'flex h-[calc(3rem+env(safe-area-inset-top))] shrink-0 items-center border-b border-hairline bg-chrome pt-[env(safe-area-inset-top)] pr-1 pl-3',
+        'flex h-[calc(3rem+env(safe-area-inset-top))] shrink-0 items-center border-b border-line bg-bg pt-[env(safe-area-inset-top)] pr-1 pl-3',
         className,
       )}
     >
@@ -24,7 +26,7 @@ export function TabsButton({ count, onClick }: { count: number; onClick: () => v
       type="button"
       aria-label={`Tabs (${count} open)`}
       onClick={onClick}
-      className="flex size-11 shrink-0 items-center justify-center rounded-row outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="flex size-11 shrink-0 items-center justify-center rounded-row focus-visible:outline-2 focus-visible:outline-offset-[-2px] outline-pink-soft"
     >
       <span
         aria-hidden
@@ -37,38 +39,43 @@ export function TabsButton({ count, onClick }: { count: number; onClick: () => v
 }
 
 /**
- * The bar of a built-in view: the menu button, the title (with the Iris mark on the Overview),
- * then the extras.
+ * The bar of a built-in view: the menu button, then the title (the wordmark on the Overview),
+ * the Search button and the tabs button.
  */
 export function ViewBar({
   menu,
   title,
-  mark = false,
-  weather,
+  wordmark = false,
+  onSearch,
   tabs,
 }: {
   menu: ReactNode;
   title: string;
-  /** The Overview shows the Iris mark beside its title. */
-  mark?: boolean;
-  weather?: ReactNode;
+  /** The Overview shows the wordmark in place of a title. */
+  wordmark?: boolean;
+  onSearch: () => void;
   tabs: ReactNode;
 }) {
   return (
     <TopBar>
       {menu}
-      {mark && (
-        <span
-          aria-hidden
-          className="mr-3 flex size-7 shrink-0 items-center justify-center rounded-tile bg-text text-[13px] font-bold text-page"
-        >
-          I
-        </span>
+      {wordmark ? (
+        <h1 className="min-w-0 flex-1 text-center">
+          <Wordmark />
+        </h1>
+      ) : (
+        <h1 className="min-w-0 flex-1 truncate text-base font-semibold tracking-[-0.01em]">
+          {title}
+        </h1>
       )}
-      <h1 className="min-w-0 flex-1 truncate text-base font-semibold tracking-[-0.01em]">
-        {title}
-      </h1>
-      {weather !== undefined && <div className="mr-1 shrink-0">{weather}</div>}
+      <button
+        type="button"
+        aria-label="Search"
+        onClick={onSearch}
+        className="flex size-11 shrink-0 items-center justify-center rounded-row text-muted focus-visible:outline-2 focus-visible:outline-offset-[-2px] outline-pink-soft"
+      >
+        <Search aria-hidden className="size-5" />
+      </button>
       {tabs}
     </TopBar>
   );

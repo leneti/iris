@@ -1,13 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { Weather } from '@/components/overview/weather';
 import type { JobsBadge } from '@/components/shell/jobs-count';
 import type { Shell } from '@/components/shell/use-shell';
 import { Canvas } from '@/components/tabs/canvas';
 import type { FrameModel } from '@/components/tabs/frame-model';
 import type { Frames } from '@/components/tabs/use-frames';
-import { useWidgets } from '@/lib/client/api';
 import { isPublicAddress, type AddressMode } from '@/lib/client/address';
 import { setAlwaysNewTab } from '@/lib/client/new-tab';
 import { shownGroups } from '@/lib/client/services';
@@ -63,7 +61,6 @@ export function PhoneShell({
   signIn,
 }: PhoneShellProps) {
   const { tabs } = shell;
-  const { data: widgets } = useWidgets();
   // The last built-in view; Back from a service returns to it.
   const [view, setView] = useState<PhoneView>('overview');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -103,15 +100,7 @@ export function PhoneShell({
   let content = null;
   if (activeService === undefined) {
     if (view === 'overview') {
-      content = (
-        <PhoneOverview
-          services={shell.services}
-          status={shell.status}
-          openIds={tabs.open}
-          onOpenService={openService}
-          onOpenJobs={() => show('jobs')}
-        />
-      );
+      content = <PhoneOverview onOpenService={openService} />;
     } else if (view === 'services') {
       content = (
         <PhoneServices
@@ -145,7 +134,7 @@ export function PhoneShell({
     <div
       data-slot="phone-shell"
       className={cn(
-        'flex flex-col bg-page text-[15px] text-text',
+        'flex flex-col bg-bg text-[15px] text-text',
         activeService === undefined
           ? 'min-h-svh pb-[env(safe-area-inset-bottom)]'
           : 'fixed inset-0 overflow-hidden overscroll-contain',
@@ -167,10 +156,8 @@ export function PhoneShell({
           <ViewBar
             menu={<MenuButton jobs={jobs} onClick={() => setMenuOpen(true)} />}
             title={TITLE[view]}
-            mark={view === 'overview'}
-            weather={
-              view === 'overview' ? <Weather compact weather={widgets?.weather} /> : undefined
-            }
+            wordmark={view === 'overview'}
+            onSearch={() => show('search')}
             tabs={tabsButton}
           />
         </div>

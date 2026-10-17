@@ -1,10 +1,10 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { AppShell } from '@/components/shell/app-shell';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { group, servicesResponse, svc } from '../shell/fixtures';
 import { cron, job } from '../overview/fixtures';
-import { data, stubBrowser, usePhoneViewport } from './mock-api';
+import { data, statusResponse, stubBrowser, usePhoneViewport } from './mock-api';
 
 vi.mock('@/lib/client/api', async () => (await import('./mock-api')).apiMock);
 
@@ -153,6 +153,42 @@ describe('phone shell', () => {
     expect(root.className).toContain('fixed');
     expect(root.className).toContain('inset-0');
     expect(root.className).toContain('overscroll-contain');
+  });
+});
+
+describe('top bar', () => {
+  test('shows menu, wordmark, search and tabs', () => {
+    mount();
+    const bar = screen.getByRole('banner');
+    expect(within(bar).getByRole('button', { name: /^Menu/ })).toBeTruthy();
+    expect(bar.textContent).toContain('iris');
+    expect(within(bar).getByRole('button', { name: 'Search' })).toBeTruthy();
+    expect(within(bar).getByRole('button', { name: /^Tabs \(\d+ open\)$/ })).toBeTruthy();
+    expect(within(bar).getByRole('button', { name: 'Search' }).className).toContain('size-11');
+  });
+
+  test('search opens the search view', () => {
+    vi.spyOn(window, 'scrollTo').mockImplementation(() => {});
+    mount();
+    fireEvent.click(within(screen.getByRole('banner')).getByRole('button', { name: 'Search' }));
+    expect(screen.queryByRole('banner')).toBeNull();
+    expect(screen.getByRole('combobox')).toBeTruthy();
+  });
+
+  test("the wordmark's i is coral when something is wrong", () => {
+    mount();
+    const i = () => document.querySelector('[data-slot="wordmark-i"]');
+    expect(i()?.className).toContain('text-pink');
+    data.status = statusResponse({ s0: 'unhealthy' });
+    cleanup();
+    mount();
+    expect(i()?.className).toContain('text-down');
+  });
+
+  test('no weather in the top bar', () => {
+    mount();
+    expect(screen.getByRole('banner').querySelector('[data-slot="weather"]')).toBeNull();
+    expect(screen.queryByText(/°/)).toBeNull();
   });
 });
 

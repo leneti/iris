@@ -1,197 +1,105 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { PhoneOverview, type PhoneOverviewProps } from '@/components/phone/phone-overview';
-import type { StandaloneWidget } from '@/lib/shared/contract';
-import { group, servicesResponse, svc } from '../shell/fixtures';
-import { cron, job, mockApi, renderFresh, streams, system, widgets } from '../overview/fixtures';
-import { statusResponse } from './mock-api';
+import { PhoneOverview } from '@/components/phone/phone-overview';
+import { ReadingStateContext } from '@/components/reading/reading-context';
+import { deriveReading, type Reading } from '@/lib/client/reading';
+import { calm } from '../../helpers/reading';
 
-Element.prototype.scrollIntoView ??= () => {};
+vi.mock('@/components/ball/ball', () => ({
+  Ball: (p: { variant?: string; hoverStrength: number }) => (
+    <div data-slot="ball-stub" data-variant={p.variant} data-hover={p.hoverStrength} />
+  ),
+}));
 
-const markets: StandaloneWidget = {
-  id: 'markets',
-  name: 'Markets',
-  group: 'Home',
-  icon: { kind: 'lucide', name: 'chart-line' },
-  type: 'coinmarketcap',
-  state: 'ok',
-  fetchedAt: '2026-10-16T10:20:00.000Z',
-  interval: '24h',
-  stats: [
-    {
-      key: 'AAA',
-      label: 'Alphacoin',
-      value: 61240,
-      unit: 'GBP',
-      changePercent: { '1h': 0.1, '24h': 1.2, '7d': -3.4, '30d': 8 },
-    },
-    {
-      key: 'BBB',
-      label: 'Betacoin',
-      value: 3180,
-      unit: 'GBP',
-      changePercent: { '1h': 0, '24h': -0.4, '7d': 1, '30d': 2 },
-    },
-  ],
-};
-
-const services = {
-  ...servicesResponse([
-    group('Media', [svc('m', 'Moviebox'), svc('s', 'Showtrack'), svc('t', 'Torrent')]),
-  ]),
-  links: [{ name: 'Example Wiki', abbr: 'EW', url: 'https://wiki.example.invalid/page' }],
-};
-
-function props(over: Partial<PhoneOverviewProps> = {}): PhoneOverviewProps {
-  const status = statusResponse({ m: 'healthy', s: 'unhealthy', t: 'stopped' });
-  const entry = status.services.t;
-  if (entry) entry.changedAt = '2026-10-16T10:00:00.000Z';
-  return {
-    services,
-    status,
-    openIds: [],
-    onOpenService: vi.fn(),
-    onOpenJobs: vi.fn(),
-    ...over,
-  };
+function show(reading: Reading = deriveReading(calm()), onOpenService = vi.fn()) {
+  render(
+    <ReadingStateContext.Provider value={reading}>
+      <PhoneOverview onOpenService={onOpenService} />
+    </ReadingStateContext.Provider>,
+  );
+  return onOpenService;
 }
 
-function api(over: Record<string, unknown> = {}) {
-  return mockApi({
-    '/api/widgets': widgets({ standalone: [markets] }),
-    '/api/system': system(),
-    '/api/streams': streams(),
-    '/api/cron': cron([
-      job({ id: 'p', name: 'price-watch', flag: 'failed', result: 'failed' }),
-      job({
-        id: 'ph',
-        name: 'photo-index',
-        flag: 'overdue',
-        previousDue: '2026-10-16T10:05:00.000Z',
-      }),
-      job({ id: 'f', name: 'feed-sync' }),
-    ]),
-    ...over,
-  });
-}
-
+let errorSpy: ReturnType<typeof vi.spyOn>;
 beforeEach(() => {
-  window.matchMedia = (() => ({
-    matches: false,
-    addEventListener() {},
-    removeEventListener() {},
-  })) as unknown as typeof window.matchMedia;
+  errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+  Element.prototype.scrollIntoView = vi.fn();
 });
-afterEach(() => vi.unstubAllGlobals());
+afterEach(() => {
+  errorSpy.mockRestore();
+  // @ts-expect-error -- jsdom has none; remove the stub so tests do not leak it
+  delete Element.prototype.scrollIntoView;
+});
+
+const one = (selector: string) => {
+  const el = document.querySelector(selector);
+  if (!el) throw new Error(`missing ${selector}`);
+  return el;
+};
 
 describe('PhoneOverview', () => {
-  test('leads with the alerts, then the health counts, System and Now playing', async () => {
-    api();
-    renderFresh(<PhoneOverview {...props()} />);
-    await screen.findByRole('region', { name: 'Alerts' });
+  test('regions are in the phone order', () => {
+    show();
     const order = [
-      screen.getByRole('region', { name: 'Alerts' }),
-      screen.getByRole('region', { name: 'Health' }),
-      screen.getByRole('region', { name: 'System' }),
-      screen.getByRole('region', { name: 'Now playing' }),
-      screen.getByRole('region', { name: 'Markets' }),
-      screen.getByRole('region', { name: 'Links' }),
-      screen.getByRole('region', { name: 'Scheduled jobs' }),
+      one('[data-slot="overview-stage"]'),
+      screen.getByRole('heading', { name: 'Omens' }).closest('section') as Element,
+      one('#ov-circle'),
+      one('#ov-hours'),
+      one('[data-slot="overview-foot"]'),
     ];
     for (let i = 1; i < order.length; i += 1) {
       expect(
-        (order[i - 1] as HTMLElement).compareDocumentPosition(order[i] as HTMLElement) &
+        (order[i - 1] as Element).compareDocumentPosition(order[i] as Element) &
           Node.DOCUMENT_POSITION_FOLLOWING,
       ).toBeTruthy();
     }
   });
 
-  test('alerts: a row for each failed or overdue job and each unhealthy or stopped service', async () => {
-    const p = props();
-    api();
-    renderFresh(<PhoneOverview {...p} />);
-    const alerts = await screen.findByRole('region', { name: 'Alerts' });
-    const rows = within(alerts).getAllByRole('button');
-    expect(rows.map((r) => r.textContent)).toEqual([
-      expect.stringContaining('price-watch failed'),
-      expect.stringContaining('photo-index overdue'),
-      expect.stringContaining('Showtrack is unhealthy'),
-      expect.stringContaining('Torrent stopped'),
-    ]);
-    fireEvent.click(rows[0] as HTMLElement);
-    expect(p.onOpenJobs).toHaveBeenCalled();
-    fireEvent.click(rows[2] as HTMLElement);
-    expect(p.onOpenService).toHaveBeenCalledWith('s');
+  test('the stage is the phone variant', () => {
+    show();
+    expect(one('[data-slot="ball-stub"]').getAttribute('data-variant')).toBe('phone');
+    expect(one('[data-slot="reading"]').className).toContain('text-[25px]');
   });
 
-  test('no alerts section when nothing needs attention', async () => {
-    api({ '/api/cron': cron([job({ id: 'f', name: 'feed-sync' })]) });
-    renderFresh(
-      <PhoneOverview
-        {...props({ status: statusResponse({ m: 'healthy', s: 'healthy', t: 'healthy' }) })}
-      />,
-    );
-    await screen.findByText('Nothing needs attention');
-    expect(screen.queryByRole('region', { name: 'Alerts' })).toBeNull();
+  test('chips are at least 44 px tall by class', () => {
+    show();
+    const chips = document.querySelectorAll('#ov-circle button');
+    expect(chips.length).toBeGreaterThan(0);
+    for (const chip of chips) expect(chip.className).toContain('min-h-11');
   });
 
-  test('health counts show each status that has services, with its word', async () => {
-    api();
-    renderFresh(<PhoneOverview {...props()} />);
-    const health = await screen.findByRole('region', { name: 'Health' });
-    expect(within(health).getByText('Healthy').nextElementSibling?.textContent).toContain('1');
-    expect(within(health).getByText('Unhealthy')).toBeTruthy();
-    expect(within(health).getByText('Stopped')).toBeTruthy();
-    expect(within(health).queryByText('Starting')).toBeNull();
+  test('footer links and the menu button are 44 px', () => {
+    show();
+    const links = document.querySelectorAll('[data-slot="overview-foot"] a');
+    expect(links.length).toBeGreaterThan(0);
+    for (const link of links) expect(link.className).toContain('min-h-11');
   });
 
-  test('Markets has one row per coin with name, symbol, price and a coloured change', async () => {
-    api();
-    renderFresh(<PhoneOverview {...props()} />);
-    const section = await screen.findByRole('region', { name: 'Markets' });
-    const rows = await within(section).findAllByRole('listitem');
-    expect(rows).toHaveLength(2);
-    expect(rows[0]?.textContent).toContain('Alphacoin');
-    expect(rows[0]?.textContent).toContain('AAA');
-    expect(rows[0]?.textContent).toContain('£61,240');
-    expect(rows[0]?.textContent).toContain('+1.2 %');
-    expect(rows[1]?.textContent).toContain('−0.4 %');
-    expect(rows[0]?.querySelector('[data-direction="up"]')).not.toBeNull();
-    expect(rows[1]?.querySelector('[data-direction="down"]')).not.toBeNull();
+  test('a chip tap opens its service', () => {
+    const open = show();
+    fireEvent.click(screen.getByRole('button', { name: 'Alpha' }));
+    expect(open).toHaveBeenCalledWith('alpha');
   });
 
-  test('Markets interval control switches the change without a request', async () => {
-    const spy = api();
-    renderFresh(<PhoneOverview {...props()} />);
-    const section = await screen.findByRole('region', { name: 'Markets' });
-    await within(section).findAllByRole('listitem');
-    await waitFor(() => expect(spy).toHaveBeenCalled());
-    const before = spy.mock.calls.length;
-    fireEvent.click(within(section).getByRole('combobox', { name: 'Interval' }));
-    fireEvent.click(await screen.findByRole('option', { name: '7 days' }));
-    expect(await within(section).findByText('−3.4 %')).toBeTruthy();
-    expect(spy.mock.calls.length).toBe(before);
+  test('touch variant has no hover state', () => {
+    show();
+    const chip = screen.getByRole('button', { name: 'Alpha' });
+    fireEvent.pointerEnter(chip);
+    // A tap leaves a sticky pointer-enter on a phone: the ball must not stay raised.
+    expect(one('[data-slot="ball-stub"]').getAttribute('data-hover')).toBe('0.6');
   });
 
-  test('Links are 48 px rows with the hostname under the name, opening in the browser', async () => {
-    api();
-    renderFresh(<PhoneOverview {...props()} />);
-    const link = (await screen.findByRole('link', { name: /Example Wiki/ })) as HTMLAnchorElement;
-    expect(link.href).toBe('https://wiki.example.invalid/page');
-    expect(link.target).toBe('_blank');
-    expect(link.rel).toBe('noopener noreferrer');
-    expect(link.className).toContain('min-h-12');
-    expect(within(link).getByText('wiki.example.invalid')).toBeTruthy();
-    expect(within(link).getByText('EW')).toBeTruthy();
-  });
-
-  test('the jobs card lists what needs attention and opens the Jobs view', async () => {
-    const p = props();
-    api();
-    renderFresh(<PhoneOverview {...p} />);
-    const card = await screen.findByRole('region', { name: 'Scheduled jobs' });
-    expect(await within(card).findByText('price-watch')).toBeTruthy();
-    fireEvent.click(within(card).getByRole('button', { name: /Open scheduled jobs/ }));
-    expect(p.onOpenJobs).toHaveBeenCalled();
+  test('a forced throw in one region leaves the others', () => {
+    const reading = deriveReading(calm());
+    Object.defineProperty(reading, 'hours', {
+      get() {
+        throw new Error('boom');
+      },
+    });
+    show(reading);
+    expect(screen.getAllByText("This part didn't draw.")).toHaveLength(1);
+    expect(screen.queryByText('The hours')).toBeNull();
+    expect(screen.getByText('The circle')).toBeTruthy();
+    expect(screen.getByText('Omens')).toBeTruthy();
   });
 });
