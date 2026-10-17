@@ -16,6 +16,14 @@ const KIND = {
   strain: `text-warn ${UNDERLINE} decoration-warn`,
 } as const;
 
+/**
+ * A reading link is inline text; on the phone its box grows 6 px above and below (padding on an
+ * inline box does not move the lines) so the tap target is at least 44 px tall.
+ */
+const TAP = 'py-[6px] sm:py-0';
+/** An inline-block button's padding does count in the line, so a negative margin cancels it. */
+const TAP_BUTTON = 'py-[4px] -my-[4px] sm:my-0 sm:py-0';
+
 function SegmentView({
   segment,
   onOpenService,
@@ -32,7 +40,7 @@ function SegmentView({
       <button
         type="button"
         onClick={() => onOpenService(target.tab)}
-        className={cn('cursor-pointer', FOCUS, tone)}
+        className={cn('cursor-pointer', FOCUS, TAP_BUTTON, tone)}
       >
         {text}
       </button>
@@ -47,7 +55,7 @@ function SegmentView({
           e.preventDefault();
           focusRegion(anchor);
         }}
-        className={cn(FOCUS, tone)}
+        className={cn(FOCUS, TAP, tone)}
       >
         {text}
       </a>
@@ -57,7 +65,7 @@ function SegmentView({
   const href = safeHref(target.href);
   if (href === null) return <span className={tone}>{text}</span>;
   return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className={cn(FOCUS, tone)}>
+    <a href={href} target="_blank" rel="noopener noreferrer" className={cn(FOCUS, TAP, tone)}>
       {text}
     </a>
   );

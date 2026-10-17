@@ -441,10 +441,13 @@ function hours(
 ): { rows: HourRow[] } | { unavailable: true } {
   if (down) return { unavailable: true };
   if (!cron) return { rows: [] };
+  // Every source down and no job has ever been seen to run (a stale host file leaves only "unknown"
+  // rows): the schedule is not answering, rather than a list of dashes.
   if (
-    cron.jobs.length === 0 &&
     cron.sources.length > 0 &&
-    cron.sources.every((s) => s.state === 'unreachable')
+    cron.sources.every((s) => s.state === 'unreachable' || s.state === 'stale') &&
+    cron.sources.some((s) => s.state === 'unreachable') &&
+    cron.jobs.every((j) => j.lastRun === null && j.result === 'unknown')
   ) {
     return { unavailable: true };
   }

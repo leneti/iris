@@ -731,6 +731,18 @@ describe('resilience', () => {
     });
   });
 
+  test('every source down with only unknown jobs (a stale host file) gives hours unavailable', () => {
+    const i = withCron(calm(), [
+      job({ id: 'x', kind: 'maintenance', lastRun: null, result: 'unknown' }),
+    ]);
+    if (!i.cron) throw new Error('cron');
+    i.cron.sources = [
+      { id: 'cron-status', state: 'unreachable', fetchedAt: null },
+      { id: 'host-status', state: 'stale', fetchedAt: null },
+    ];
+    expect(read(i).hours).toEqual({ unavailable: true });
+  });
+
   test('unavailable status ignores service sentences but job failures still make it wrong', () => {
     const base = { ...withDown(calm(), 'alpha'), unavailable: new Set<Source>(['status']) };
     const quiet = read(base);

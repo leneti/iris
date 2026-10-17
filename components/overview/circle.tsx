@@ -22,6 +22,19 @@ function label(chip: Chip): string {
   return parts.join(', ');
 }
 
+/**
+ * The small word or figure at a chip's right edge. On the phone the name has priority: a word
+ * ("degraded", "Healthy") is shortened or dropped, since the dot's colour and the accessible
+ * label already carry the state. Null: nothing shown.
+ */
+export function chipTag(chip: Chip, touch: boolean): string | null {
+  if (chip.state === 'down') return 'down';
+  if (chip.state === 'warn') return touch ? '!' : 'degraded';
+  if (!chip.figure) return null;
+  if (touch && !/^[\d↑↓]/.test(chip.figure)) return null;
+  return chip.figure;
+}
+
 function ChipView({
   chip,
   touch,
@@ -35,6 +48,7 @@ function ChipView({
 }) {
   const down = chip.state === 'down';
   const degraded = chip.state === 'warn';
+  const tag = chipTag(chip, touch);
   return (
     <button
       type="button"
@@ -50,19 +64,19 @@ function ChipView({
         'hover:border-pink/60 hover:shadow-[0_0_22px_-8px_var(--color-pink-glow)]',
         'focus-visible:border-pink/60 focus-visible:outline-2 focus-visible:outline-pink-soft',
         down ? 'border-down bg-down/8' : 'border-line bg-surface',
-        touch && 'min-h-11 py-[10px]',
+        touch && 'min-h-11 gap-[7px] px-[9px] py-[10px]',
       )}
     >
       <ServiceIcon service={chip.service} size={22} />
-      <span className="min-w-0 flex-1 truncate font-medium">{chip.name}</span>
-      {(down || degraded || chip.figure) && (
+      <span className="min-w-0 flex-1 shrink truncate font-medium">{chip.name}</span>
+      {tag !== null && (
         <em
           className={cn(
-            'font-mono text-xs not-italic',
+            'shrink-[8] truncate font-mono text-xs not-italic',
             down ? 'text-down' : degraded ? 'text-warn' : 'text-faint',
           )}
         >
-          {down ? 'down' : degraded ? 'degraded' : chip.figure}
+          {tag}
         </em>
       )}
       <span aria-hidden className={cn('size-[7px] shrink-0 rounded-full', DOT[chip.state])} />
