@@ -3145,6 +3145,7 @@ __metadata:
     jsdom: "npm:30.1.1"
     lucide-react: "npm:1.49.0"
     next: "npm:16.3.8"
+    ogl: "npm:1.0.11"
     oxfmt: "npm:0.71.0"
     oxlint: "npm:1.86.0"
     radix-ui: "npm:1.6.7"
@@ -3648,6 +3649,13 @@ __metadata:
   version: 2.2.1
   resolution: "obug@npm:2.2.1"
   checksum: 10c0/8a7c001847d880fa6ba83c7bbee6a80fd271ee628439cd508c8647d53b217abb1759e2d5e4aaeb09a35d0a274bdb225a0a5a78eded3213d63e656153cf411b63
+  languageName: node
+  linkType: hard
+
+"ogl@npm:1.0.11":
+  version: 1.0.11
+  resolution: "ogl@npm:1.0.11"
+  checksum: 10c0/93cf2195da1c06a190c30cb8664231dd2d5fb06c5120d517754e11a22ab37fcb001361f9d2163dbac9f754a2aa2beb59ba82df37f972d6a674d6ebf9a2a089b8
   languageName: node
   linkType: hard
 
