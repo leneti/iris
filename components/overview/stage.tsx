@@ -21,10 +21,8 @@ const KIND = {
  * inline box does not move the lines) so the tap target is at least 44 px tall.
  */
 const TAP = 'py-[6px] sm:py-0';
-/** An inline-block button's padding does count in the line, so a negative margin cancels it. */
-const TAP_BUTTON = 'py-[4px] -my-[4px] sm:my-0 sm:py-0';
 
-function SegmentView({
+export function SegmentView({
   segment,
   onOpenService,
 }: {
@@ -36,14 +34,24 @@ function SegmentView({
   if (!target) return kind ? <span className={tone}>{text}</span> : <>{text}</>;
 
   if ('tab' in target) {
+    // Not a native <button>: a button is an atomic inline, so a line could break between it and
+    // the comma that follows it. A span with role="button" is plain inline text and wraps like it.
+    const { tab } = target;
     return (
-      <button
-        type="button"
-        onClick={() => onOpenService(target.tab)}
-        className={cn('cursor-pointer', FOCUS, TAP_BUTTON, tone)}
+      <span
+        role="button"
+        tabIndex={0}
+        onClick={() => onOpenService(tab)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            onOpenService(tab);
+          }
+        }}
+        className={cn('cursor-pointer', FOCUS, TAP, tone)}
       >
         {text}
-      </button>
+      </span>
     );
   }
   if ('anchor' in target) {
