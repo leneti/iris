@@ -6,8 +6,6 @@ import { setAlwaysNewTab } from '@/lib/client/new-tab';
 import type { ServiceEntry, ServicesResponse } from '@/lib/shared/contract';
 import { group, servicesResponse, svc } from '../shell/fixtures';
 
-vi.mock('next-themes', () => ({ useTheme: () => ({ theme: 'light', setTheme: vi.fn() }) }));
-
 let servicesData: ServicesResponse | undefined;
 const mutate = vi.fn();
 vi.mock('@/lib/client/api', () => ({

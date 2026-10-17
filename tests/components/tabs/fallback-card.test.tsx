@@ -5,8 +5,6 @@ import { frameModel, type FrameModel } from '@/components/tabs/frame-model';
 import type { ServiceEntry } from '@/lib/shared/contract';
 import { svc } from '../shell/fixtures';
 
-vi.mock('next-themes', () => ({ useTheme: () => ({ theme: 'light', setTheme: vi.fn() }) }));
-
 const torrent: ServiceEntry = {
   ...svc('t', 'Torrent Client', 'Downloads'),
   url: 'https://torrent.example.invalid/',

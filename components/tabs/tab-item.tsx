@@ -2,7 +2,7 @@
 
 import { Ban, Clock, House, Loader2, Pause } from 'lucide-react';
 import { HealthMark } from '@/components/health-mark';
-import { ServiceIcon } from '@/components/shell/sidebar-row';
+import { ServiceIcon } from '@/components/service-icon';
 import { BUILTIN_JOBS, BUILTIN_OVERVIEW } from '@/lib/client/tabs';
 import type { ServiceEntry, ServiceStatus } from '@/lib/shared/contract';
 import type { TabMark } from './frame-model';

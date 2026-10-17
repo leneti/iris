@@ -1,12 +1,12 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
-@custom-variant dark (&:where(.dark, .dark *));
-
-/* Flat theme: solid colours, 1 px hairlines, shadows only on floating layers. Values from mockups/README.md. */
+/* Reading theme: dark only. The 16 Reading tokens first, then every legacy name as an alias of them. */
 @theme static {
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
+  --font-display: var(--font-space-grotesk), 'Inter', sans-serif;
+  --font-serif: var(--font-instrument-serif), Georgia, serif;
 
   --radius-row: 4px;
   --radius-tile: 5px;
@@ -14,113 +14,88 @@
   --radius-panel: 8px;
   --radius-sheet: 12px;
 
-  --color-page: #f1f5f9;
-  --color-chrome: #f8fafc;
-  --color-raised: #ffffff;
-  --color-hover: #edf1f6;
-  --color-hover-raised: #f1f5f9;
-  --color-selected: #e2e8f0;
-  --color-selected-raised: #e2e8f0;
-  --color-hairline: #e2e8f0;
-  --color-hairline-raised: #e2e8f0;
-  --color-hairline-strong: #cbd5e1;
-  --color-control: #7c8ba1;
-  --color-text: #0f172a;
-  --color-text-2: #475569;
-  --color-text-3: #5f6e84;
-  --color-accent: #2563eb;
-  --color-accent-contrast: #ffffff;
-  --color-accent-mark: #2563eb;
-  --color-accent-text: #1d4ed8;
-  --color-scrim: rgb(15 23 42 / 0.28);
-  --color-tooltip: #0f172a;
-  --color-tooltip-text: #f8fafc;
-  --color-status-healthy: #15803d;
-  --color-status-healthy-text: #166534;
-  --color-status-starting: #0e7490;
-  --color-status-starting-text: #155e75;
-  --color-status-degraded: #b45309;
-  --color-status-degraded-text: #92400e;
-  --color-status-unhealthy: #dc2626;
-  --color-status-unhealthy-text: #b91c1c;
-  --color-status-stopped: #475569;
-  --color-status-stopped-text: #475569;
-  --color-status-unknown: #64748b;
-  --color-status-unknown-text: #64748b;
-  --color-status-on-solid: #ffffff;
-  --color-meter-track: #cbd5e1;
-  --color-meter-normal: #475569;
-  --color-meter-warning: #b45309;
-  --color-meter-critical: #dc2626;
-  --color-well: #f4f7fa;
+  --color-bg: #0b0710;
+  --color-surface: #150e1b;
+  --color-surface-2: #1e1526;
+  --color-line: #2e2236;
+  --color-line-strong: #46344f;
+  --color-text: #f7eef6;
+  --color-muted: #b7a5b8;
+  --color-faint: #8d7b8f;
+  --color-pink: #f25bd0;
+  --color-pink-soft: #ff9fe6;
+  --color-pink-glow: rgb(242 91 208 / 0.28);
+  --color-pink-wash: rgb(242 91 208 / 0.08);
+  --color-on-pink: #1a0716;
+  --color-ok: #5fe3a1;
+  --color-warn: #ffc65c;
+  --color-down: #ff6e7a;
 
-  /* Status tags and flagged rows: the status colour mixed into the surface, so solid, not see-through. */
-  --color-tint-healthy: color-mix(in srgb, var(--color-status-healthy) 14%, var(--color-raised));
-  --color-tint-degraded: color-mix(in srgb, var(--color-status-degraded) 14%, var(--color-raised));
-  --color-tint-unhealthy: color-mix(
-    in srgb,
-    var(--color-status-unhealthy) 14%,
-    var(--color-raised)
-  );
-  --color-tag-line-healthy: color-mix(
-    in srgb,
-    var(--color-status-healthy) 40%,
-    var(--color-raised)
-  );
-  --color-tag-line-degraded: color-mix(
-    in srgb,
-    var(--color-status-degraded) 40%,
-    var(--color-raised)
-  );
-  --color-tag-line-unhealthy: color-mix(
-    in srgb,
-    var(--color-status-unhealthy) 40%,
-    var(--color-raised)
-  );
-  --color-row-degraded: color-mix(in srgb, var(--color-status-degraded) 8%, var(--color-raised));
-  --color-row-unhealthy: color-mix(in srgb, var(--color-status-unhealthy) 8%, var(--color-raised));
-}
-
-.dark {
-  --color-page: #0b1120;
-  --color-chrome: #0f172a;
-  --color-raised: #1b2336;
-  --color-hover: #1a2438;
-  --color-hover-raised: #232d42;
-  --color-selected: #2a3447;
-  --color-selected-raised: #303b52;
-  --color-hairline: #1e293b;
-  --color-hairline-raised: #2b3549;
-  --color-hairline-strong: #334155;
-  --color-control: #64748b;
-  --color-text: #f8fafc;
-  --color-text-2: #a8b3c5;
-  --color-text-3: #8e9bb0;
-  --color-accent: #2563eb;
-  --color-accent-contrast: #ffffff;
-  --color-accent-mark: #60a5fa;
-  --color-accent-text: #93c5fd;
-  --color-scrim: rgb(2 6 23 / 0.6);
-  --color-tooltip: #f1f5f9;
-  --color-tooltip-text: #0f172a;
-  --color-status-healthy: #22c55e;
-  --color-status-healthy-text: #4ade80;
+  /* Legacy names, kept so components not yet restyled keep working. */
+  --color-page: var(--color-bg);
+  --color-chrome: var(--color-bg);
+  --color-raised: var(--color-surface);
+  --color-hover: var(--color-surface);
+  --color-hover-raised: var(--color-surface-2);
+  --color-selected: var(--color-surface-2);
+  --color-selected-raised: var(--color-line);
+  --color-hairline: var(--color-line);
+  --color-hairline-raised: var(--color-line);
+  --color-hairline-strong: var(--color-line-strong);
+  --color-control: var(--color-faint);
+  --color-text-2: var(--color-muted);
+  --color-text-3: var(--color-faint);
+  --color-accent: var(--color-pink);
+  --color-accent-contrast: var(--color-on-pink);
+  --color-accent-mark: var(--color-pink);
+  --color-accent-text: var(--color-pink-soft);
+  --color-scrim: rgb(5 3 7 / 0.6);
+  --color-tooltip: var(--color-surface-2);
+  --color-tooltip-text: var(--color-text);
+  --color-status-healthy: var(--color-ok);
+  --color-status-healthy-text: var(--color-ok);
   --color-status-starting: #22d3ee;
   --color-status-starting-text: #67e8f9;
-  --color-status-degraded: #f59e0b;
-  --color-status-degraded-text: #fbbf24;
-  --color-status-unhealthy: #ef4444;
-  --color-status-unhealthy-text: #fca5a5;
+  --color-status-degraded: var(--color-warn);
+  --color-status-degraded-text: var(--color-warn);
+  --color-status-unhealthy: var(--color-down);
+  --color-status-unhealthy-text: var(--color-down);
   --color-status-stopped: #94a3b8;
   --color-status-stopped-text: #94a3b8;
   --color-status-unknown: #7c8ba1;
   --color-status-unknown-text: #7c8ba1;
-  --color-status-on-solid: #0b1120;
-  --color-meter-track: #2b3549;
-  --color-meter-normal: #a8b3c5;
-  --color-meter-warning: #f59e0b;
-  --color-meter-critical: #ef4444;
-  --color-well: #141c2c;
+  --color-status-on-solid: var(--color-on-pink);
+  --color-meter-track: var(--color-surface-2);
+  --color-meter-normal: var(--color-muted);
+  --color-meter-warning: var(--color-warn);
+  --color-meter-critical: var(--color-down);
+  --color-well: var(--color-surface-2);
+
+  /* Status tags and flagged rows: the status colour mixed into the surface. */
+  --color-tint-healthy: color-mix(in srgb, var(--color-status-healthy) 14%, var(--color-surface));
+  --color-tint-degraded: color-mix(in srgb, var(--color-status-degraded) 14%, var(--color-surface));
+  --color-tint-unhealthy: color-mix(
+    in srgb,
+    var(--color-status-unhealthy) 14%,
+    var(--color-surface)
+  );
+  --color-tag-line-healthy: color-mix(
+    in srgb,
+    var(--color-status-healthy) 40%,
+    var(--color-surface)
+  );
+  --color-tag-line-degraded: color-mix(
+    in srgb,
+    var(--color-status-degraded) 40%,
+    var(--color-surface)
+  );
+  --color-tag-line-unhealthy: color-mix(
+    in srgb,
+    var(--color-status-unhealthy) 40%,
+    var(--color-surface)
+  );
+  --color-row-degraded: color-mix(in srgb, var(--color-status-degraded) 8%, var(--color-surface));
+  --color-row-unhealthy: color-mix(in srgb, var(--color-status-unhealthy) 8%, var(--color-surface));
 }
 
 /* Names the shadcn components expect, pointed at the tokens above. */
@@ -133,26 +108,22 @@
   --color-primary-foreground: var(--color-accent-contrast);
   --color-secondary: var(--color-selected-raised);
   --color-secondary-foreground: var(--color-text);
-  --color-muted: var(--color-hover-raised);
   --color-muted-foreground: var(--color-text-2);
   --color-border: var(--color-hairline-raised);
   --color-input: var(--color-control);
-  --color-ring: var(--color-accent-mark);
+  --color-ring: var(--color-pink-soft);
   --color-destructive: var(--color-status-unhealthy);
 }
 
 @layer base {
   html {
-    color-scheme: light;
-  }
-  html.dark {
     color-scheme: dark;
   }
   body {
-    background-color: var(--color-page);
+    background-color: var(--color-bg);
     color: var(--color-text);
     font-family: var(--font-sans);
-    font-size: 13px;
+    font-size: 14px;
   }
   * {
     border-color: var(--color-hairline-raised);

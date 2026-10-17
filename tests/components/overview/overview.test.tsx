@@ -7,8 +7,6 @@ import type { StandaloneWidget } from '@/lib/shared/contract';
 import { group, servicesResponse, svc } from '../shell/fixtures';
 import { cron, job, mockApi, renderFresh, streams, system, widgets } from './fixtures';
 
-vi.mock('next-themes', () => ({ useTheme: () => ({ resolvedTheme: 'light' }) }));
-
 const markets: StandaloneWidget = {
   id: 'markets',
   name: 'Markets',

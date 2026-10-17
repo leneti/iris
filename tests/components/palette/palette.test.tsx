@@ -5,9 +5,6 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import type { ServiceEntry, ServicesResponse } from '@/lib/shared/contract';
 import { group, servicesResponse, svc } from '../shell/fixtures';
 
-const setTheme = vi.hoisted(() => vi.fn());
-vi.mock('next-themes', () => ({ useTheme: () => ({ theme: 'light', setTheme }) }));
-
 let servicesData: ServicesResponse | undefined;
 vi.mock('@/lib/client/api', () => ({
   useServices: () => ({ data: servicesData, mutate: vi.fn() }),
@@ -70,7 +67,6 @@ beforeEach(() => {
     ...servicesResponse([group('Media', [moviebox, streamhouse]), group('Tools', [noEmbed])]),
     links: [{ name: 'Router Admin', abbr: 'RA', url: 'http://router.example.invalid/admin' }],
   };
-  setTheme.mockClear();
 });
 afterEach(() => vi.restoreAllMocks());
 
@@ -243,14 +239,6 @@ describe('Enter', () => {
     expect(features).toContain('noopener');
     expect(features).toContain('noreferrer');
     expect(screen.queryByRole('tab', { name: /Streamhouse/ })).toBeNull();
-  });
-
-  test('on "Switch to dark theme" changes the theme', () => {
-    mount();
-    openPalette();
-    type('dark theme');
-    enter();
-    expect(setTheme).toHaveBeenCalledWith('dark');
   });
 
   test('on "Collapse sidebar" collapses the sidebar and the label flips', () => {

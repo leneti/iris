@@ -6,9 +6,9 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { BUILTIN_JOBS, BUILTIN_OVERVIEW } from '@/lib/client/tabs';
 import { cn } from '@/lib/utils';
 import { JobsCount, dockerText, type SidebarProps } from './sidebar';
-import { ActiveBar, rowState, ServiceIcon } from './sidebar-row';
+import { ServiceIcon } from '@/components/service-icon';
+import { ActiveBar, rowState } from './sidebar-row';
 import { useModKey } from '@/lib/client/shortcuts';
-import { ThemeSwitch } from './theme-switch';
 
 const DOCKER_MARK = { ok: 'healthy', unreachable: 'degraded', pending: 'unknown' } as const;
 
@@ -139,7 +139,6 @@ export function SidebarRail(props: SidebarProps) {
           </TooltipTrigger>
           <TooltipContent side="right">{dockerText(props.docker)}</TooltipContent>
         </Tooltip>
-        <ThemeSwitch compact />
         <RailButton label="Expand sidebar" onClick={props.onToggleCollapsed}>
           <PanelLeft className="size-4 text-text-2" />
         </RailButton>

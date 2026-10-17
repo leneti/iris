@@ -3,7 +3,7 @@
 import { Ban, ExternalLink, LogIn } from 'lucide-react';
 import { useId } from 'react';
 import { Address } from '@/components/shell/status-strip';
-import { ServiceIcon } from '@/components/shell/sidebar-row';
+import { ServiceIcon } from '@/components/service-icon';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { isPublicAddress } from '@/lib/client/address';

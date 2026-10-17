@@ -1,9 +1,8 @@
 'use client';
 
-import { Clock, Moon, PanelLeft, PanelLeftOpen, Sun, type LucideIcon } from 'lucide-react';
-import { useTheme } from 'next-themes';
+import { Clock, PanelLeft, PanelLeftOpen, type LucideIcon } from 'lucide-react';
 import { HealthMark } from '@/components/health-mark';
-import { ServiceIcon } from '@/components/shell/sidebar-row';
+import { ServiceIcon } from '@/components/service-icon';
 import { builtinName } from '@/components/tabs/tab-item';
 import { frameModel } from '@/components/tabs/frame-model';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
@@ -79,8 +78,6 @@ const Chip = ({ children }: { children: React.ReactNode }) => (
 
 export function Palette(props: PaletteProps) {
   const { groups, links, statusById, openIds, address, onOpenService, onOpenBuiltin } = props;
-  const { theme, resolvedTheme, setTheme } = useTheme();
-  const dark = (resolvedTheme ?? theme) === 'dark';
 
   const serviceById = new Map(groups.flatMap((g) => g.services.map((s) => [s.id, s] as const)));
   const urlOf = (id: string) => {
@@ -156,25 +153,15 @@ export function Palette(props: PaletteProps) {
       onSelect: (newWindow) => (newWindow ? openInNewWindow(urlOf(id)) : props.onFocusTab(id)),
     });
   });
-  entries.push(
-    {
-      value: 'action:jobs',
-      section: 'Actions',
-      label: 'Show scheduled jobs',
-      keywords: ['cron', 'tasks'],
-      icon: <ActionIcon Icon={Clock} />,
-      meta: props.jobsFailed > 0 ? <Chip>{props.jobsFailed} failed</Chip> : undefined,
-      onSelect: () => onOpenBuiltin(BUILTIN_JOBS),
-    },
-    {
-      value: 'action:theme',
-      section: 'Actions',
-      label: dark ? 'Switch to light theme' : 'Switch to dark theme',
-      keywords: ['appearance', 'mode'],
-      icon: <ActionIcon Icon={dark ? Sun : Moon} />,
-      onSelect: () => setTheme(dark ? 'light' : 'dark'),
-    },
-  );
+  entries.push({
+    value: 'action:jobs',
+    section: 'Actions',
+    label: 'Show scheduled jobs',
+    keywords: ['cron', 'tasks'],
+    icon: <ActionIcon Icon={Clock} />,
+    meta: props.jobsFailed > 0 ? <Chip>{props.jobsFailed} failed</Chip> : undefined,
+    onSelect: () => onOpenBuiltin(BUILTIN_JOBS),
+  });
   const { onToggleCollapsed } = props;
   if (onToggleCollapsed !== undefined) {
     entries.push({

@@ -7,8 +7,6 @@ import { prefs } from '@/lib/client/prefs';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { group, svc } from './fixtures';
 
-vi.mock('next-themes', () => ({ useTheme: () => ({ theme: 'light', setTheme: vi.fn() }) }));
-
 class NoopObserver {
   observe() {}
   unobserve() {}

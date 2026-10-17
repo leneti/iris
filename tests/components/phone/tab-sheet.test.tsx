@@ -6,7 +6,6 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { group, servicesResponse, svc } from '../shell/fixtures';
 import { data, statusResponse, stubBrowser, usePhoneViewport } from './mock-api';
 
-vi.mock('next-themes', () => ({ useTheme: () => ({ theme: 'light', setTheme: vi.fn() }) }));
 vi.mock('@/lib/client/api', async () => (await import('./mock-api')).apiMock);
 
 stubBrowser();

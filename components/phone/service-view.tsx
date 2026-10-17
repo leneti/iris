@@ -2,7 +2,7 @@
 
 import { ChevronLeft, RotateCw } from 'lucide-react';
 import { HealthMark } from '@/components/health-mark';
-import { ServiceIcon } from '@/components/shell/sidebar-row';
+import { ServiceIcon } from '@/components/service-icon';
 import type { ServiceEntry, ServiceStatus } from '@/lib/shared/contract';
 import { TabsButton, TopBar } from './top-bar';
 

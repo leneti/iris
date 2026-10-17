@@ -25,7 +25,6 @@ import { BUILTIN_JOBS, BUILTIN_OVERVIEW } from '@/lib/client/tabs';
 import type { GroupEntry, ServiceStatus } from '@/lib/shared/contract';
 import { cn } from '@/lib/utils';
 import { ActiveBar, rowState, SidebarRow } from './sidebar-row';
-import { ThemeSwitch } from './theme-switch';
 
 export type JobsBadge = { failed: number; overdue: number };
 export type DockerFooter = {
@@ -195,8 +194,7 @@ export function Sidebar(props: SidebarProps) {
           <span>{dockerText(props.docker)}</span>
           <span className="tabular-nums">{props.docker.count} services</span>
         </div>
-        <div className="flex items-center justify-between px-1 pt-1">
-          <ThemeSwitch />
+        <div className="flex items-center justify-end px-1 pt-1">
           <button
             type="button"
             aria-label="Collapse sidebar"

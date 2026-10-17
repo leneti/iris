@@ -12,7 +12,7 @@ const buttonVariants = cva(
         destructive: 'bg-destructive text-status-on-solid hover:brightness-95 ',
         outline: 'border border-input bg-background hover:bg-selected-raised hover:text-text ',
         secondary: 'bg-secondary text-secondary-foreground hover:brightness-95',
-        ghost: 'hover:bg-selected-raised hover:text-text dark:hover:bg-hover-raised',
+        ghost: 'hover:bg-selected-raised hover:text-text',
         link: 'text-primary underline-offset-4 hover:underline',
       },
       size: {

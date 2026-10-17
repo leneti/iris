@@ -4,7 +4,7 @@ import { ChevronDown, ChevronRight } from 'lucide-react';
 import { HealthMark } from '@/components/health-mark';
 import { formatStat, isFailed } from '@/components/overview/figures';
 import { groupIcon, COLLAPSED_GROUPS_PREF } from '@/components/shell/sidebar';
-import { ServiceIcon } from '@/components/shell/sidebar-row';
+import { ServiceIcon } from '@/components/service-icon';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useWidgets } from '@/lib/client/api';
 import { worstStatus } from '@/lib/client/health';

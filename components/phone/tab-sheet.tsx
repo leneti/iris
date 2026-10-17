@@ -3,7 +3,7 @@
 import { ExternalLink, LogIn, X } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { HealthMark } from '@/components/health-mark';
-import { ServiceIcon } from '@/components/shell/sidebar-row';
+import { ServiceIcon } from '@/components/service-icon';
 import { CopyField } from '@/components/tabs/copy-field';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import type { ServiceEntry, ServiceStatus } from '@/lib/shared/contract';

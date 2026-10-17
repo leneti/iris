@@ -4,8 +4,6 @@ import type { ServiceEntry } from '@/lib/shared/contract';
 import { svc } from '../shell/fixtures';
 import { CanvasHarness, tabsOf } from './harness';
 
-vi.mock('next-themes', () => ({ useTheme: () => ({ theme: 'light', setTheme: vi.fn() }) }));
-
 const a = svc('a', 'Alpha');
 const b = svc('b', 'Beta');
 const blocked: ServiceEntry = {

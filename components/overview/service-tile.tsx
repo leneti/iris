@@ -1,5 +1,5 @@
 import { HealthMark } from '@/components/health-mark';
-import { ServiceIcon } from '@/components/shell/sidebar-row';
+import { ServiceIcon } from '@/components/service-icon';
 import type { ServiceEntry, ServiceStatus, ServiceWidget } from '@/lib/shared/contract';
 import { Figures, isFailed, Unavailable } from './figures';
 import { cn } from '@/lib/utils';

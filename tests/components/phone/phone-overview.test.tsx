@@ -8,8 +8,6 @@ import { statusResponse } from './mock-api';
 
 Element.prototype.scrollIntoView ??= () => {};
 
-vi.mock('next-themes', () => ({ useTheme: () => ({ resolvedTheme: 'light' }) }));
-
 const markets: StandaloneWidget = {
   id: 'markets',
   name: 'Markets',

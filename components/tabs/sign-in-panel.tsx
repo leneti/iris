@@ -1,7 +1,7 @@
 'use client';
 
 import { ExternalLink, Loader2, LogIn } from 'lucide-react';
-import { ServiceIcon } from '@/components/shell/sidebar-row';
+import { ServiceIcon } from '@/components/service-icon';
 import { Button } from '@/components/ui/button';
 import type { ServiceEntry } from '@/lib/shared/contract';
 
