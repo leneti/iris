@@ -1,6 +1,7 @@
-# Local agent ledgers stay untracked
+# Local agent ledgers and machine-specific agent notes stay untracked
 .llms/
 .superpowers/
+CLAUDE.local.md
 
 node_modules/
 .next/

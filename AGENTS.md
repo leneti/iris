@@ -36,3 +36,12 @@ The label schema, the two config files, the environment variables and the endpoi
   The schemas are strict, so the server's tests catch undeclared fields, but the browser parses with `parseTolerant`, which drops unknown keys: a page that is already open keeps working after a deploy that adds a field.
 - Removing or renaming anything, changing a meaning or default, or making something required is a breaking change: raise the contract version and say so in the table in `docs/contract.md`.
 - A change that crosses this repository and a deployment's Compose files is two commits: Iris first, released and deployed, then the Compose change.
+
+## Release and deployment
+
+`README.md` ("Updates") describes the pipeline: CI publishes `ghcr.io/leneti/iris:latest` and `:sha-<short>` on every green push to `main`, and Renovate keeps dependencies, Actions and the Node image current.
+
+- A push to `main` ships. The host's updater pulls `latest` each night and recreates the container, so a green `main` is live by the next morning even if no one deploys it by hand. Keep `main` deployable, and do feature work on a branch.
+- Renovate merges grouped non-major updates into `main` on its own. Rebase onto them; never force-push over them.
+- The deployment lives in a separate, private repository: the Compose files, the `iris.*` labels on other services, `iris.yaml` and the environment values. Nothing from it is copied here.
+- Machine-specific deploy steps (paths, the Compose command, rollback, timing windows) are in `CLAUDE.local.md` at the repository root when it exists. It is untracked; never commit it.
