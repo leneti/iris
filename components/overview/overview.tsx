@@ -5,11 +5,11 @@ import { useWidgets } from '@/lib/client/api';
 import { shownGroups } from '@/lib/client/services';
 import { groupIcon, dockerText } from '@/components/shell/sidebar';
 import type { DockerState } from '@/components/shell/use-shell';
-import type { ServiceStatus, ServicesResponse, StandaloneWidget } from '@/lib/shared/contract';
+import type { ServiceStatus, ServicesResponse } from '@/lib/shared/contract';
 import { cn } from '@/lib/utils';
 import { JobsCard } from './jobs-card';
-import { LinksRow } from './links-row';
-import { MarketsTile } from './markets-tile';
+import { LinksCard } from './links';
+import { MarketsCard } from './markets';
 import { NowPlayingPanel } from './now-playing-panel';
 import { ServiceTile } from './service-tile';
 import { SystemPanel } from './system-panel';
@@ -51,32 +51,9 @@ export function Overview({
   const serviceCount = groups.reduce((n, g) => n + g.services.length, 0);
   const tabCount = openIds.filter((id) => !id.startsWith('builtin:')).length;
 
-  // Standalone tiles sit in their own group, and a group that only they use is added at the end.
-  const names = new Set(groups.map((g) => g.name));
-  const extra = [...new Set(standalone.map((w) => w.group))].filter((g) => !names.has(g));
-  const sections: {
-    name: string;
-    icon: string | null;
-    services: (typeof groups)[number]['services'];
-    tiles: StandaloneWidget[];
-  }[] = [
-    ...groups.map((g) => ({
-      name: g.name,
-      icon: g.icon,
-      services: g.services,
-      tiles: standalone.filter((w) => w.group === g.name),
-    })),
-    ...extra.map((name) => ({
-      name,
-      icon: null,
-      services: [],
-      tiles: standalone.filter((w) => w.group === name),
-    })),
-  ];
-
   const withWidget = (id: string) => widgets?.services[id] !== undefined;
-  const rich = (s: (typeof sections)[number]) => s.services.filter((x) => withWidget(x.id));
-  const plain = (s: (typeof sections)[number]) => s.services.filter((x) => !withWidget(x.id));
+  const rich = (g: (typeof groups)[number]) => g.services.filter((x) => withWidget(x.id));
+  const plain = (g: (typeof groups)[number]) => g.services.filter((x) => !withWidget(x.id));
 
   return (
     <div className="flex items-start gap-5 px-6 py-5">
@@ -110,18 +87,18 @@ export function Overview({
           </div>
         </header>
         <div className="flex flex-col gap-5">
-          {sections.map((section) => {
-            const Icon = groupIcon(section.icon);
+          {groups.map((group) => {
+            const Icon = groupIcon(group.icon);
             return (
-              <section key={section.name} aria-label={section.name}>
+              <section key={group.name} aria-label={group.name}>
                 <GroupLabel
-                  name={section.name}
+                  name={group.name}
                   icon={Icon ? <Icon aria-hidden className="size-3.5" /> : null}
-                  count={section.services.length + section.tiles.length}
+                  count={group.services.length}
                 />
                 {/* Cards with figures first, two to a row so four figures fit; then the plain tiles. */}
-                {[rich(section), plain(section)].map((list, i) =>
-                  list.length === 0 && (i === 1 || section.tiles.length === 0) ? null : (
+                {[rich(group), plain(group)].map((list, i) =>
+                  list.length === 0 ? null : (
                     <div
                       key={i}
                       className={cn('mt-2 grid gap-2.5', i === 0 ? 'grid-cols-2' : 'grid-cols-3')}
@@ -136,19 +113,21 @@ export function Overview({
                           onOpen={onOpenService}
                         />
                       ))}
-                      {i === 0 && section.tiles.map((w) => <MarketsTile key={w.id} widget={w} />)}
                     </div>
                   ),
                 )}
               </section>
             );
           })}
-          <LinksRow links={services?.links ?? []} />
         </div>
       </div>
       <aside aria-label="Panels" className="flex w-[360px] shrink-0 flex-col gap-4">
         <SystemPanel />
         <NowPlayingPanel />
+        {standalone.map((w) => (
+          <MarketsCard key={w.id} widget={w} />
+        ))}
+        <LinksCard links={services?.links ?? []} />
         <JobsCard onOpenJobs={onOpenJobs} />
       </aside>
     </div>

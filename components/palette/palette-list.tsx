@@ -90,7 +90,10 @@ export function PaletteList({
       filter={scoreEntry}
       className={cn(
         'bg-raised **:data-[slot=command-input-wrapper]:h-[52px] **:data-[slot=command-input-wrapper]:gap-2.5 **:data-[slot=command-input-wrapper]:border-hairline-raised **:data-[slot=command-input-wrapper]:px-3.5 [&_[cmdk-group-heading]]:px-4 [&_[cmdk-group-heading]]:pt-2.5 [&_[cmdk-group-heading]]:pb-1 [&_[cmdk-group-heading]]:text-[11px] [&_[cmdk-group-heading]]:font-semibold [&_[cmdk-group-heading]]:tracking-[0.06em] [&_[cmdk-group-heading]]:text-text-3 [&_[cmdk-group-heading]]:uppercase',
-        page ? 'h-full rounded-none' : 'rounded-panel',
+        // On a phone the page scrolls, so the field sticks to the top instead of the list scrolling.
+        page
+          ? 'overflow-visible rounded-none **:data-[slot=command-input-wrapper]:sticky **:data-[slot=command-input-wrapper]:top-0 **:data-[slot=command-input-wrapper]:z-10 **:data-[slot=command-input-wrapper]:bg-raised'
+          : 'rounded-panel',
       )}
       onKeyDown={(e) => {
         newWindow.current = e.key === 'Enter' && (e.metaKey || e.ctrlKey);

@@ -13,7 +13,9 @@ import type { Frames } from './use-frames';
  * gets an iframe, a blocked one gets the card, and a suspended one gets nothing. Inactive panes
  * are `hidden`, never removed or moved: moving an iframe in the DOM reloads it. React keeps each
  * keyed pane where it is, and a tab that returns from suspension is inserted, not reordered.
- * Built-in views (`children`) share the canvas and show when no service tab is active.
+ * Built-in views (`children`) share the canvas and show when no service tab is active. With
+ * `flow` (the phone) they sit in the page's flow and the page itself scrolls; otherwise they fill
+ * the canvas and scroll inside it.
  */
 export function Canvas({
   tabs,
@@ -24,6 +26,7 @@ export function Canvas({
   onCheckAgain,
   onAlwaysNewTab,
   children,
+  flow = false,
   ref,
 }: {
   tabs: TabsState;
@@ -35,6 +38,7 @@ export function Canvas({
   onCheckAgain: () => void;
   onAlwaysNewTab: (id: string, on: boolean) => void;
   children?: ReactNode;
+  flow?: boolean;
   ref?: Ref<HTMLElement>;
 }) {
   const builtinActive = tabs.active === null || isBuiltin(tabs.active);
@@ -75,7 +79,10 @@ export function Canvas({
         );
       })}
       {children !== undefined && (
-        <div hidden={!builtinActive} className="absolute inset-0 overflow-auto overscroll-contain">
+        <div
+          hidden={!builtinActive}
+          className={flow ? 'relative' : 'absolute inset-0 overflow-auto overscroll-contain'}
+        >
           {children}
         </div>
       )}

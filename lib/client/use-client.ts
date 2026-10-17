@@ -44,22 +44,15 @@ export function useMedia(query: string, serverValue = false): boolean {
 }
 
 /**
- * The height the browser actually shows, in CSS px at zoom 1, or null without visualViewport
- * (and on the server). Firefox for Android lays a page out as if its toolbar were hidden, so
- * 100svh and 100dvh reach under the screen edge while the toolbar shows; this does not.
+ * False in Firefox for Android: it reports the gesture bar as a bottom safe-area inset, but its
+ * page stops above that bar, so padding for it only leaves an empty strip. True elsewhere and on
+ * the server.
  */
-export function useVisibleHeight(): number | null {
+export function useBottomInset(): boolean {
   return useSyncExternalStore(
-    (notify) => {
-      const vv = window.visualViewport;
-      vv?.addEventListener('resize', notify);
-      return () => vv?.removeEventListener('resize', notify);
-    },
-    () => {
-      const vv = window.visualViewport;
-      return vv ? Math.round(vv.height * vv.scale) : null;
-    },
-    () => null,
+    () => () => {},
+    () => !/Android.*Firefox\//.test(navigator.userAgent),
+    () => true,
   );
 }
 

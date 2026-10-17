@@ -28,6 +28,7 @@ export function TabSwitcher({
   onCloseOthers: () => void;
   onCloseAll: () => void;
 }) {
+  const closable = tabs.filter((t) => !t.pinned).length;
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
@@ -49,24 +50,26 @@ export function TabSwitcher({
             <TabGlyph tab={t} />
             <span className="flex-1 truncate">{t.name}</span>
             <TabStatus tab={t} />
-            <button
-              type="button"
-              aria-label={`Close ${t.name} tab`}
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose(t.id);
-              }}
-              className="flex size-5 items-center justify-center rounded-row text-text-3 hover:bg-hover-raised hover:text-text"
-            >
-              <X className="size-3.5" />
-            </button>
+            {!t.pinned && (
+              <button
+                type="button"
+                aria-label={`Close ${t.name} tab`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onClose(t.id);
+                }}
+                className="flex size-5 items-center justify-center rounded-row text-text-3 hover:bg-hover-raised hover:text-text"
+              >
+                <X className="size-3.5" />
+              </button>
+            )}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled={tabs.length < 2} onSelect={onCloseOthers}>
+        <DropdownMenuItem disabled={closable < 2} onSelect={onCloseOthers}>
           Close other tabs
         </DropdownMenuItem>
-        <DropdownMenuItem disabled={tabs.length === 0} onSelect={onCloseAll}>
+        <DropdownMenuItem disabled={closable === 0} onSelect={onCloseAll}>
           Close all tabs
         </DropdownMenuItem>
       </DropdownMenuContent>

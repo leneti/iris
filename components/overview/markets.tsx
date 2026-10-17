@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowDownRight, ArrowUpRight, ChartLine } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight } from 'lucide-react';
 import { useState } from 'react';
 import {
   Select,
@@ -12,6 +12,7 @@ import {
 import type { StandaloneWidget } from '@/lib/shared/contract';
 import { cn } from '@/lib/utils';
 import { formatStat, isFailed, Unavailable } from './figures';
+import { Panel } from './panel';
 
 export type Interval = StandaloneWidget['interval'];
 
@@ -80,59 +81,65 @@ export function CoinRow({
 }
 
 /**
- * The standalone "Markets" tile. All four intervals arrive in one reply, so the control only
- * picks which one to show. It never fetches.
+ * A standalone widget as a card in the side column (the phone's Overview column on a phone), one
+ * row per coin. All four intervals arrive in one reply, so the control only picks which one to
+ * show. It never fetches. `touch` gives 44 px rows and control for a phone.
  */
-export function MarketsTile({ widget }: { widget: StandaloneWidget }) {
+export function MarketsCard({
+  widget,
+  touch = false,
+}: {
+  widget: StandaloneWidget;
+  touch?: boolean;
+}) {
   const [interval, setInterval] = useState<Interval>(widget.interval);
   const failed = isFailed(widget.state);
   return (
-    <div
-      role="group"
-      aria-label={widget.name}
-      className="flex flex-col gap-2.5 rounded-panel border border-hairline-raised bg-raised p-3"
-    >
-      <div className="flex h-7 items-center gap-2.5">
-        <span
-          aria-hidden
-          className="flex size-7 shrink-0 items-center justify-center rounded-tile bg-selected text-text-2"
-        >
-          <ChartLine className="size-4" />
-        </span>
-        <span className="min-w-0 flex-1 truncate text-[14px] font-semibold">{widget.name}</span>
-        {!failed && (
+    <Panel
+      title={widget.name}
+      meta={
+        failed ? undefined : (
           <Select value={interval} onValueChange={(v) => setInterval(v as Interval)}>
             <SelectTrigger
               size="sm"
               aria-label="Interval"
-              className="h-6 gap-1 px-2 py-0 text-xs text-text"
+              className={cn(
+                'gap-1 text-text',
+                touch ? 'px-3 text-[13px] data-[size=sm]:h-11' : 'px-2 text-xs data-[size=sm]:h-7',
+              )}
             >
               <SelectValue />
             </SelectTrigger>
             <SelectContent position="popper" align="end">
               {INTERVALS.map((i) => (
-                <SelectItem key={i.value} value={i.value}>
+                <SelectItem key={i.value} value={i.value} className={cn(touch && 'min-h-11')}>
                   {i.label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
-        )}
-      </div>
+        )
+      }
+    >
       {failed ? (
-        <Unavailable />
+        <div className="px-4 pb-4">
+          <Unavailable />
+        </div>
       ) : (
-        <ul className="divide-y divide-hairline-raised rounded-tile border border-hairline-raised bg-well">
+        <ul>
           {widget.stats.map((s) => (
             <CoinRow
               key={s.key}
               stat={s}
               interval={interval}
-              className="min-h-9 px-2.5 text-[13px]"
+              className={cn(
+                'border-t border-hairline-raised px-4',
+                touch ? 'min-h-11 gap-3' : 'min-h-10 text-[13px]',
+              )}
             />
           ))}
         </ul>
       )}
-    </div>
+    </Panel>
   );
 }

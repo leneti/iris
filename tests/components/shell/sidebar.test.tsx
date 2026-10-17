@@ -140,7 +140,6 @@ describe('TabBar switcher', () => {
         onClose={onClose}
         onCloseOthers={noop}
         onCloseAll={noop}
-        onNew={noop}
       />,
     );
     const trigger = screen.getByRole('button', { name: /Open tabs/ });
@@ -168,7 +167,6 @@ describe('TabBar tablist', () => {
         onClose={onClose}
         onCloseOthers={noop}
         onCloseAll={noop}
-        onNew={noop}
       />,
     );
     return { onClose, onFocus };

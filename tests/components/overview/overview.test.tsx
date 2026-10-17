@@ -1,6 +1,6 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { direction } from '@/components/overview/markets-tile';
+import { direction } from '@/components/overview/markets';
 import { Overview, type OverviewProps } from '@/components/overview/overview';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { StandaloneWidget } from '@/lib/shared/contract';
@@ -180,7 +180,7 @@ describe('Markets', () => {
     show(props());
     expect(await screen.findByText(/\+1\.2 %/)).toBeTruthy();
     // No health mark on a standalone tile.
-    const tile = screen.getByRole('group', { name: 'Markets' });
+    const tile = screen.getByRole('region', { name: 'Markets' });
     expect(within(tile).queryByRole('img', { name: 'healthy' })).toBeNull();
     await waitFor(() => expect(spy).toHaveBeenCalled());
     const before = spy.mock.calls.length;
@@ -200,6 +200,28 @@ describe('Markets', () => {
     const up = await screen.findByText(/\+1\.2 %/);
     expect(up.dataset.direction).toBe('up');
     expect(up.className).toContain('text-status-healthy-text');
+  });
+
+  test('sits in the side column under System, not in its group, with Links below it', async () => {
+    api({ '/api/widgets': widgets({ standalone: [markets] }) });
+    show(
+      props({
+        services: {
+          ...services,
+          links: [{ name: 'Example Wiki', abbr: 'EW', url: 'https://wiki.example.invalid/' }],
+        },
+      }),
+    );
+    const card = await screen.findByRole('region', { name: 'Markets' });
+    const side = screen.getByRole('complementary', { name: 'Panels' });
+    expect(side.contains(card)).toBe(true);
+    const names = within(side)
+      .getAllByRole('region')
+      .map((r) => r.getAttribute('aria-label'));
+    expect(names.indexOf('Markets')).toBeGreaterThan(names.indexOf('System'));
+    expect(names.indexOf('Links')).toBe(names.indexOf('Markets') + 1);
+    const home = screen.getByRole('region', { name: 'Home' });
+    expect(within(home).queryByText('Alphacoin')).toBeNull();
   });
 
   test('direction: up, down, and flat when it rounds to zero or is missing', () => {

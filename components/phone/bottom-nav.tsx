@@ -14,22 +14,29 @@ const ITEMS: readonly { view: PhoneView; label: string; Icon: LucideIcon }[] = [
 ];
 
 /**
- * Four items, 56 px plus the bottom safe-area inset. The current one has the accent colour and a
- * 2 px bar on top. The Jobs badge is the sidebar's own count, passed in by the shell.
+ * Four items, 56 px plus the bottom safe-area inset, fixed to the bottom of the screen (the page
+ * scrolls under it, and the browser keeps a fixed bar clear of its own toolbars). The current one
+ * has the accent colour and a 2 px bar on top. The Jobs badge is the sidebar's own count.
+ * `inset` is false where the browser reports a gesture-bar inset it does not draw under.
  */
 export function BottomNav({
   view,
   jobs,
   onSelect,
+  inset = true,
 }: {
   view: PhoneView;
+  inset?: boolean;
   jobs: JobsBadge;
   onSelect: (view: PhoneView) => void;
 }) {
   return (
     <nav
       aria-label="Main"
-      className="grid shrink-0 grid-cols-4 border-t border-hairline bg-chrome pb-[env(safe-area-inset-bottom)]"
+      className={cn(
+        'fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-hairline bg-chrome',
+        inset && 'pb-[env(safe-area-inset-bottom)]',
+      )}
     >
       {ITEMS.map(({ view: id, label, Icon }) => {
         const current = id === view;

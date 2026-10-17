@@ -109,6 +109,31 @@ describe('tab marks', () => {
   });
 });
 
+describe('pinned Overview', () => {
+  test('is the first tab before anything is open, selected, with no close mark', () => {
+    mount();
+    const tabs = screen.getAllByRole('tab');
+    expect(tabs).toHaveLength(1);
+    expect(tabs[0]?.textContent).toBe('Overview');
+    expect(tabs[0]?.getAttribute('aria-selected')).toBe('true');
+    expect(screen.queryByRole('button', { name: /New tab/ })).toBeNull();
+  });
+
+  test('stays first, ignores Delete and middle-click, and comes back into focus when clicked', () => {
+    mount();
+    openFromSidebar('Svc 0');
+    const overview = tab('Overview');
+    expect(screen.getAllByRole('tab')[0]).toBe(overview);
+    expect(overview.getAttribute('aria-selected')).toBe('false');
+    fireEvent.keyDown(overview, { key: 'Delete' });
+    fireEvent(overview, new MouseEvent('auxclick', { bubbles: true, button: 1 }));
+    expect(tab('Overview')).toBeTruthy();
+    fireEvent.click(tab('Overview'));
+    expect(tab('Overview').getAttribute('aria-selected')).toBe('true');
+    expect(tab('Svc 0')).toBeTruthy();
+  });
+});
+
 describe('controls', () => {
   test('reload returns the frame to its start URL and shows the spinner again', () => {
     mount();

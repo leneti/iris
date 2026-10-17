@@ -88,22 +88,33 @@ export function AppShell({
     }
   }
 
-  const items: TabItem[] = tabs.open.flatMap<TabItem>((id) => {
-    if (isBuiltin(id)) return [{ id, name: builtinName(id), service: null, status: null }];
-    const service = byId.get(id);
-    const model = models.get(id);
-    return service && model
-      ? [
-          {
-            id,
-            name: service.name,
-            service,
-            status: statusById[id] ?? 'unknown',
-            mark: tabMark(model, tabs.live.includes(id), frames.loaded.has(id)),
-          },
-        ]
-      : [];
-  });
+  // The Overview is pinned first, whether or not it is in `tabs.open`.
+  const overviewTab: TabItem = {
+    id: BUILTIN_OVERVIEW,
+    name: builtinName(BUILTIN_OVERVIEW),
+    service: null,
+    status: null,
+    pinned: true,
+  };
+  const items: TabItem[] = [overviewTab].concat(
+    tabs.open.flatMap<TabItem>((id) => {
+      if (id === BUILTIN_OVERVIEW) return [];
+      if (isBuiltin(id)) return [{ id, name: builtinName(id), service: null, status: null }];
+      const service = byId.get(id);
+      const model = models.get(id);
+      return service && model
+        ? [
+            {
+              id,
+              name: service.name,
+              service,
+              status: statusById[id] ?? 'unknown',
+              mark: tabMark(model, tabs.live.includes(id), frames.loaded.has(id)),
+            },
+          ]
+        : [];
+    }),
+  );
 
   const activeId = tabs.active;
   const builtinActive = activeId === null || isBuiltin(activeId);
@@ -181,12 +192,15 @@ export function AppShell({
       <div className="flex min-w-0 flex-1 flex-col">
         <TabBar
           tabs={items}
-          activeId={activeId}
-          onFocus={(id) => shell.dispatch({ type: 'focus', id })}
+          activeId={activeId ?? BUILTIN_OVERVIEW}
+          onFocus={(id) =>
+            id === BUILTIN_OVERVIEW
+              ? shell.openBuiltin(BUILTIN_OVERVIEW)
+              : shell.dispatch({ type: 'focus', id })
+          }
           onClose={(id) => shell.dispatch({ type: 'close', id })}
           onCloseOthers={() => shell.dispatch({ type: 'closeOthers' })}
           onCloseAll={() => shell.dispatch({ type: 'closeAll' })}
-          onNew={() => shell.openBuiltin(BUILTIN_OVERVIEW)}
           controls={
             activeService && activeId ? (
               <TabControls

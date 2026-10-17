@@ -122,32 +122,39 @@ describe('phone shell', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  test('the shell takes the visible height from visualViewport, unzoomed, and follows it', () => {
-    // Firefox for Android lays the page out as if its toolbar were hidden, so CSS units alone
-    // put the bottom navigation under the screen edge; the visual viewport is what shows.
-    const vv = Object.assign(new EventTarget(), { height: 700, scale: 1 });
-    vi.stubGlobal('visualViewport', vv);
+  test('a built-in view scrolls the page, so the browser sizes it and can pull to refresh', () => {
+    const { container } = mount();
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.className).toContain('min-h-svh');
+    expect(root.className).not.toContain('overflow-hidden');
+    expect(root.className).not.toContain('overscroll-contain');
+    expect(root.className).not.toMatch(/(^| )h-svh/);
+    expect(nav('Overview').closest('nav')?.className).toContain('fixed');
+  });
+
+  test('an open service fills the screen and keeps overscroll inside', () => {
+    const { container } = mount();
+    openService('Svc 0');
+    const root = container.firstElementChild as HTMLElement;
+    expect(root.className).toContain('fixed');
+    expect(root.className).toContain('inset-0');
+    expect(root.className).toContain('overscroll-contain');
+  });
+
+  test('Firefox for Android gets no gesture-bar padding under the navigation', () => {
+    const ua = vi.spyOn(navigator, 'userAgent', 'get');
+    ua.mockReturnValue('Mozilla/5.0 (Android 16; Mobile; rv:150.0) Gecko/150.0 Firefox/150.0');
     try {
-      const { container } = mount();
-      const root = container.firstElementChild as HTMLElement;
-      expect(root.style.height).toBe('700px');
-      act(() => {
-        Object.assign(vv, { height: 325, scale: 2 });
-        vv.dispatchEvent(new Event('resize'));
-      });
-      expect(root.style.height).toBe('650px');
+      mount();
+      expect(nav('Overview').closest('nav')?.className).not.toContain('safe-area-inset-bottom');
     } finally {
-      vi.unstubAllGlobals();
-      stubBrowser();
+      ua.mockRestore();
     }
   });
 
-  test('the shell is 100svh tall, clear of the browser toolbars, and contains overscroll', () => {
-    const { container } = mount();
-    const root = container.firstElementChild as HTMLElement;
-    // dvh can reach under Firefox for Android's bottom toolbar and hide the navigation bar.
-    expect(root.className).toContain('h-svh');
-    expect(root.className).toContain('overscroll-contain');
+  test('other browsers pad the navigation for the gesture bar', () => {
+    mount();
+    expect(nav('Overview').closest('nav')?.className).toContain('safe-area-inset-bottom');
   });
 });
 

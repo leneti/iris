@@ -45,7 +45,8 @@ export function tabsReducer(state: TabsState, action: TabsAction): TabsState {
     case 'focus':
       return id && state.open.includes(id) ? touch(state, id, max) : state;
     case 'close': {
-      if (!id || !state.open.includes(id)) return state;
+      // The Overview is pinned: closing it is a no-op.
+      if (!id || id === BUILTIN_OVERVIEW || !state.open.includes(id)) return state;
       const next: TabsState = {
         open: state.open.filter((x) => x !== id),
         active: state.active,

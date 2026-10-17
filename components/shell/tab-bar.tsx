@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import { useEffect, useRef, type KeyboardEvent, type ReactNode } from 'react';
 import { TabGlyph, TabStatus, type TabItem } from '@/components/tabs/tab-item';
 import { TabSwitcher } from '@/components/tabs/tab-switcher';
@@ -15,7 +15,6 @@ export type TabBarProps = {
   onClose: (id: string) => void;
   onCloseOthers: () => void;
   onCloseAll: () => void;
-  onNew: () => void;
   /** Reload, pop-out and fullscreen for the active service tab. */
   controls?: ReactNode;
   /** The "more" menu, last in the strip. */
@@ -23,8 +22,8 @@ export type TabBarProps = {
 };
 
 /**
- * 40 px strip of 28 px tabs, "+" (opens the Overview), the active tab's controls, the tab
- * switcher and the "more" menu.
+ * 40 px strip of 28 px tabs, the pinned Overview first, then the active tab's controls, the tab
+ * switcher and the "more" menu. A pinned tab has no close mark and ignores Delete and middle-click.
  */
 export function TabBar({
   tabs,
@@ -33,7 +32,6 @@ export function TabBar({
   onClose,
   onCloseOthers,
   onCloseAll,
-  onNew,
   controls,
   more,
 }: TabBarProps) {
@@ -44,9 +42,9 @@ export function TabBar({
       ?.querySelector('[aria-selected="true"]')
       ?.scrollIntoView?.({ block: 'nearest', inline: 'nearest' });
   }, [activeId]);
-  const onKey = (e: KeyboardEvent<HTMLButtonElement>, index: number, id: string) => {
+  const onKey = (e: KeyboardEvent<HTMLButtonElement>, index: number, tab: TabItem) => {
     if (e.key === 'Delete') {
-      onClose(id);
+      if (!tab.pinned) onClose(tab.id);
       return;
     }
     const last = tabs.length - 1;
@@ -89,11 +87,12 @@ export function TabBar({
               tabIndex={stop ? 0 : -1}
               onClick={() => onFocus(t.id)}
               onAuxClick={(e) => {
-                if (e.button === 1) onClose(t.id);
+                if (e.button === 1 && !t.pinned) onClose(t.id);
               }}
-              onKeyDown={(e) => onKey(e, i, t.id)}
+              onKeyDown={(e) => onKey(e, i, t)}
               className={cn(
-                'flex h-7 max-w-48 shrink-0 items-center gap-2 rounded-row pl-2 pr-1 text-[13px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+                'flex h-7 max-w-48 shrink-0 items-center gap-2 rounded-row pl-2 text-[13px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+                t.pinned ? 'pr-2.5' : 'pr-1',
                 active ? 'bg-selected font-medium' : 'hover:bg-hover',
               )}
             >
@@ -101,28 +100,22 @@ export function TabBar({
               <span className="truncate">{t.name}</span>
               <TabStatus tab={t} />
               {/* A mouse affordance only: a button inside a tab is invalid ARIA. Keyboard users press Delete, or use the tab switcher. */}
-              <span
-                aria-hidden
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onClose(t.id);
-                }}
-                className="flex size-5 shrink-0 items-center justify-center rounded-row text-text-3 hover:bg-hover-raised hover:text-text"
-              >
-                <X className="size-3.5" />
-              </span>
+              {!t.pinned && (
+                <span
+                  aria-hidden
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose(t.id);
+                  }}
+                  className="flex size-5 shrink-0 items-center justify-center rounded-row text-text-3 hover:bg-hover-raised hover:text-text"
+                >
+                  <X className="size-3.5" />
+                </span>
+              )}
             </button>
           );
         })}
       </div>
-      <button
-        type="button"
-        aria-label="New tab: open the Overview"
-        onClick={onNew}
-        className="flex size-7 shrink-0 items-center justify-center rounded-row text-text-2 outline-none hover:bg-hover focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        <Plus className="size-4" />
-      </button>
       <div className="flex-1" />
       {controls}
       {controls && <span aria-hidden className="mx-1 h-4 w-px bg-hairline-strong" />}

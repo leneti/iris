@@ -8,12 +8,13 @@ import { Canvas } from '@/components/tabs/canvas';
 import type { FrameModel } from '@/components/tabs/frame-model';
 import type { Frames } from '@/components/tabs/use-frames';
 import { useWidgets } from '@/lib/client/api';
-import { useVisibleHeight } from '@/lib/client/use-client';
+import { useBottomInset } from '@/lib/client/use-client';
 import { isPublicAddress, type AddressMode } from '@/lib/client/address';
 import { setAlwaysNewTab } from '@/lib/client/new-tab';
 import { shownGroups } from '@/lib/client/services';
 import { BUILTIN_JOBS, BUILTIN_OVERVIEW, isBuiltin } from '@/lib/client/tabs';
 import type { ServiceEntry } from '@/lib/shared/contract';
+import { cn } from '@/lib/utils';
 import { BottomNav, type PhoneView } from './bottom-nav';
 import { PhoneJobs } from './phone-jobs';
 import { PhoneOverview } from './phone-overview';
@@ -45,8 +46,11 @@ const TITLE: Record<Exclude<PhoneView, 'search'>, string> = {
 
 /**
  * The phone layout below 640 px (handoff 7.7): a top bar, the content, and a bottom navigation
- * bar. An open service takes the whole height and hides the bottom navigation. The Canvas holds
- * every frame in one place whichever view shows, so no frame is ever moved or reloaded.
+ * bar. A built-in view scrolls the page itself, under a sticky top bar and above the fixed bottom
+ * navigation, so the browser sizes it, hides its toolbar on scroll, and pulls to refresh at the
+ * top. An open service fills the screen and hides the bottom navigation; the frame scrolls
+ * inside. The Canvas holds every frame in one place whichever view shows, so no frame is ever
+ * moved or reloaded.
  */
 export function PhoneShell({
   shell,
@@ -61,7 +65,7 @@ export function PhoneShell({
 }: PhoneShellProps) {
   const { tabs } = shell;
   const { data: widgets } = useWidgets();
-  const visibleHeight = useVisibleHeight();
+  const inset = useBottomInset();
   // The last built-in view; Back from a service returns to it.
   const [view, setView] = useState<PhoneView>('overview');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -87,6 +91,8 @@ export function PhoneShell({
         };
 
   function show(next: PhoneView) {
+    // The page scrolls, so a new view starts at its top.
+    if (next !== view) window.scrollTo?.(0, 0);
     setView(next);
   }
   function focusTab(id: string) {
@@ -138,8 +144,13 @@ export function PhoneShell({
 
   return (
     <div
-      className="flex h-svh flex-col overflow-hidden overscroll-contain bg-page text-[15px] text-text"
-      style={visibleHeight === null ? undefined : { height: visibleHeight }}
+      data-slot="phone-shell"
+      className={cn(
+        'flex flex-col bg-page text-[15px] text-text',
+        activeService === undefined
+          ? cn('min-h-svh', inset ? 'pb-[calc(3.5rem+env(safe-area-inset-bottom))]' : 'pb-14')
+          : 'fixed inset-0 overflow-hidden overscroll-contain',
+      )}
     >
       {activeService !== undefined && activeId !== null ? (
         <ServiceBar
@@ -153,12 +164,16 @@ export function PhoneShell({
           onTabs={() => setSheetOpen(true)}
         />
       ) : view === 'search' ? null : (
-        <ViewBar
-          title={TITLE[view]}
-          mark={view === 'overview'}
-          weather={view === 'overview' ? <Weather compact weather={widgets?.weather} /> : undefined}
-          tabs={tabsButton}
-        />
+        <div className="sticky top-0 z-20">
+          <ViewBar
+            title={TITLE[view]}
+            mark={view === 'overview'}
+            weather={
+              view === 'overview' ? <Weather compact weather={widgets?.weather} /> : undefined
+            }
+            tabs={tabsButton}
+          />
+        </div>
       )}
       <Canvas
         tabs={tabs}
@@ -168,10 +183,13 @@ export function PhoneShell({
         frames={frames}
         onCheckAgain={shell.recheck}
         onAlwaysNewTab={setAlwaysNewTab}
+        flow
       >
         {content}
       </Canvas>
-      {activeService === undefined && <BottomNav view={view} jobs={jobs} onSelect={show} />}
+      {activeService === undefined && (
+        <BottomNav view={view} jobs={jobs} onSelect={show} inset={inset} />
+      )}
       <TabSheet
         open={sheetOpen}
         onOpenChange={setSheetOpen}

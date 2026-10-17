@@ -191,7 +191,8 @@ describe('Enter', () => {
     expect(
       screen.getAllByRole('tab').filter((t) => /Moviebox/.test(t.textContent ?? '')),
     ).toHaveLength(1);
-    expect(screen.getAllByRole('tab')).toHaveLength(2);
+    // The two services and the pinned Overview.
+    expect(screen.getAllByRole('tab')).toHaveLength(3);
     expect(screen.getByRole('tab', { name: /Moviebox/ }).getAttribute('aria-selected')).toBe(
       'true',
     );

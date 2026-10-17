@@ -14,6 +14,8 @@ export type TabItem = {
   status: ServiceStatus | null;
   /** Replaces the health mark while the frame loads, the card shows or the tab is suspended. */
   mark?: TabMark | null;
+  /** The Overview: always first in the strip, with no way to close it. */
+  pinned?: boolean;
 };
 
 export function builtinName(id: string): string {

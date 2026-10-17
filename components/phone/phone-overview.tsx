@@ -4,6 +4,8 @@ import { ChevronRight, TriangleAlert } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { HealthMark } from '@/components/health-mark';
 import { JobsCard } from '@/components/overview/jobs-card';
+import { LinksCard } from '@/components/overview/links';
+import { MarketsCard } from '@/components/overview/markets';
 import { NowPlayingPanel } from '@/components/overview/now-playing-panel';
 import { SystemPanel } from '@/components/overview/system-panel';
 import { secondsSince, useNow } from '@/components/jobs/time';
@@ -11,7 +13,6 @@ import { useCron, useWidgets } from '@/lib/client/api';
 import { formatAge, formatDuration } from '@/lib/client/format';
 import type { ServiceStatus, ServicesResponse, StatusResponse } from '@/lib/shared/contract';
 import { cn } from '@/lib/utils';
-import { LinksCard, MarketsCard } from './phone-cards';
 
 export type PhoneOverviewProps = {
   services: ServicesResponse | undefined;
@@ -178,9 +179,9 @@ export function PhoneOverview({ services, status, onOpenService, onOpenJobs }: P
       <SystemPanel variant="phone" />
       <NowPlayingPanel />
       {(widgets?.standalone ?? []).map((w) => (
-        <MarketsCard key={w.id} widget={w} />
+        <MarketsCard key={w.id} widget={w} touch />
       ))}
-      <LinksCard links={services?.links ?? []} />
+      <LinksCard links={services?.links ?? []} touch />
       <JobsCard onOpenJobs={onOpenJobs} touch />
     </Stack>
   );

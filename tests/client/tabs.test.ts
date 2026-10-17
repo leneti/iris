@@ -110,6 +110,11 @@ describe('tabsReducer', () => {
     expect(tabsReducer(s, { type: 'closeAll' })).toEqual(emptyTabs);
   });
 
+  test('the Overview is pinned: closing it changes nothing', () => {
+    const s = openAll(['builtin:overview', 'a']);
+    expect(tabsReducer(s, { type: 'close', id: 'builtin:overview' })).toBe(s);
+  });
+
   test('setMaxLive trims the live set to the most recent', () => {
     const s = tabsReducer(openAll(ids(6), 8), { type: 'setMaxLive', max: 3 });
     expect(s.live).toEqual(['s6', 's5', 's4']);
