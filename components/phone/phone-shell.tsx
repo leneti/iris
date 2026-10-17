@@ -8,6 +8,7 @@ import { Canvas } from '@/components/tabs/canvas';
 import type { FrameModel } from '@/components/tabs/frame-model';
 import type { Frames } from '@/components/tabs/use-frames';
 import { useWidgets } from '@/lib/client/api';
+import { useVisibleHeight } from '@/lib/client/use-client';
 import { isPublicAddress, type AddressMode } from '@/lib/client/address';
 import { setAlwaysNewTab } from '@/lib/client/new-tab';
 import { shownGroups } from '@/lib/client/services';
@@ -60,6 +61,7 @@ export function PhoneShell({
 }: PhoneShellProps) {
   const { tabs } = shell;
   const { data: widgets } = useWidgets();
+  const visibleHeight = useVisibleHeight();
   // The last built-in view; Back from a service returns to it.
   const [view, setView] = useState<PhoneView>('overview');
   const [sheetOpen, setSheetOpen] = useState(false);
@@ -135,7 +137,10 @@ export function PhoneShell({
   }
 
   return (
-    <div className="flex h-svh flex-col overflow-hidden overscroll-contain bg-page text-[15px] text-text">
+    <div
+      className="flex h-svh flex-col overflow-hidden overscroll-contain bg-page text-[15px] text-text"
+      style={visibleHeight === null ? undefined : { height: visibleHeight }}
+    >
       {activeService !== undefined && activeId !== null ? (
         <ServiceBar
           service={activeService}

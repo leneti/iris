@@ -122,6 +122,26 @@ describe('phone shell', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
+  test('the shell takes the visible height from visualViewport, unzoomed, and follows it', () => {
+    // Firefox for Android lays the page out as if its toolbar were hidden, so CSS units alone
+    // put the bottom navigation under the screen edge; the visual viewport is what shows.
+    const vv = Object.assign(new EventTarget(), { height: 700, scale: 1 });
+    vi.stubGlobal('visualViewport', vv);
+    try {
+      const { container } = mount();
+      const root = container.firstElementChild as HTMLElement;
+      expect(root.style.height).toBe('700px');
+      act(() => {
+        Object.assign(vv, { height: 325, scale: 2 });
+        vv.dispatchEvent(new Event('resize'));
+      });
+      expect(root.style.height).toBe('650px');
+    } finally {
+      vi.unstubAllGlobals();
+      stubBrowser();
+    }
+  });
+
   test('the shell is 100svh tall, clear of the browser toolbars, and contains overscroll', () => {
     const { container } = mount();
     const root = container.firstElementChild as HTMLElement;

@@ -43,6 +43,26 @@ export function useMedia(query: string, serverValue = false): boolean {
   );
 }
 
+/**
+ * The height the browser actually shows, in CSS px at zoom 1, or null without visualViewport
+ * (and on the server). Firefox for Android lays a page out as if its toolbar were hidden, so
+ * 100svh and 100dvh reach under the screen edge while the toolbar shows; this does not.
+ */
+export function useVisibleHeight(): number | null {
+  return useSyncExternalStore(
+    (notify) => {
+      const vv = window.visualViewport;
+      vv?.addEventListener('resize', notify);
+      return () => vv?.removeEventListener('resize', notify);
+    },
+    () => {
+      const vv = window.visualViewport;
+      return vv ? Math.round(vv.height * vv.scale) : null;
+    },
+    () => null,
+  );
+}
+
 /** A per-device preference. The server render and hydration see `fallback`. */
 export function usePref<T>(key: string, fallback: T): T {
   const raw = useSyncExternalStore(
