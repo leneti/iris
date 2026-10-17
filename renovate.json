@@ -32,6 +32,11 @@
     {
       "matchFileNames": [".nvmrc"],
       "allowedVersions": "<25"
+    },
+    {
+      "description": "TypeScript 7 has no stable JavaScript API, which Next's type check needs",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7"
     }
   ]
 }
