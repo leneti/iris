@@ -23,6 +23,7 @@ beforeEach(() => {
       <AppShell mode="lan" phoneMaxLive={3} />
     </TooltipProvider>,
   );
+  fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
   fireEvent.click(
     within(screen.getByRole('navigation', { name: 'Main' })).getByRole('button', {
       name: /^Search/,
@@ -58,12 +59,13 @@ describe('phone search', () => {
 
   test('choosing a service opens it full height', () => {
     fireEvent.click(screen.getByText('Showtrack'));
-    expect(screen.queryByRole('navigation', { name: 'Main' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Menu' })).toBeNull();
     expect(screen.getByTitle(/^Showtrack/)).toBeTruthy();
   });
 
   test('Cancel returns to the Overview', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Menu' }));
     expect(
       within(screen.getByRole('navigation', { name: 'Main' }))
         .getByRole('button', { name: /^Overview/ })

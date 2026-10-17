@@ -36,13 +36,18 @@ export function TabsButton({ count, onClick }: { count: number; onClick: () => v
   );
 }
 
-/** The bar of a built-in view: the title (with the Iris mark on the Overview), then the extras. */
+/**
+ * The bar of a built-in view: the menu button, the title (with the Iris mark on the Overview),
+ * then the extras.
+ */
 export function ViewBar({
+  menu,
   title,
   mark = false,
   weather,
   tabs,
 }: {
+  menu: ReactNode;
   title: string;
   /** The Overview shows the Iris mark beside its title. */
   mark?: boolean;
@@ -51,6 +56,7 @@ export function ViewBar({
 }) {
   return (
     <TopBar>
+      {menu}
       {mark && (
         <span
           aria-hidden

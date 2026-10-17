@@ -11,17 +11,18 @@ vi.mock('@/lib/client/api', async () => (await import('./mock-api')).apiMock);
 
 stubBrowser();
 
-const nav = (name: string) =>
-  within(screen.getByRole('navigation', { name: 'Main' })).getByRole('button', {
+const menuButton = () => screen.queryByRole('button', { name: /^Menu/ });
+function nav(name: string) {
+  fireEvent.click(menuButton()!);
+  return within(screen.getByRole('navigation', { name: 'Main' })).getByRole('button', {
     name: new RegExp(`^${name}`),
   });
+}
 const tabsButton = () => screen.getByRole('button', { name: /^Tabs \(\d+ open\)$/ });
 const sheet = () => screen.getByRole('dialog', { name: 'Open tabs' });
 
 function open(name: string) {
-  if (!screen.queryByRole('navigation', { name: 'Main' })) {
-    fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-  }
+  if (!menuButton()) fireEvent.click(screen.getByRole('button', { name: 'Back' }));
   fireEvent.click(nav('Services'));
   fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${name}(?!\\d)`) }));
 }
@@ -102,7 +103,7 @@ describe('tab sheet', () => {
     fireEvent.click(within(sheet()).getByRole('button', { name: 'Close all tabs' }));
     expect(screen.queryByRole('dialog')).toBeNull();
     expect(screen.queryByTitle(/^Alpha/)).toBeNull();
-    expect(screen.getByRole('navigation', { name: 'Main' })).toBeTruthy();
+    expect(menuButton()).toBeTruthy();
     expect(tabsButton().textContent).toContain('0');
   });
 

@@ -43,19 +43,6 @@ export function useMedia(query: string, serverValue = false): boolean {
   );
 }
 
-/**
- * False in Firefox for Android: it reports the gesture bar as a bottom safe-area inset, but its
- * page stops above that bar, so padding for it only leaves an empty strip. True elsewhere and on
- * the server.
- */
-export function useBottomInset(): boolean {
-  return useSyncExternalStore(
-    () => () => {},
-    () => !/Android.*Firefox\//.test(navigator.userAgent),
-    () => true,
-  );
-}
-
 /** A per-device preference. The server render and hydration see `fallback`. */
 export function usePref<T>(key: string, fallback: T): T {
   const raw = useSyncExternalStore(

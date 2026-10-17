@@ -19,11 +19,15 @@ function mount(phoneMaxLive = 3) {
   );
 }
 
-const bottomNav = () => screen.queryByRole('navigation', { name: 'Main' });
-const nav = (name: string) =>
-  within(screen.getByRole('navigation', { name: 'Main' })).getByRole('button', {
+/** The menu button: only a built-in view's top bar has one. */
+const menuButton = () => screen.queryByRole('button', { name: /^Menu/ });
+/** An item of the menu, opening the menu first. */
+function nav(name: string) {
+  if (!screen.queryByRole('navigation', { name: 'Main' })) fireEvent.click(menuButton()!);
+  return within(screen.getByRole('navigation', { name: 'Main' })).getByRole('button', {
     name: new RegExp(`^${name}`),
   });
+}
 const tabsButton = () => screen.getByRole('button', { name: /^Tabs \(\d+ open\)$/ });
 const frame = (name: string) =>
   screen.getByTitle(new RegExp(`^${name}(?!\\d)`)) as HTMLIFrameElement;
@@ -31,7 +35,7 @@ const iframes = () => document.querySelectorAll('iframe');
 
 /** Opens a service from the Services view, wherever the phone is now. */
 function openService(name: string) {
-  if (!bottomNav()) fireEvent.click(screen.getByRole('button', { name: 'Back' }));
+  if (!menuButton()) fireEvent.click(screen.getByRole('button', { name: 'Back' }));
   fireEvent.click(nav('Services'));
   fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${name}(?!\\d)`) }));
 }
@@ -63,9 +67,11 @@ afterEach(() => {
 });
 
 describe('phone shell', () => {
-  test('shows the top bar and the four-item bottom navigation, not the desktop sidebar', () => {
+  test('shows the top bar with a menu of four items, not the desktop sidebar', () => {
     mount();
-    expect(screen.getByRole('banner')).toBeTruthy();
+    expect(within(screen.getByRole('banner')).getByRole('button', { name: /^Menu/ })).toBeTruthy();
+    expect(screen.queryByRole('navigation', { name: 'Main' })).toBeNull();
+    nav('Overview');
     const names = within(screen.getByRole('navigation', { name: 'Main' }))
       .getAllByRole('button')
       .map((b) => b.textContent?.replace(/\d+/g, ''));
@@ -74,25 +80,27 @@ describe('phone shell', () => {
     expect(screen.queryByRole('tablist')).toBeNull();
   });
 
-  test('marks the current item', () => {
+  test('marks the current item, and choosing one closes the menu', () => {
     mount();
     expect(nav('Overview').getAttribute('aria-current')).toBe('page');
     fireEvent.click(nav('Services'));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.getByRole('heading', { name: 'Services' })).toBeTruthy();
     expect(nav('Services').getAttribute('aria-current')).toBe('page');
     expect(nav('Overview').getAttribute('aria-current')).toBeNull();
   });
 
-  test('opening a service hides the bottom navigation, and Back returns with the tab open (9.2)', () => {
+  test('opening a service puts Back in place of the menu, and Back returns with the tab open (9.2)', () => {
     mount();
     openService('Svc 0');
-    expect(bottomNav()).toBeNull();
+    expect(menuButton()).toBeNull();
     expect(frame('Svc 0')).toBeTruthy();
     expect(tabsButton().textContent).toContain('1');
 
     fireEvent.click(screen.getByRole('button', { name: 'Back' }));
-    expect(bottomNav()).toBeTruthy();
-    expect(nav('Services').getAttribute('aria-current')).toBe('page');
+    expect(menuButton()).toBeTruthy();
     expect(tabsButton().textContent).toContain('1');
+    expect(nav('Services').getAttribute('aria-current')).toBe('page');
     // The frame is still there, only hidden.
     expect(frame('Svc 0').closest('[hidden]')).not.toBeNull();
   });
@@ -129,7 +137,14 @@ describe('phone shell', () => {
     expect(root.className).not.toContain('overflow-hidden');
     expect(root.className).not.toContain('overscroll-contain');
     expect(root.className).not.toMatch(/(^| )h-svh/);
-    expect(nav('Overview').closest('nav')?.className).toContain('fixed');
+  });
+
+  test('nothing is fixed to the bottom edge, which Firefox for Android does not keep on screen', () => {
+    const { container } = mount();
+    nav('Overview');
+    for (const el of [container, ...document.querySelectorAll('[role="dialog"]')]) {
+      expect(el.innerHTML).not.toMatch(/\bbottom-0\b/);
+    }
   });
 
   test('an open service fills the screen and keeps overscroll inside', () => {
@@ -139,22 +154,6 @@ describe('phone shell', () => {
     expect(root.className).toContain('fixed');
     expect(root.className).toContain('inset-0');
     expect(root.className).toContain('overscroll-contain');
-  });
-
-  test('Firefox for Android gets no gesture-bar padding under the navigation', () => {
-    const ua = vi.spyOn(navigator, 'userAgent', 'get');
-    ua.mockReturnValue('Mozilla/5.0 (Android 16; Mobile; rv:150.0) Gecko/150.0 Firefox/150.0');
-    try {
-      mount();
-      expect(nav('Overview').closest('nav')?.className).not.toContain('safe-area-inset-bottom');
-    } finally {
-      ua.mockRestore();
-    }
-  });
-
-  test('other browsers pad the navigation for the gesture bar', () => {
-    mount();
-    expect(nav('Overview').closest('nav')?.className).toContain('safe-area-inset-bottom');
   });
 });
 
@@ -172,7 +171,13 @@ describe('Jobs badge (9.1)', () => {
   test('is absent when no job needs attention', () => {
     data.cron = cron([job({ id: 'c', name: 'feed-sync' })]);
     mount();
+    expect(menuButton()?.getAttribute('aria-label')).toBe('Menu');
     expect(within(nav('Jobs')).queryByLabelText(/need attention/)).toBeNull();
+  });
+
+  test('the menu button says so too, without opening the menu', () => {
+    mount();
+    expect(menuButton()?.getAttribute('aria-label')).toBe('Menu, 2 jobs need attention');
   });
 });
 
@@ -219,7 +224,7 @@ describe('frames', () => {
 describe('resizing', () => {
   test('growing past 640 px shows the desktop sidebar again', () => {
     const { rerender } = mount();
-    expect(bottomNav()).toBeTruthy();
+    expect(menuButton()).toBeTruthy();
     act(() => {
       window.matchMedia = ((query: string) => ({
         matches: false,
@@ -234,6 +239,6 @@ describe('resizing', () => {
       </TooltipProvider>,
     );
     // useMedia re-reads on the next render of a subscriber; the desktop shell has a sidebar.
-    expect(bottomNav()).toBeNull();
+    expect(menuButton()).toBeNull();
   });
 });

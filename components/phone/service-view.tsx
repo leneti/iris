@@ -12,7 +12,7 @@ const ICON_BUTTON =
 /**
  * The bar above an open service: Back, the service's icon, name and health, Reload and the tabs
  * button. The frame itself lives in the shell's Canvas, which never moves it; this is only the
- * chrome. The bottom navigation is hidden while it shows (handoff 7.7).
+ * chrome. Back takes the menu button's place while it shows (handoff 7.7).
  */
 export function ServiceBar({
   service,
