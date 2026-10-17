@@ -14,7 +14,7 @@
   },
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": ["minor", "patch", "pin", "pinDigest", "digest"],
       "groupName": "non-major",
       "schedule": ["before 6am on monday"],
       "automerge": true
