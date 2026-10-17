@@ -66,7 +66,10 @@ beforeEach(() => {
     removeEventListener() {},
   })) as unknown as typeof window.matchMedia;
   servicesData = servicesResponse([group('Media', [...many, torrent])]);
-  statusData = undefined;
+  // The Overview shows its chips once the status has loaded; until then it is still reading.
+  statusData = statusResponse(
+    Object.fromEntries([...many, torrent].map((s) => [s.id, 'healthy' as const])),
+  );
   mutate.mockClear();
 });
 afterEach(() => {
@@ -126,7 +129,8 @@ describe('desktop chrome', () => {
   test("the wordmark's i is coral on a service tab when a service is unhealthy", () => {
     statusData = statusResponse({ s0: 'unhealthy' });
     mount();
-    openFromOverview('Svc 0');
+    // The reading's own "Svc 0 has fallen silent" also opens the tab; take the chip.
+    openFromOverview('Svc 0, down');
     expect(document.querySelector('[data-slot="wordmark-i"]')?.className).toContain('text-down');
   });
 

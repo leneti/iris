@@ -212,18 +212,7 @@ export function AppShell({
             onAlwaysNewTab={setAlwaysNewTab}
           >
             {builtinActive &&
-              (activeId === BUILTIN_JOBS ? (
-                <JobsView />
-              ) : (
-                <Overview
-                  services={shell.services}
-                  statusById={statusById}
-                  openIds={tabs.open}
-                  docker={shell.docker}
-                  onOpenService={openService}
-                  onOpenJobs={() => shell.openBuiltin(BUILTIN_JOBS)}
-                />
-              ))}
+              (activeId === BUILTIN_JOBS ? <JobsView /> : <Overview onOpenService={openService} />)}
           </Canvas>
         </div>
       )}

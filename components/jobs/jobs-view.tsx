@@ -69,7 +69,7 @@ export function JobsView() {
       )}
       <p className="text-xs text-text-2">
         A job is overdue when its last run is older than its most recent scheduled time plus a grace
-        period. Failed and overdue jobs also show in the header pill and on the sidebar entry.
+        period. Failed and overdue jobs also show in the Jobs pill in the top bar.
       </p>
     </div>
   );

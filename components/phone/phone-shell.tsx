@@ -30,7 +30,7 @@ export type PhoneShellProps = {
   frames: Frames;
   alwaysNewTab: Readonly<Record<string, boolean>>;
   address: { mode: AddressMode; hostname: string; protocol: string };
-  /** The sidebar's Scheduled jobs count, from the same source. */
+  /** The Scheduled jobs count, from the same source as the Jobs pill. */
   jobs: JobsBadge;
   /** AppShell's wrapper, so a service this device always opens in a browser tab still does. */
   openService: (id: string) => void;

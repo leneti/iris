@@ -2,10 +2,12 @@ import { fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { AppShell } from '@/components/shell/app-shell';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import type { ServiceEntry, ServicesResponse } from '@/lib/shared/contract';
+import type { ServiceEntry, ServicesResponse, StatusResponse } from '@/lib/shared/contract';
+import { statusResponse } from '../phone/mock-api';
 import { group, servicesResponse, svc } from '../shell/fixtures';
 
 let servicesData: ServicesResponse | undefined;
+let statusData: StatusResponse | undefined;
 vi.mock('@/lib/client/api', () => ({
   POLL_MS: {
     status: 10_000,
@@ -16,7 +18,7 @@ vi.mock('@/lib/client/api', () => ({
     services: 30_000,
   },
   useServices: () => ({ data: servicesData, mutate: vi.fn() }),
-  useStatus: () => ({ data: undefined }),
+  useStatus: () => ({ data: statusData }),
   useCron: () => ({ data: undefined }),
   useWidgets: () => ({ data: undefined }),
   useSystem: () => ({ data: undefined }),
@@ -74,6 +76,8 @@ beforeEach(() => {
     ...servicesResponse([group('Media', [moviebox, streamhouse]), group('Tools', [noEmbed])]),
     links: [{ name: 'Router Admin', abbr: 'RA', url: 'http://router.example.invalid/admin' }],
   };
+  // The Overview shows its chips once the status has loaded; until then it is still reading.
+  statusData = statusResponse({ movies: 'healthy', stream: 'healthy', legacy: 'healthy' });
 });
 afterEach(() => vi.restoreAllMocks());
 
