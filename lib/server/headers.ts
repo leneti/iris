@@ -38,6 +38,7 @@ function frameSources(host: string, env: ServerEnv): string[] {
   const underZone = safeZone !== undefined && (name === safeZone || name.endsWith(`.${safeZone}`));
   const safeName = SAFE_NAME.test(name) || SAFE_IPV6.test(name);
   if (env.allowedHosts.includes(host) && !underZone && safeName) sources.push(`http://${name}:*`);
+  sources.push(...env.frameSources);
   return sources;
 }
 

@@ -6,7 +6,7 @@ Iris is a self-hosted dashboard for a Docker media server. It finds services fro
 
 - **Discovery from labels.** A container with `iris.enable=true` appears with its name, group, icon and address. A YAML file covers services that cannot carry labels.
 - **Health.** Docker state plus an HTTP probe give one status per service.
-- **Tabs.** Services open in iframes when they allow it, and in a new browser tab when they do not. Keyboard palette, phone layout, light and dark themes.
+- **Tabs.** Services open in iframes when they allow it, and in a new browser tab when they do not. When an app sends its frame to a sign-in page (for example Cloudflare Access), Iris opens the sign-in in a small window, closes it once the app answers and shows the app in its tab. Keyboard palette, phone layout, light and dark themes.
 - **Panels.** System (Glances), Now playing (Tautulli), Scheduled jobs (cron-status and a host status file).
 - **Integrations.** Small stat tiles for Seerr, Tautulli, Radarr, Sonarr, Prowlarr, autobrr, Gotify, qBittorrent, a Cloudflare tunnel, CoinMarketCap markets and Open-Meteo weather.
 
@@ -129,6 +129,7 @@ Everything else is optional. The full list of environment variables, labels and 
 | `IRIS_TRAEFIK_URL`                              | Health probes and integration requests   |
 | `IRIS_CRON_STATUS_URL`, `IRIS_HOST_STATUS_FILE` | Scheduled jobs panel                     |
 | `IRIS_ICONS_BASE`                               | dashboard-icons set, pinned to a commit  |
+| `IRIS_FRAME_SOURCES`                            | Extra https addresses Iris may frame     |
 | `IRIS_CONFIG_DIR`, `IRIS_CACHE_DIR`             | Default `/config` and `/cache`           |
 | `IRIS_*_KEY`, `*_TOKEN`, qBittorrent sign-in    | Integration credentials; empty means off |
 

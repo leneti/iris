@@ -8,6 +8,8 @@ export interface ServerEnv {
   readonly cronStatusUrl: string | undefined;
   readonly zone: string | undefined;
   readonly allowedHosts: readonly string[];
+  /** Extra https origins the page may frame, from `IRIS_FRAME_SOURCES`. */
+  readonly frameSources: readonly string[];
   readonly hostStatusFile: string | undefined;
   readonly iconsBase: string | undefined;
   readonly configDir: string;
@@ -25,6 +27,32 @@ export interface ServerEnv {
   readonly cloudflareToken: string | undefined;
   readonly coinmarketcapKey: string | undefined;
   readonly gotifyToken: string | undefined;
+}
+
+const SAFE_NAME = /^[a-z0-9]([a-z0-9.-]*[a-z0-9])?$/;
+const IP_LIKE = /^[0-9.]+$/;
+
+/**
+ * `IRIS_FRAME_SOURCES`: comma-separated https URLs whose origins the page may frame besides the
+ * zone's. Anything that is not https with a host name (no IP literal, no credentials) is dropped,
+ * so a bad entry can never widen the policy beyond one named origin.
+ */
+function parseFrameSources(raw: string | undefined): readonly string[] {
+  const origins = new Set<string>();
+  for (const part of (raw ?? '').split(',')) {
+    const value = part.trim();
+    if (!value) continue;
+    let url: URL;
+    try {
+      url = new URL(value);
+    } catch {
+      continue;
+    }
+    if (url.protocol !== 'https:' || url.username || url.password) continue;
+    if (!SAFE_NAME.test(url.hostname) || IP_LIKE.test(url.hostname)) continue;
+    origins.add(url.origin);
+  }
+  return Object.freeze([...origins]);
 }
 
 export function loadEnv(
@@ -51,6 +79,7 @@ export function loadEnv(
         .map((h) => h.trim().toLowerCase())
         .filter(Boolean),
     ),
+    frameSources: parseFrameSources(source.IRIS_FRAME_SOURCES),
     hostStatusFile: opt('IRIS_HOST_STATUS_FILE'),
     iconsBase: opt('IRIS_ICONS_BASE'),
     configDir: opt('IRIS_CONFIG_DIR') ?? '/config',

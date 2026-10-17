@@ -185,7 +185,8 @@ describe('controls', () => {
     fireEvent.click(screen.getByRole('menuitem', { name: 'Sign in and retry' }));
     expect(open).toHaveBeenCalledTimes(1);
     expect(String(open.mock.calls[0]![0])).toBe('https://s0.example.invalid/');
-    expect(popup.opener).toBeNull();
+    // The popup keeps its opener: Chromium lets Iris close a popup only while it has one.
+    expect(popup.opener).not.toBeNull();
     // While the popup is open the tab is left alone.
     act(() => void vi.advanceTimersByTime(1500));
     expect(within(tab('Svc 0')).queryByRole('img', { name: 'loading' })).toBeNull();

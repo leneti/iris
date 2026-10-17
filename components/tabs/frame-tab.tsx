@@ -1,10 +1,12 @@
 'use client';
 
 import { Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { isPublicAddress } from '@/lib/client/address';
 import type { FrameModel } from './frame-model';
+import { frameWatch } from './frame-watch';
+import { clickStillActive, SignInPanel, type SignInStep } from './sign-in-panel';
 import { SlowHint } from './slow-hint';
 import { useSignIn } from './sign-in';
 
@@ -44,8 +46,9 @@ function FrameSkeleton({ name }: { name: string }) {
 
 /**
  * One live tab: the iframe (never re-parented: it only gets `hidden`), a skeleton until `load`,
- * and the slow-load hint after 12 s. The parent keys it by service id and reload count, so a
- * reload starts everything, including the 12 s timer, again.
+ * the slow-load hint after 12 s, and the sign-in panel when the app sends the frame to a sign-in
+ * page Iris can't show. The parent keys it by service id and reload count, so a reload starts
+ * everything, including the 12 s timer and the sign-in watch, again.
  */
 export function FrameTab({
   model,
@@ -63,7 +66,25 @@ export function FrameTab({
   const { service, url } = model;
   const [slow, setSlow] = useState(false);
   const [dismissed, setDismissed] = useState(false);
+  const [signInStep, setSignInStep] = useState<SignInStep | null>(null);
+  const settle = useRef<() => void>(() => {});
   const signIn = useSignIn();
+  const startSignIn = () => setSignInStep(signIn(url, onSignedIn) ? 'waiting' : 'blocked');
+  const needsSignIn = signInStep !== null;
+
+  // A layout effect runs in the same task that creates the iframe, before its navigation can
+  // answer, so a violation it causes always finds it registered.
+  useLayoutEffect(() => {
+    const done = frameWatch().track(url, () => {
+      // Straight to the sign-in window while the click that opened the tab still counts.
+      if (clickStillActive()) setSignInStep(signIn(url, onSignedIn) ? 'waiting' : 'blocked');
+      else setSignInStep('ask');
+    });
+    settle.current = done;
+    return done;
+    // Only a new address starts a new watch; the callbacks are read when it fires.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [url]);
 
   useEffect(() => {
     if (loaded) return;
@@ -77,11 +98,17 @@ export function FrameTab({
         src={url}
         title={`${service.name} (${service.group})`}
         allow={ALLOW}
-        onLoad={onLoad}
+        onLoad={() => {
+          settle.current();
+          onLoad();
+        }}
         className="size-full border-0 bg-raised"
       />
-      {!loaded && <FrameSkeleton name={service.name} />}
-      {!loaded && slow && !dismissed && (
+      {!loaded && !needsSignIn && <FrameSkeleton name={service.name} />}
+      {signInStep !== null && (
+        <SignInPanel service={service} url={url} step={signInStep} onStart={startSignIn} />
+      )}
+      {!loaded && !needsSignIn && slow && !dismissed && (
         <SlowHint
           name={service.name}
           url={url}

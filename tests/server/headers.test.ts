@@ -118,6 +118,18 @@ describe('securityHeaders', () => {
     expect(csp('192.0.2.10:4747', e)).not.toContain('script-src *');
   });
 
+  test('IRIS_FRAME_SOURCES adds named https origins after the zone, on every host', () => {
+    const e = loadEnv({
+      IRIS_ZONE: 'example.invalid',
+      IRIS_ALLOWED_HOSTS: '192.0.2.10:4747,example.invalid',
+      IRIS_FRAME_SOURCES: 'https://media.example.net:32400/web, https://other.example.org',
+    });
+    expect(csp('example.invalid', e)).toContain(
+      'frame-src https://*.example.invalid https://media.example.net:32400 https://other.example.org;',
+    );
+    expect(csp('192.0.2.10:4747', e)).toContain('https://media.example.net:32400');
+  });
+
   test('fixed directives and the other headers', () => {
     const headers = securityHeaders('192.0.2.10:4747', env);
     const value = headers['Content-Security-Policy'] ?? '';
