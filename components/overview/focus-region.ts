@@ -10,4 +10,4 @@ export function focusRegion(anchor: Anchor): void {
 
 /** What every anchored region needs so `focusRegion` can land on it. */
 export const REGION =
-  'scroll-mt-16 rounded-sm outline-none focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink-soft';
+  'scroll-mt-16 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-pink-soft';

@@ -34,6 +34,7 @@ function ChipView({
   onHover: (on: boolean) => void;
 }) {
   const down = chip.state === 'down';
+  const degraded = chip.state === 'warn';
   return (
     <button
       type="button"
@@ -44,7 +45,7 @@ function ChipView({
       onFocus={() => onHover(true)}
       onBlur={() => onHover(false)}
       className={cn(
-        'flex min-w-0 cursor-pointer items-center gap-[9px] rounded-[12px] border px-[10px] py-[7px] text-left outline-none',
+        'flex min-w-0 cursor-pointer items-center gap-[9px] rounded-[12px] border px-[10px] py-[7px] text-left',
         'transition-[border-color,box-shadow] duration-200',
         'hover:border-pink/60 hover:shadow-[0_0_22px_-8px_var(--color-pink-glow)]',
         'focus-visible:border-pink/60 focus-visible:outline-2 focus-visible:outline-pink-soft',
@@ -54,9 +55,14 @@ function ChipView({
     >
       <ServiceIcon service={chip.service} size={22} />
       <span className="min-w-0 flex-1 truncate font-medium">{chip.name}</span>
-      {(down || chip.figure) && (
-        <em className={cn('font-mono text-xs not-italic', down ? 'text-down' : 'text-faint')}>
-          {down ? 'down' : chip.figure}
+      {(down || degraded || chip.figure) && (
+        <em
+          className={cn(
+            'font-mono text-xs not-italic',
+            down ? 'text-down' : degraded ? 'text-warn' : 'text-faint',
+          )}
+        >
+          {down ? 'down' : degraded ? 'degraded' : chip.figure}
         </em>
       )}
       <span aria-hidden className={cn('size-[7px] shrink-0 rounded-full', DOT[chip.state])} />

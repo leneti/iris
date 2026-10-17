@@ -65,7 +65,9 @@ describe('chips', () => {
 
   test('a degraded chip is named degraded', () => {
     show(read(withStatus(calm(), 'alpha', 'degraded')));
-    expect(screen.getByRole('button', { name: 'Alpha, degraded' })).toBeTruthy();
+    const chip = screen.getByRole('button', { name: 'Alpha, degraded' });
+    // Not colour alone: the word shows for sighted users too.
+    expect(within(chip).getByText('degraded').className).toContain('text-warn');
   });
 
   test('hovering a chip raises the ball to 1 and leaving returns to 0.6', () => {
@@ -374,6 +376,27 @@ describe('resilience', () => {
     expect(slot('static-ball')).not.toBeNull();
     expect(screen.queryByText("This part didn't draw.")).toBeNull();
     expect(slot('reading')).not.toBeNull();
+  });
+});
+
+describe('focus', () => {
+  test('no element hides its outline and then asks for a focus-visible outline', () => {
+    const input = withSystem(
+      withJob(withDown(calm(), 'alpha'), 'feed-sync', { result: 'failed' }),
+      { cpu: 90 },
+    );
+    show(read(input));
+    const broken = [...document.querySelectorAll('[class]')].filter((el) => {
+      const c = el.getAttribute('class') ?? '';
+      return /(^|\s)outline-none(\s|$)/.test(c) && c.includes('focus-visible:outline');
+    });
+    expect(broken).toEqual([]);
+    // And the interactive ones do ask for a visible ring.
+    for (const el of document.querySelectorAll(
+      '#ov-circle button, [data-slot="reading"] a, [data-slot="reading"] button, #ov-hours',
+    )) {
+      expect(el.getAttribute('class')).toContain('focus-visible:outline-2');
+    }
   });
 });
 

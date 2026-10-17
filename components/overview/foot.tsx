@@ -29,7 +29,7 @@ export function Foot({ touch = false }: { touch?: boolean }) {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={cn(
-                  'rounded-sm text-muted underline decoration-line-strong underline-offset-4 outline-none hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-soft',
+                  'rounded-sm text-muted underline decoration-line-strong underline-offset-4 hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-pink-soft',
                   size,
                 )}
               >

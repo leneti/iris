@@ -32,7 +32,7 @@ function SegmentView({
       <button
         type="button"
         onClick={() => onOpenService(target.tab)}
-        className={cn('cursor-pointer outline-none', FOCUS, tone)}
+        className={cn('cursor-pointer', FOCUS, tone)}
       >
         {text}
       </button>
@@ -47,7 +47,7 @@ function SegmentView({
           e.preventDefault();
           focusRegion(anchor);
         }}
-        className={cn('outline-none', FOCUS, tone)}
+        className={cn(FOCUS, tone)}
       >
         {text}
       </a>
@@ -57,12 +57,7 @@ function SegmentView({
   const href = safeHref(target.href);
   if (href === null) return <span className={tone}>{text}</span>;
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="noopener noreferrer"
-      className={cn('outline-none', FOCUS, tone)}
-    >
+    <a href={href} target="_blank" rel="noopener noreferrer" className={cn(FOCUS, tone)}>
       {text}
     </a>
   );
