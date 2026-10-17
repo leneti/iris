@@ -16,3 +16,6 @@ next-env.d.ts
 .env*
 !dev/.env.fixtures
 .playwright-mcp/
+
+# Project-local agent skills, installed per machine
+.claude/skills/
