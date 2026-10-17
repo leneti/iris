@@ -3,7 +3,8 @@
 import type { ReactNode } from 'react';
 import { useWidgets } from '@/lib/client/api';
 import { shownGroups } from '@/lib/client/services';
-import { groupIcon, dockerText } from '@/components/shell/sidebar';
+import { groupIcon } from '@/components/shell/groups';
+import { formatDuration } from '@/lib/client/format';
 import type { DockerState } from '@/components/shell/use-shell';
 import type { ServiceStatus, ServicesResponse } from '@/lib/shared/contract';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,14 @@ export type OverviewProps = {
   onOpenService: (id: string) => void;
   onOpenJobs: () => void;
 };
+
+function dockerText(d: Pick<DockerState, 'state' | 'ageSeconds'>): string {
+  if (d.state === 'pending') return 'Docker · checking…';
+  if (d.state === 'ok') return 'Docker · live';
+  return d.ageSeconds === null
+    ? 'Docker unreachable'
+    : `Docker unreachable · ${formatDuration(d.ageSeconds)}`;
+}
 
 function GroupLabel({ name, icon, count }: { name: string; icon: ReactNode; count: number }) {
   return (

@@ -30,6 +30,14 @@ export const mutate = vi.fn();
 
 /** The module replacement for `@/lib/client/api`. */
 export const apiMock = {
+  POLL_MS: {
+    status: 10_000,
+    cron: 60_000,
+    system: 10_000,
+    streams: 15_000,
+    widgets: 10_000,
+    services: 30_000,
+  },
   useServices: () => ({ data: data.services, mutate }),
   useStatus: () => ({ data: data.status }),
   useCron: () => ({ data: data.cron }),

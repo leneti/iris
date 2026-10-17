@@ -2,7 +2,7 @@
 
 import { Ban, ExternalLink, LogIn } from 'lucide-react';
 import { useId } from 'react';
-import { Address } from '@/components/shell/status-strip';
+import { Address } from '@/components/shell/address';
 import { ServiceIcon } from '@/components/service-icon';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';

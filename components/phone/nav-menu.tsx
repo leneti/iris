@@ -1,7 +1,7 @@
 'use client';
 
 import { Clock, House, LayoutGrid, Menu, Search, type LucideIcon } from 'lucide-react';
-import { JobsCount, type JobsBadge } from '@/components/shell/sidebar';
+import { JobsCount, type JobsBadge } from '@/components/shell/jobs-count';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
 

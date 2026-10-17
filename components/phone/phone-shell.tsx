@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Weather } from '@/components/overview/weather';
-import type { JobsBadge } from '@/components/shell/sidebar';
+import type { JobsBadge } from '@/components/shell/jobs-count';
 import type { Shell } from '@/components/shell/use-shell';
 import { Canvas } from '@/components/tabs/canvas';
 import type { FrameModel } from '@/components/tabs/frame-model';

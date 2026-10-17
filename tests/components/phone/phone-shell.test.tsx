@@ -66,7 +66,7 @@ afterEach(() => {
 });
 
 describe('phone shell', () => {
-  test('shows the top bar with a menu of four items, not the desktop sidebar', () => {
+  test('shows the top bar with a menu of four items, not the desktop shell', () => {
     mount();
     expect(within(screen.getByRole('banner')).getByRole('button', { name: /^Menu/ })).toBeTruthy();
     expect(screen.queryByRole('navigation', { name: 'Main' })).toBeNull();
@@ -221,7 +221,7 @@ describe('frames', () => {
 });
 
 describe('resizing', () => {
-  test('growing past 640 px shows the desktop sidebar again', () => {
+  test('growing past 640 px shows the desktop shell again', () => {
     const { rerender } = mount();
     expect(menuButton()).toBeTruthy();
     act(() => {
@@ -237,7 +237,7 @@ describe('resizing', () => {
         <AppShell mode="lan" phoneMaxLive={3} />
       </TooltipProvider>,
     );
-    // useMedia re-reads on the next render of a subscriber; the desktop shell has a sidebar.
+    // useMedia re-reads on the next render of a subscriber; the desktop shell has no menu button.
     expect(menuButton()).toBeNull();
   });
 });

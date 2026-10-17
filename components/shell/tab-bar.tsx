@@ -22,7 +22,7 @@ export type TabBarProps = {
 };
 
 /**
- * 40 px strip of 28 px tabs, the pinned Overview first, then the active tab's controls, the tab
+ * Inline in the top bar: pill tabs, the pinned Overview first, then the active tab's controls, the tab
  * switcher and the "more" menu. A pinned tab has no close mark and ignores Delete and middle-click.
  */
 export function TabBar({
@@ -67,7 +67,7 @@ export function TabBar({
     list.current?.querySelectorAll<HTMLElement>('[role="tab"]')[to]?.focus();
   };
   return (
-    <div className="flex h-10 shrink-0 items-center gap-1 bg-chrome px-2">
+    <div className="flex h-full items-center gap-1">
       <div
         ref={list}
         role="tablist"
@@ -91,9 +91,11 @@ export function TabBar({
               }}
               onKeyDown={(e) => onKey(e, i, t)}
               className={cn(
-                'flex h-7 max-w-48 shrink-0 items-center gap-2 rounded-row pl-2 text-[13px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
-                t.pinned ? 'pr-2.5' : 'pr-1',
-                active ? 'bg-selected font-medium' : 'hover:bg-hover',
+                'flex max-w-48 shrink-0 items-center gap-2 rounded-full py-[5px] pl-3 text-[13px] outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring',
+                t.pinned ? 'pr-3' : 'pr-1.5',
+                active
+                  ? 'bg-pink-wash font-medium text-pink-soft shadow-[inset_0_0_0_1px_rgb(242_91_208/0.4)]'
+                  : 'text-muted hover:text-text',
               )}
             >
               <TabGlyph tab={t} />

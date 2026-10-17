@@ -3,14 +3,24 @@ import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { AppShell } from '@/components/shell/app-shell';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { setAlwaysNewTab } from '@/lib/client/new-tab';
-import type { ServiceEntry, ServicesResponse } from '@/lib/shared/contract';
+import type { ServiceEntry, ServicesResponse, StatusResponse } from '@/lib/shared/contract';
+import { statusResponse } from '../phone/mock-api';
 import { group, servicesResponse, svc } from '../shell/fixtures';
 
 let servicesData: ServicesResponse | undefined;
+let statusData: StatusResponse | undefined;
 const mutate = vi.fn();
 vi.mock('@/lib/client/api', () => ({
+  POLL_MS: {
+    status: 10_000,
+    cron: 60_000,
+    system: 10_000,
+    streams: 15_000,
+    widgets: 10_000,
+    services: 30_000,
+  },
   useServices: () => ({ data: servicesData, mutate }),
-  useStatus: () => ({ data: undefined }),
+  useStatus: () => ({ data: statusData }),
   useCron: () => ({ data: undefined }),
   useWidgets: () => ({ data: undefined }),
   useSystem: () => ({ data: undefined }),
@@ -37,13 +47,11 @@ function mount(mode: 'lan' | 'zone' = 'lan') {
     </TooltipProvider>,
   );
 }
-const openFromSidebar = (name: string) =>
-  // The sidebar only: the Overview shows the same names as tiles.
-  fireEvent.click(
-    within(screen.getByRole('navigation')).getByRole('button', {
-      name: new RegExp(`^${name}(?!\\d)`),
-    }),
-  );
+const openFromOverview = (name: string) => {
+  // Service tiles live on the Overview; a service tab replaces it, so go back to it first.
+  if (tab('Overview').getAttribute('aria-selected') !== 'true') fireEvent.click(tab('Overview'));
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${name}(?!\\d)`) }));
+};
 const tab = (name: string) => screen.getByRole('tab', { name: new RegExp(`^${name}(?!\\d)`) });
 const frame = (name: string) =>
   screen.getByTitle(new RegExp(`^${name}(?!\\d)`)) as HTMLIFrameElement;
@@ -58,6 +66,7 @@ beforeEach(() => {
     removeEventListener() {},
   })) as unknown as typeof window.matchMedia;
   servicesData = servicesResponse([group('Media', [...many, torrent])]);
+  statusData = undefined;
   mutate.mockClear();
 });
 afterEach(() => {
@@ -69,7 +78,7 @@ afterEach(() => {
 describe('tab marks', () => {
   test('a tab shows a spinner while its frame loads, and none after load', () => {
     mount();
-    openFromSidebar('Svc 0');
+    openFromOverview('Svc 0');
     expect(within(tab('Svc 0')).getByRole('img', { name: 'loading' })).toBeTruthy();
     fireEvent.load(frame('Svc 0'));
     expect(within(tab('Svc 0')).queryByRole('img', { name: 'loading' })).toBeNull();
@@ -77,7 +86,7 @@ describe('tab marks', () => {
 
   test('a blocked service shows the blocked mark and no iframe', () => {
     mount();
-    openFromSidebar('Torrent Client');
+    openFromOverview('Torrent Client');
     expect(within(tab('Torrent Client')).getByRole('img', { name: 'blocked' })).toBeTruthy();
     expect(document.querySelector('iframe')).toBeNull();
     expect(screen.getByRole('heading', { name: /can.t be shown here/ })).toBeTruthy();
@@ -85,7 +94,7 @@ describe('tab marks', () => {
 
   test('a 9th tab suspends the least recently used: iframe removed, pause mark shown', () => {
     mount();
-    for (let i = 0; i < 9; i += 1) openFromSidebar(`Svc ${i}`);
+    for (let i = 0; i < 9; i += 1) openFromOverview(`Svc ${i}`);
     expect(document.querySelectorAll('iframe')).toHaveLength(8);
     expect(screen.queryByTitle(/^Svc 0 /)).toBeNull();
     expect(within(tab('Svc 0')).getByRole('img', { name: 'suspended' })).toBeTruthy();
@@ -99,11 +108,37 @@ describe('tab marks', () => {
 
   test('a frame survives switching tabs (the same node comes back)', () => {
     mount();
-    openFromSidebar('Svc 0');
-    openFromSidebar('Svc 1');
+    openFromOverview('Svc 0');
+    openFromOverview('Svc 1');
     const first = frame('Svc 0');
     fireEvent.click(tab('Svc 0'));
     expect(frame('Svc 0')).toBe(first);
+  });
+});
+
+describe('desktop chrome', () => {
+  test('no sidebar and no theme switch render', () => {
+    mount();
+    expect(screen.queryByRole('navigation', { name: 'Services' })).toBeNull();
+    expect(screen.queryByRole('switch')).toBeNull();
+  });
+
+  test("the wordmark's i is coral on a service tab when a service is unhealthy", () => {
+    statusData = statusResponse({ s0: 'unhealthy' });
+    mount();
+    openFromOverview('Svc 0');
+    expect(document.querySelector('[data-slot="wordmark-i"]')?.className).toContain('text-down');
+  });
+
+  test('a service frame fills the area under the top bar', () => {
+    mount();
+    openFromOverview('Svc 0');
+    const canvas = document.querySelector('[data-slot="canvas"]') as HTMLElement;
+    expect(canvas.parentElement?.className).toContain('flex-col');
+    expect(canvas.parentElement?.className).toContain('h-dvh');
+    expect(canvas.className).toContain('flex-1');
+    expect(frame('Svc 0').closest('[data-slot="canvas"]')).toBe(canvas);
+    expect((frame('Svc 0').parentElement as HTMLElement).className).toContain('inset-0');
   });
 });
 
@@ -119,7 +154,7 @@ describe('pinned Overview', () => {
 
   test('stays first, ignores Delete and middle-click, and comes back into focus when clicked', () => {
     mount();
-    openFromSidebar('Svc 0');
+    openFromOverview('Svc 0');
     const overview = tab('Overview');
     expect(screen.getAllByRole('tab')[0]).toBe(overview);
     expect(overview.getAttribute('aria-selected')).toBe('false');
@@ -135,7 +170,7 @@ describe('pinned Overview', () => {
 describe('controls', () => {
   test('reload returns the frame to its start URL and shows the spinner again', () => {
     mount();
-    openFromSidebar('Svc 0');
+    openFromOverview('Svc 0');
     fireEvent.load(frame('Svc 0'));
     fireEvent.click(screen.getByRole('button', { name: 'Reload' }));
     expect(frame('Svc 0').getAttribute('src')).toBe('http://localhost:8080/');
@@ -145,14 +180,14 @@ describe('controls', () => {
   test('pop-out opens the address with noopener,noreferrer', () => {
     const open = vi.spyOn(window, 'open').mockReturnValue(null);
     mount();
-    openFromSidebar('Svc 0');
+    openFromOverview('Svc 0');
     fireEvent.click(screen.getByRole('button', { name: 'Open in new browser tab' }));
     expect(open).toHaveBeenCalledWith('http://localhost:8080/', '_blank', 'noopener,noreferrer');
   });
 
   test('fullscreen is hidden where the Fullscreen API is not available', () => {
     mount();
-    openFromSidebar('Svc 0');
+    openFromOverview('Svc 0');
     expect(screen.queryByRole('button', { name: 'Full screen' })).toBeNull();
   });
 
@@ -161,7 +196,7 @@ describe('controls', () => {
     const request = vi.fn().mockResolvedValue(undefined);
     HTMLElement.prototype.requestFullscreen = request;
     mount();
-    openFromSidebar('Svc 0');
+    openFromOverview('Svc 0');
     fireEvent.click(screen.getByRole('button', { name: 'Full screen' }));
     expect(request).toHaveBeenCalledTimes(1);
     const target = request.mock.contexts[0] as HTMLElement;
@@ -174,7 +209,7 @@ describe('controls', () => {
     const popup = { closed: false, opener: {} as unknown };
     const open = vi.spyOn(window, 'open').mockReturnValue(popup as unknown as Window);
     mount('zone');
-    openFromSidebar('Svc 0');
+    openFromOverview('Svc 0');
     fireEvent.load(frame('Svc 0'));
     fireEvent.pointerDown(screen.getByRole('button', { name: 'More' }), {
       button: 0,
@@ -195,7 +230,7 @@ describe('controls', () => {
 
   test('the more menu has no "Sign in and retry" on a LAN address', () => {
     mount('lan');
-    openFromSidebar('Svc 0');
+    openFromOverview('Svc 0');
     fireEvent.pointerDown(screen.getByRole('button', { name: 'More' }), {
       button: 0,
       ctrlKey: false,
@@ -206,7 +241,7 @@ describe('controls', () => {
 
   test('"Check again" re-fetches the services list', () => {
     mount();
-    openFromSidebar('Torrent Client');
+    openFromOverview('Torrent Client');
     fireEvent.click(screen.getByRole('button', { name: 'Check again' }));
     expect(mutate).toHaveBeenCalledTimes(1);
   });
@@ -217,14 +252,14 @@ describe('always open in a new tab', () => {
     const open = vi.spyOn(window, 'open').mockReturnValue(null);
     setAlwaysNewTab('s1', true);
     mount();
-    openFromSidebar('Svc 1');
+    openFromOverview('Svc 1');
     expect(open).toHaveBeenCalledWith('http://localhost:8080/', '_blank', 'noopener,noreferrer');
     expect(screen.queryByRole('tab', { name: /Svc 1/ })).toBeNull();
   });
 
   test('the card switch stores the choice per device', () => {
     mount();
-    openFromSidebar('Torrent Client');
+    openFromOverview('Torrent Client');
     fireEvent.click(screen.getByRole('switch', { name: /Always open Torrent Client/ }));
     expect(
       JSON.parse(localStorage.getItem('iris.pref.tabs.alwaysNewTab') ?? '{}') as unknown,
@@ -235,7 +270,7 @@ describe('always open in a new tab', () => {
 describe('copy link', () => {
   test('the address stays focused and selected after the menu closes', async () => {
     mount();
-    openFromSidebar('Torrent Client');
+    openFromOverview('Torrent Client');
     fireEvent.pointerDown(screen.getByRole('button', { name: 'More' }), {
       button: 0,
       ctrlKey: false,

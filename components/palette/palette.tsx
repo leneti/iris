@@ -1,6 +1,6 @@
 'use client';
 
-import { Clock, PanelLeft, PanelLeftOpen, type LucideIcon } from 'lucide-react';
+import { Clock, PanelLeft, type LucideIcon } from 'lucide-react';
 import { HealthMark } from '@/components/health-mark';
 import { ServiceIcon } from '@/components/service-icon';
 import { builtinName } from '@/components/tabs/tab-item';
@@ -30,9 +30,6 @@ export type PaletteProps = {
   onFocusTab: (id: string) => void;
   onOpenBuiltin: (id: Builtin) => void;
   jobsFailed: number;
-  /** The sidebar actions are left out when there is no sidebar (the phone). */
-  sidebarCollapsed?: boolean;
-  onToggleCollapsed?: () => void;
   /** Page mode: a Cancel button beside the field. */
   onCancel?: () => void;
 };
@@ -162,17 +159,6 @@ export function Palette(props: PaletteProps) {
     meta: props.jobsFailed > 0 ? <Chip>{props.jobsFailed} failed</Chip> : undefined,
     onSelect: () => onOpenBuiltin(BUILTIN_JOBS),
   });
-  const { onToggleCollapsed } = props;
-  if (onToggleCollapsed !== undefined) {
-    entries.push({
-      value: 'action:sidebar',
-      section: 'Actions',
-      label: props.sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar',
-      keywords: ['navigation'],
-      icon: <ActionIcon Icon={props.sidebarCollapsed ? PanelLeftOpen : PanelLeft} />,
-      onSelect: onToggleCollapsed,
-    });
-  }
 
   const done = () => {
     if (props.mode === 'dialog') props.onOpenChange(false);

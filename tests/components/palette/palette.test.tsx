@@ -7,6 +7,14 @@ import { group, servicesResponse, svc } from '../shell/fixtures';
 
 let servicesData: ServicesResponse | undefined;
 vi.mock('@/lib/client/api', () => ({
+  POLL_MS: {
+    status: 10_000,
+    cron: 60_000,
+    system: 10_000,
+    streams: 15_000,
+    widgets: 10_000,
+    services: 30_000,
+  },
   useServices: () => ({ data: servicesData, mutate: vi.fn() }),
   useStatus: () => ({ data: undefined }),
   useCron: () => ({ data: undefined }),
@@ -46,13 +54,12 @@ const openPalette = () => fireEvent.keyDown(document, { key: 'k', ctrlKey: true 
 const type = (text: string) => fireEvent.change(input(), { target: { value: text } });
 const enter = (init: KeyboardEventInit = {}) =>
   fireEvent.keyDown(input(), { key: 'Enter', ...init });
-const openFromSidebar = (name: string) =>
-  // The sidebar only: the Overview shows the same names as tiles.
-  fireEvent.click(
-    within(screen.getByRole('navigation')).getByRole('button', {
-      name: new RegExp(`^${name}(?!\\d)`),
-    }),
-  );
+const openFromOverview = (name: string) => {
+  // Service tiles live on the Overview; a service tab replaces it, so go back to it first.
+  const overview = screen.getByRole('tab', { name: 'Overview' });
+  if (overview.getAttribute('aria-selected') !== 'true') fireEvent.click(overview);
+  fireEvent.click(screen.getByRole('button', { name: new RegExp(`^${name}(?!\\d)`) }));
+};
 
 beforeEach(() => {
   localStorage.clear();
@@ -94,9 +101,9 @@ describe('opening the palette', () => {
     expect(screen.getByRole('dialog')).toBeTruthy();
   });
 
-  test('the sidebar search button opens it (4.3)', () => {
+  test('the top bar search button opens it (4.3)', () => {
     mount();
-    fireEvent.click(screen.getByRole('button', { name: /Search services/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Search' }));
     expect(screen.getByRole('dialog')).toBeTruthy();
   });
 
@@ -129,7 +136,7 @@ describe('search', () => {
 
   test('sections are Services, Links, Open tabs and Actions', () => {
     mount();
-    openFromSidebar('Moviebox');
+    openFromOverview('Moviebox');
     openPalette();
     const dialog = screen.getByRole('dialog');
     for (const heading of ['Services', 'Links', 'Open tabs', 'Actions']) {
@@ -158,7 +165,7 @@ describe('unique rows', () => {
 
   test('"tab" does not match an open tab just because the row is an open tab', () => {
     mount();
-    openFromSidebar('Streamhouse');
+    openFromOverview('Streamhouse');
     openPalette();
     type('tab');
     expect(screen.queryByRole('option', { name: /Streamhouse/ })).toBeNull();
@@ -179,8 +186,8 @@ describe('unique rows', () => {
 describe('Enter', () => {
   test('on an open service focuses its tab instead of opening a second one', () => {
     mount();
-    openFromSidebar('Moviebox');
-    openFromSidebar('Streamhouse');
+    openFromOverview('Moviebox');
+    openFromOverview('Streamhouse');
     openPalette();
     type('Moviebox');
     enter();
@@ -241,14 +248,10 @@ describe('Enter', () => {
     expect(screen.queryByRole('tab', { name: /Streamhouse/ })).toBeNull();
   });
 
-  test('on "Collapse sidebar" collapses the sidebar and the label flips', () => {
+  test('has no theme or sidebar actions', () => {
     mount();
     openPalette();
-    type('collapse');
-    enter();
-    expect(localStorage.getItem('iris.pref.sidebar.collapsed')).toBe('"collapsed"');
-    openPalette();
-    expect(screen.getByRole('option', { name: /Expand sidebar/ })).toBeTruthy();
+    expect(screen.queryByRole('option', { name: /sidebar|theme|dark|light/i })).toBeNull();
   });
 
   test('on "Show scheduled jobs" opens the jobs tab', () => {
@@ -277,8 +280,6 @@ describe('page mode', () => {
         onFocusTab={() => {}}
         onOpenBuiltin={() => {}}
         jobsFailed={0}
-        sidebarCollapsed={false}
-        onToggleCollapsed={() => {}}
       />,
     );
     expect(screen.queryByRole('dialog')).toBeNull();
