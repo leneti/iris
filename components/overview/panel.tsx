@@ -17,7 +17,7 @@ export function Panel({
     <section
       aria-label={title}
       className={cn(
-        'overflow-hidden rounded-menu border border-hairline-raised bg-raised',
+        'overflow-hidden rounded-panel border border-hairline-raised bg-raised',
         className,
       )}
     >

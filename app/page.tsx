@@ -8,11 +8,12 @@ export const dynamic = 'force-dynamic';
 
 export default async function Page() {
   const host = (await headers()).get('host');
+  const config = getConfigWatcher().get().iris.config;
   // Only the mode and the phone's frame limit reach the client; the zone stays on the server.
   return (
     <AppShell
-      mode={addressMode(host, loadEnv().zone)}
-      phoneMaxLive={getConfigWatcher().get().iris.config.phone.maxLiveFrames}
+      mode={addressMode(host, loadEnv().zone, config.addresses)}
+      phoneMaxLive={config.phone.maxLiveFrames}
     />
   );
 }

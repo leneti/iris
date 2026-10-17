@@ -365,6 +365,18 @@ export function discover(input: DiscoverInput): DiscoverResult {
     });
   }
 
+  // Hidden services keep their health; only the browser leaves them out of lists.
+  const hidden = new Set(config.hidden);
+  for (const s of services) if (hidden.has(s.id)) s.hidden = true;
+  for (const id of hidden) {
+    if (!ids.has(id))
+      warnings.push({
+        code: 'HIDDEN_UNKNOWN',
+        serviceId: id,
+        message: `iris.yaml hides "${id}", but no service has that id`,
+      });
+  }
+
   // Step 6: groups in iris.yaml order, unknown ones alphabetically; services by order, name.
   const byGroup = new Map<string, ResolvedService[]>();
   for (const s of services) {

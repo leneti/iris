@@ -122,10 +122,11 @@ describe('phone shell', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  test('the shell is 100dvh tall and contains overscroll', () => {
+  test('the shell is 100svh tall, clear of the browser toolbars, and contains overscroll', () => {
     const { container } = mount();
     const root = container.firstElementChild as HTMLElement;
-    expect(root.className).toContain('h-dvh');
+    // dvh can reach under Firefox for Android's bottom toolbar and hide the navigation bar.
+    expect(root.className).toContain('h-svh');
     expect(root.className).toContain('overscroll-contain');
   });
 });

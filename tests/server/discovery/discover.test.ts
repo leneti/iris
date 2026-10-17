@@ -926,6 +926,20 @@ describe('toPublicService (criterion 8.3)', () => {
     }
   });
 
+  it('marks the services listed in hidden, keeps them in their group, and warns about unknown ids', () => {
+    const r = run({
+      containers: [ctr('a', { 'iris.enable': 'true' }), ctr('b', { 'iris.enable': 'true' })],
+      config: { ...config, hidden: ['b', 'missing'] },
+    });
+    const byId = new Map(flat(r).map((s) => [s.id, s]));
+    expect(byId.get('a')).not.toHaveProperty('hidden');
+    expect(byId.get('b')).toMatchObject({ hidden: true });
+    expect(ServiceEntry.safeParse(toPublicService(byId.get('b')!)).success).toBe(true);
+    expect(r.warnings).toContainEqual(
+      expect.objectContaining({ code: 'HIDDEN_UNKNOWN', serviceId: 'missing' }),
+    );
+  });
+
   it('public service output contains no IP-like string', () => {
     const r = run();
     const json = JSON.stringify(r.groups.map((g) => g.services.map(toPublicService)));

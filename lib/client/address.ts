@@ -1,6 +1,6 @@
 import type { EmbedInfo, ServiceEntry } from '@/lib/shared/contract';
 
-export type AddressMode = 'lan' | 'zone';
+export type AddressMode = 'lan' | 'zone' | 'public';
 
 function normaliseHost(host: string): string {
   let h = host.trim().toLowerCase();
@@ -18,11 +18,16 @@ function normaliseHost(host: string): string {
  * Which address a service opens at (handoff 7.3). 'zone' when the host is the zone or one of
  * its subdomains; everything else, including a missing host or zone, is the LAN stage.
  */
-export function addressMode(host: string | null, zone: string | undefined): AddressMode {
+export function addressMode(
+  host: string | null,
+  zone: string | undefined,
+  addresses: 'auto' | 'public' = 'auto',
+): AddressMode {
+  const outside = addresses === 'public' ? 'public' : 'lan';
   const z = zone?.trim().toLowerCase().replace(/\.$/, '');
-  if (!host || !z) return 'lan';
+  if (!host || !z) return outside;
   const h = normaliseHost(host);
-  return h === z || h.endsWith(`.${z}`) ? 'zone' : 'lan';
+  return h === z || h.endsWith(`.${z}`) ? 'zone' : outside;
 }
 
 function bracketed(hostname: string): string {
@@ -31,10 +36,12 @@ function bracketed(hostname: string): string {
 
 /**
  * The address a tab's iframe loads, or null when there is none to load. Null in zone mode means
- * a service with only a LAN port; the UI labels that "Home network only".
+ * a service with only a LAN port; the UI labels that "Home network only". Public mode (iris.yaml
+ * `addresses: public`) takes the public address first and the LAN port only without one.
  */
 export function frameUrl(s: ServiceEntry, mode: AddressMode, hostname: string): string | null {
-  if (mode === 'lan' && s.lan) {
+  if (mode === 'public' && s.url !== null) return s.url;
+  if ((mode === 'lan' || mode === 'public') && s.lan) {
     const path = s.lan.path.startsWith('/') ? s.lan.path : `/${s.lan.path}`;
     return `http://${bracketed(hostname)}:${s.lan.port}${path}`;
   }

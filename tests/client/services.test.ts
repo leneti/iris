@@ -1,4 +1,4 @@
-import { isDiscoveryReady } from '@/lib/client/services';
+import { isDiscoveryReady, shownGroups } from '@/lib/client/services';
 import { group, servicesResponse, svc } from '../components/shell/fixtures';
 
 describe('isDiscoveryReady', () => {
@@ -23,5 +23,23 @@ describe('isDiscoveryReady', () => {
     expect(
       isDiscoveryReady({ ...full, warnings: [{ code: 'CONFIG_INVALID', message: 'x' }] }),
     ).toBe(true);
+  });
+});
+
+describe('shownGroups', () => {
+  test('drops hidden services, and a group left empty', () => {
+    const vpn = { ...svc('vpn', 'VPN', 'Infra'), hidden: true as const };
+    const groups = [
+      group('Media', [svc('plex', 'Plex')]),
+      group('Infra', [vpn]),
+      group('Mixed', [
+        svc('a', 'A', 'Mixed'),
+        { ...svc('b', 'B', 'Mixed'), hidden: true as const },
+      ]),
+    ];
+    expect(shownGroups(groups).map((g) => [g.name, g.services.map((s) => s.id)])).toEqual([
+      ['Media', ['plex']],
+      ['Mixed', ['a']],
+    ]);
   });
 });

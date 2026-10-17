@@ -1,5 +1,6 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { direction } from '@/components/overview/markets-tile';
 import { Overview, type OverviewProps } from '@/components/overview/overview';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { StandaloneWidget } from '@/lib/shared/contract';
@@ -80,9 +81,10 @@ describe('service tiles', () => {
       }),
     });
     show(props());
-    const tile = await screen.findByRole('button', { name: /Showtrack/ });
-    await waitFor(() => expect(within(tile).getByText('Data unavailable')).toBeTruthy());
-    expect(within(tile).getByRole('img', { name: 'degraded' })).toBeTruthy();
+    // The tile moves to the cards-with-figures row once its widget arrives, so look it up again.
+    const tile = () => screen.getByRole('button', { name: /Showtrack/ });
+    await waitFor(() => expect(within(tile()).getByText('Data unavailable')).toBeTruthy());
+    expect(within(tile()).getByRole('img', { name: 'degraded' })).toBeTruthy();
   });
 
   test('the state decides, not fetchedAt: a failed read with an old fetchedAt is unavailable', async () => {
@@ -99,9 +101,27 @@ describe('service tiles', () => {
       }),
     });
     show(props());
-    const tile = await screen.findByRole('button', { name: /Showtrack/ });
-    await waitFor(() => expect(within(tile).getByText('Data unavailable')).toBeTruthy());
-    expect(within(tile).queryByText('Wanted')).toBeNull();
+    const tile = () => screen.getByRole('button', { name: /Showtrack/ });
+    await waitFor(() => expect(within(tile()).getByText('Data unavailable')).toBeTruthy());
+    expect(within(tile()).queryByText('Wanted')).toBeNull();
+  });
+
+  test('a service hidden in iris.yaml has no tile, and its group goes when it is the last', async () => {
+    api();
+    show(
+      props({
+        services: servicesResponse([
+          group('Media', [
+            svc('moviebox', 'Moviebox'),
+            { ...svc('showtrack', 'Showtrack'), hidden: true },
+          ]),
+          group('Infra', [{ ...svc('vpn', 'VPN', 'Infra'), hidden: true }]),
+        ]),
+      }),
+    );
+    await screen.findByRole('button', { name: /Moviebox/ });
+    expect(screen.queryByRole('button', { name: /Showtrack/ })).toBeNull();
+    expect(screen.queryByRole('region', { name: 'Infra' })).toBeNull();
   });
 
   test('a service without an integration shows its description', async () => {
@@ -174,11 +194,20 @@ describe('Markets', () => {
     expect(spy.mock.calls.length).toBe(before);
   });
 
-  test('the change is neutral text, not a status colour', async () => {
+  test('the change is coloured by direction and keeps its sign, so it reads without colour', async () => {
     api({ '/api/widgets': widgets({ standalone: [markets] }) });
     show(props());
-    const change = await screen.findByText(/\+1\.2 %/);
-    expect(change.className).not.toMatch(/status-|green|red/);
+    const up = await screen.findByText(/\+1\.2 %/);
+    expect(up.dataset.direction).toBe('up');
+    expect(up.className).toContain('text-status-healthy-text');
+  });
+
+  test('direction: up, down, and flat when it rounds to zero or is missing', () => {
+    expect(direction(1.2)).toBe('up');
+    expect(direction(-0.4)).toBe('down');
+    expect(direction(0.04)).toBe('flat');
+    expect(direction(null)).toBe('flat');
+    expect(direction(Number.NaN)).toBe('flat');
   });
 });
 
@@ -242,6 +271,16 @@ describe('Weather', () => {
 });
 
 describe('System panel', () => {
+  test('the load average is rounded to two decimals', async () => {
+    const base = system();
+    api({
+      '/api/system': system({ cpu: { ...base.cpu, load: [0.91650390625, 1, 1] } }),
+    });
+    show(props());
+    expect(await screen.findByText(/load 0\.92\b/)).toBeTruthy();
+    expect(screen.queryByText(/0\.9165/)).toBeNull();
+  });
+
   test('meters take warn and bad colours from level, and ok stays neutral', async () => {
     api();
     show(props());

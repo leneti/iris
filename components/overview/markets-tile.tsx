@@ -1,6 +1,6 @@
 'use client';
 
-import { ChartLine } from 'lucide-react';
+import { ArrowDownRight, ArrowUpRight, ChartLine } from 'lucide-react';
 import { useState } from 'react';
 import {
   Select,
@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import type { StandaloneWidget } from '@/lib/shared/contract';
+import { cn } from '@/lib/utils';
 import { formatStat, isFailed, Unavailable } from './figures';
 
 export type Interval = StandaloneWidget['interval'];
@@ -21,12 +22,61 @@ export const INTERVALS: readonly { value: Interval; label: string; short: string
   { value: '30d', label: '30 days', short: '30 days' },
 ];
 
-/** "+1.2 %" or "−3.4 %": a sign carries the direction, so no status colour is used. */
+/** "+1.2 %" or "−3.4 %": the sign carries the direction, so it still reads without colour. */
 export function formatChange(percent: number | null | undefined): string {
   if (typeof percent !== 'number' || !Number.isFinite(percent)) return '—';
   const rounded = Math.round(Math.abs(percent) * 10) / 10;
   const sign = percent < 0 && rounded !== 0 ? '−' : '+';
   return `${sign}${rounded} %`;
+}
+
+/** A change that rounds to zero, or no figure at all, is flat. */
+export function direction(percent: number | null | undefined): 'up' | 'down' | 'flat' {
+  if (typeof percent !== 'number' || !Number.isFinite(percent)) return 'flat';
+  if (Math.round(Math.abs(percent) * 10) === 0) return 'flat';
+  return percent > 0 ? 'up' : 'down';
+}
+
+/** The change as a small pill: green with an up arrow, red with a down arrow, grey when flat. */
+export function Change({ percent }: { percent: number | null | undefined }) {
+  const dir = direction(percent);
+  const Icon = dir === 'up' ? ArrowUpRight : dir === 'down' ? ArrowDownRight : null;
+  return (
+    <span
+      data-direction={dir}
+      className={cn(
+        'inline-flex shrink-0 items-center gap-0.5 rounded-row px-1.5 py-0.5 text-xs font-semibold whitespace-nowrap tabular-nums',
+        dir === 'up' && 'bg-tint-healthy text-status-healthy-text',
+        dir === 'down' && 'bg-tint-unhealthy text-status-unhealthy-text',
+        dir === 'flat' && 'bg-selected text-text-2',
+      )}
+    >
+      {Icon && <Icon aria-hidden className="size-3.5" />}
+      {formatChange(percent)}
+    </span>
+  );
+}
+
+/** One coin: the name in full weight with its symbol, then the price and the change. */
+export function CoinRow({
+  stat,
+  interval,
+  className,
+}: {
+  stat: StandaloneWidget['stats'][number];
+  interval: Interval;
+  className?: string;
+}) {
+  return (
+    <li className={cn('flex items-center gap-2', className)}>
+      <span className="flex min-w-0 flex-1 items-baseline gap-1.5">
+        <span className="truncate font-semibold text-text">{stat.label}</span>
+        <span className="text-[11px] font-medium text-text-3">{stat.key}</span>
+      </span>
+      <span className="font-semibold tabular-nums">{formatStat(stat)}</span>
+      <Change percent={stat.changePercent?.[interval]} />
+    </li>
+  );
 }
 
 /**
@@ -40,7 +90,7 @@ export function MarketsTile({ widget }: { widget: StandaloneWidget }) {
     <div
       role="group"
       aria-label={widget.name}
-      className="flex min-h-[52px] flex-col justify-center rounded-menu border border-hairline-raised bg-raised px-3 py-2"
+      className="flex flex-col gap-2.5 rounded-panel border border-hairline-raised bg-raised p-3"
     >
       <div className="flex h-7 items-center gap-2.5">
         <span
@@ -49,7 +99,7 @@ export function MarketsTile({ widget }: { widget: StandaloneWidget }) {
         >
           <ChartLine className="size-4" />
         </span>
-        <span className="min-w-0 flex-1 truncate font-semibold">{widget.name}</span>
+        <span className="min-w-0 flex-1 truncate text-[14px] font-semibold">{widget.name}</span>
         {!failed && (
           <Select value={interval} onValueChange={(v) => setInterval(v as Interval)}>
             <SelectTrigger
@@ -69,25 +119,20 @@ export function MarketsTile({ widget }: { widget: StandaloneWidget }) {
           </Select>
         )}
       </div>
-      <div className="mt-1.5 min-h-[30px]">
-        {failed ? (
-          <Unavailable />
-        ) : (
-          <ul
-            className="grid gap-x-2"
-            style={{ gridTemplateColumns: `repeat(${widget.stats.length}, minmax(0, 1fr))` }}
-          >
-            {widget.stats.map((s) => (
-              <li key={s.key} className="min-w-0">
-                <div className="text-[13px] font-semibold tabular-nums">{formatStat(s)}</div>
-                <div className="text-[11px] whitespace-nowrap text-text-3 tabular-nums">
-                  {s.key} · {formatChange(s.changePercent?.[interval])}
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      {failed ? (
+        <Unavailable />
+      ) : (
+        <ul className="divide-y divide-hairline-raised rounded-tile border border-hairline-raised bg-well">
+          {widget.stats.map((s) => (
+            <CoinRow
+              key={s.key}
+              stat={s}
+              interval={interval}
+              className="min-h-9 px-2.5 text-[13px]"
+            />
+          ))}
+        </ul>
+      )}
     </div>
   );
 }

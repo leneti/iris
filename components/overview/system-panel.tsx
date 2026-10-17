@@ -145,7 +145,9 @@ export function SystemPanel({ variant = 'desktop' }: { variant?: 'desktop' | 'ph
   // The server keeps the last values for a minute after Glances stops answering; they are muted.
   const stale = state !== 'ok';
   const { cpu, memory, disks, network, temperature } = data;
-  const load = cpu.load?.[0];
+  // Glances sends the load average unrounded (0.91650390625); two decimals are plenty.
+  const raw = cpu.load?.[0];
+  const load = raw == null ? raw : Math.round(raw * 100) / 100;
   const phone = variant === 'phone';
   const celsius = temperature?.celsius;
   const cells = [

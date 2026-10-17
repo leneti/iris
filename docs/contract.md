@@ -6,9 +6,10 @@ This document describes everything an operator can set or depend on: container l
 
 ## Which Iris version understands which labels
 
-| Iris version | Contract version | Understands                                                        |
-| ------------ | ---------------- | ------------------------------------------------------------------ |
-| `v0.1.0`     | 1                | All labels, config keys, environment variables and endpoints below |
+| Iris version | Contract version | Understands                                                                                                                  |
+| ------------ | ---------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `v0.1.0`     | 1                | All labels, config keys, environment variables and endpoints below                                                           |
+| `v0.2.0`     | 1                | Adds the optional `iris.yaml` keys `hidden` and `addresses`, and the optional `hidden` field of a service in `/api/services` |
 
 ## Container labels
 
@@ -49,17 +50,19 @@ Two YAML files in `IRIS_CONFIG_DIR` (default `/config`), both validated with zod
 
 `iris.yaml` keys:
 
-| Key                               | Purpose                                                                                                                                                |
-| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `title`, `defaultGroup`, `groups` | Page title, group for entries without one, and the ordered groups with their icons                                                                     |
-| `cron`                            | `timezone`, `staleAfterMinutes`, `graceMinutes`, and optional per-job overrides in `jobs` (`match`, `schedule`, `label`, `graceMinutes`)               |
-| `maintenance`                     | Fallback schedules for the backup and updater rows (`id`, `name`, `schedule`, `label`, `graceMinutes`)                                                 |
-| `system`                          | Glances `url`, `interface`, `sensor`, `disks` (mount and label) and `thresholds` (`warn`, `bad`)                                                       |
-| `streams`                         | Tautulli `url` and `showUsers`                                                                                                                         |
-| `phone`                           | `maxLiveFrames` (3; 8 on wider screens)                                                                                                                |
-| `weather`                         | Open-Meteo `label`, `latitude`, `longitude`, `timezone`, `units`, `refreshMinutes`. Coordinates stay on the server. Leave the block out for no weather |
-| `links`                           | Bookmarks (`name`, `abbr`, `url`), http or https only. `{zone}` is replaced from `IRIS_ZONE`                                                           |
-| `widgets`                         | `refreshSeconds` per integration, and `standalone` tiles that belong to no container (for example a `coinmarketcap` tile)                              |
+| Key                               | Purpose                                                                                                                                                                                                    |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `title`, `defaultGroup`, `groups` | Page title, group for entries without one, and the ordered groups with their icons                                                                                                                         |
+| `cron`                            | `timezone`, `staleAfterMinutes`, `graceMinutes`, and optional per-job overrides in `jobs` (`match`, `schedule`, `label`, `graceMinutes`)                                                                   |
+| `maintenance`                     | Fallback schedules for the backup and updater rows (`id`, `name`, `schedule`, `label`, `graceMinutes`)                                                                                                     |
+| `system`                          | Glances `url`, `interface`, `sensor`, `disks` (mount and label) and `thresholds` (`warn`, `bad`)                                                                                                           |
+| `streams`                         | Tautulli `url` and `showUsers`                                                                                                                                                                             |
+| `phone`                           | `maxLiveFrames` (3; 8 on wider screens)                                                                                                                                                                    |
+| `weather`                         | Open-Meteo `label`, `latitude`, `longitude`, `timezone`, `units`, `refreshMinutes`. Coordinates stay on the server. Leave the block out for no weather                                                     |
+| `links`                           | Bookmarks (`name`, `abbr`, `url`), http or https only. `{zone}` is replaced from `IRIS_ZONE`                                                                                                               |
+| `hidden`                          | Service ids left off the Overview, the sidebar and the Services list. They stay in search, and their health still counts and raises alerts. An unknown id gives a `HIDDEN_UNKNOWN` warning. Since `v0.2.0` |
+| `addresses`                       | `auto` (default): opened outside the zone, Iris frames services at their LAN port. `public`: it uses the public address whenever a service has one, and the LAN port only otherwise. Since `v0.2.0`        |
+| `widgets`                         | `refreshSeconds` per integration, and `standalone` tiles that belong to no container (for example a `coinmarketcap` tile)                                                                                  |
 
 `services.yaml` is a fallback for services that cannot carry labels: a list of `services`, each with `id`, `name`, `group`, `icon`, optional `description`, `container` (health from Docker), `url` (or `none`), `embed` and `widget: { type }`. `{zone}` is replaced from `IRIS_ZONE`.
 
@@ -89,16 +92,16 @@ An empty credential means "not configured": that integration is off. Credentials
 
 All endpoints are `GET` only and return JSON. [`lib/shared/contract.ts`](../lib/shared/contract.ts) holds the zod schemas and types and is the source of truth for every field; this section only summarises.
 
-| Endpoint                                          | Returns                                                                                                                                                                                                    |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/api/healthz`                                    | `{ "ok": true }`, for container health checks                                                                                                                                                              |
-| `/api/services`                                   | `generatedAt`, `sources`, `groups` (each with its `services`: id, name, group, description, keywords, order, `icon`, `url`, `urlSource`, `lan`, `embed`, `container`, `discovery`), `links`, `warnings`    |
-| `/api/status`                                     | `generatedAt`, `docker` (`ok` or `unreachable`), `services` keyed by id (`status`, `docker`, `http`, `changedAt`), `summary` counts                                                                        |
-| `/api/cron`                                       | `generatedAt`, `timezone`, `sources`, `jobs` (id, name, kind, `schedule`, `lastRun`, `result`, `summary`, `link`, `previousDue`, `nextDue`, `flag`), `summary` counts                                      |
-| `/api/system`                                     | `generatedAt`, `source`, `cpu`, `memory`, `disks`, `network`, `temperature`, `uptimeSeconds`                                                                                                               |
-| `/api/streams`                                    | `generatedAt`, `source`, `streamCount`, `transcodeCount`, `totalBitsPerSec`, `sessions`                                                                                                                    |
-| `/api/widgets`                                    | `generatedAt`, `services` keyed by id, `standalone` tiles, `weather`                                                                                                                                       |
-| `/api/icons/di/<slug>`, `/api/icons/local/<file>` | An icon image (proxied and cached); `src` values in `/api/services` point here. A `di` slug is served only while the current service list references it; any other slug is a 404, with no outbound request |
+| Endpoint                                          | Returns                                                                                                                                                                                                                                             |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/healthz`                                    | `{ "ok": true }`, for container health checks                                                                                                                                                                                                       |
+| `/api/services`                                   | `generatedAt`, `sources`, `groups` (each with its `services`: id, name, group, description, keywords, order, `icon`, `url`, `urlSource`, `lan`, `embed`, `container`, `discovery`, and `hidden: true` when listed in `hidden`), `links`, `warnings` |
+| `/api/status`                                     | `generatedAt`, `docker` (`ok` or `unreachable`), `services` keyed by id (`status`, `docker`, `http`, `changedAt`), `summary` counts                                                                                                                 |
+| `/api/cron`                                       | `generatedAt`, `timezone`, `sources`, `jobs` (id, name, kind, `schedule`, `lastRun`, `result`, `summary`, `link`, `previousDue`, `nextDue`, `flag`), `summary` counts                                                                               |
+| `/api/system`                                     | `generatedAt`, `source`, `cpu`, `memory`, `disks`, `network`, `temperature`, `uptimeSeconds`                                                                                                                                                        |
+| `/api/streams`                                    | `generatedAt`, `source`, `streamCount`, `transcodeCount`, `totalBitsPerSec`, `sessions`                                                                                                                                                             |
+| `/api/widgets`                                    | `generatedAt`, `services` keyed by id, `standalone` tiles, `weather`                                                                                                                                                                                |
+| `/api/icons/di/<slug>`, `/api/icons/local/<file>` | An icon image (proxied and cached); `src` values in `/api/services` point here. A `di` slug is served only while the current service list references it; any other slug is a 404, with no outbound request                                          |
 
 Status values are `healthy`, `starting`, `degraded`, `unhealthy`, `stopped` and `unknown`. Cron flags are `ok`, `warning`, `overdue`, `failed` and `unknown`.
 

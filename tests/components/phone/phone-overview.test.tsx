@@ -147,7 +147,7 @@ describe('PhoneOverview', () => {
     expect(within(health).queryByText('Starting')).toBeNull();
   });
 
-  test('Markets has one row per coin with name, symbol, price and a neutral change', async () => {
+  test('Markets has one row per coin with name, symbol, price and a coloured change', async () => {
     api();
     renderFresh(<PhoneOverview {...props()} />);
     const section = await screen.findByRole('region', { name: 'Markets' });
@@ -158,7 +158,8 @@ describe('PhoneOverview', () => {
     expect(rows[0]?.textContent).toContain('£61,240');
     expect(rows[0]?.textContent).toContain('+1.2 %');
     expect(rows[1]?.textContent).toContain('−0.4 %');
-    expect(rows[0]?.innerHTML).not.toMatch(/status-|green|red/);
+    expect(rows[0]?.querySelector('[data-direction="up"]')).not.toBeNull();
+    expect(rows[1]?.querySelector('[data-direction="down"]')).not.toBeNull();
   });
 
   test('Markets interval control switches the change without a request', async () => {

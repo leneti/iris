@@ -52,6 +52,7 @@
   --color-meter-normal: #475569;
   --color-meter-warning: #b45309;
   --color-meter-critical: #dc2626;
+  --color-well: #f4f7fa;
 
   /* Status tags and flagged rows: the status colour mixed into the surface, so solid, not see-through. */
   --color-tint-healthy: color-mix(in srgb, var(--color-status-healthy) 14%, var(--color-raised));
@@ -119,6 +120,7 @@
   --color-meter-normal: #a8b3c5;
   --color-meter-warning: #f59e0b;
   --color-meter-critical: #ef4444;
+  --color-well: #141c2c;
 }
 
 /* Names the shadcn components expect, pointed at the tokens above. */

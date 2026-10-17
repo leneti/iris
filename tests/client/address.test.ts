@@ -77,6 +77,19 @@ describe('frameUrl', () => {
   });
 });
 
+describe('public mode (addresses: public)', () => {
+  test('addressMode gives public outside the zone, and zone inside it', () => {
+    expect(addressMode('192.0.2.10:3000', 'example.invalid', 'public')).toBe('public');
+    expect(addressMode('iris.example.invalid', 'example.invalid', 'public')).toBe('zone');
+    expect(addressMode('192.0.2.10:3000', 'example.invalid', 'auto')).toBe('lan');
+  });
+  test('frameUrl prefers the public address and falls back to the LAN port', () => {
+    expect(frameUrl(radarr, 'public', '192.0.2.10')).toBe('https://radarr.example.invalid/');
+    expect(frameUrl(lanOnly, 'public', '192.0.2.10')).toBe('http://192.0.2.10:5000/ui');
+    expect(frameUrl(entry({ url: null, urlSource: 'none' }), 'public', '192.0.2.10')).toBeNull();
+  });
+});
+
 describe('effectiveEmbed', () => {
   const allowed = radarr.embed;
   test('http frame on an https page becomes blocked/mixed-content', () => {

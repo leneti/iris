@@ -5,6 +5,7 @@ import { useHostname, useMedia, usePref, useProtocol } from '@/lib/client/use-cl
 import { frameUrl, isPublicAddress, type AddressMode } from '@/lib/client/address';
 import { NEW_TAB_PREF, openInBrowserTab, setAlwaysNewTab } from '@/lib/client/new-tab';
 import { prefs } from '@/lib/client/prefs';
+import { shownGroups } from '@/lib/client/services';
 import { BUILTIN_JOBS, BUILTIN_OVERVIEW, DEFAULT_MAX_LIVE, isBuiltin } from '@/lib/client/tabs';
 import type { ServiceEntry } from '@/lib/shared/contract';
 import { shouldOpenPalette } from '@/lib/client/shortcuts';
@@ -144,8 +145,9 @@ export function AppShell({
     prefs.set(SIDEBAR_PREF, collapsed ? 'expanded' : 'collapsed');
   }
 
+  const listed = shownGroups(groups);
   const sidebarProps = {
-    groups,
+    groups: listed,
     statusById,
     openIds: tabs.open,
     activeId,
@@ -154,7 +156,7 @@ export function AppShell({
     onSearch: () => setPaletteOpen(true),
     onToggleCollapsed: toggleCollapsed,
     jobs,
-    docker: { ...shell.docker, count: groups.reduce((n, g) => n + g.services.length, 0) },
+    docker: { ...shell.docker, count: listed.reduce((n, g) => n + g.services.length, 0) },
   };
 
   return (

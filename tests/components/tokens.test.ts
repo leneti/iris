@@ -64,6 +64,8 @@ const TOKENS: ReadonlyArray<readonly [string, string, string]> = [
   ['meter-normal', '#475569', '#A8B3C5'],
   ['meter-warning', '#B45309', '#F59E0B'],
   ['meter-critical', '#DC2626', '#EF4444'],
+  // Added with the 2026-10-17 Overview redesign: the recessed strip that holds a card's figures.
+  ['well', '#F4F7FA', '#141C2C'],
 ];
 
 describe('theme tokens', () => {

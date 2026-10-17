@@ -67,6 +67,8 @@ export const ServiceEntry = obj({
   embed: EmbedInfo,
   container: z.string().nullable(),
   discovery: z.enum(['label', 'manual']),
+  // Iris 0.2: listed in iris.yaml `hidden`. Absent means shown.
+  hidden: z.literal(true).optional(),
 });
 export type ServiceEntry = z.infer<typeof ServiceEntry>;
 

@@ -1,4 +1,4 @@
-import type { ServicesResponse } from '@/lib/shared/contract';
+import type { GroupEntry, ServicesResponse } from '@/lib/shared/contract';
 
 /**
  * Whether a `/api/services` answer is a real, complete list. The server answers `STARTING` with
@@ -8,4 +8,15 @@ import type { ServicesResponse } from '@/lib/shared/contract';
  */
 export function isDiscoveryReady(services: ServicesResponse): boolean {
   return services.sources.docker === 'ok' && !services.warnings.some((w) => w.code === 'STARTING');
+}
+
+/**
+ * The groups as lists show them: services hidden in iris.yaml are left out, and so is a group
+ * they leave empty. Search, health counts and alerts still use every service.
+ */
+export function shownGroups(groups: GroupEntry[]): GroupEntry[] {
+  return groups.flatMap((g) => {
+    const services = g.services.filter((s) => s.hidden !== true);
+    return services.length === 0 ? [] : [{ ...g, services }];
+  });
 }

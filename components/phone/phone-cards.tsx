@@ -2,8 +2,8 @@
 
 import { ExternalLink } from 'lucide-react';
 import { useState } from 'react';
-import { formatChange, INTERVALS, type Interval } from '@/components/overview/markets-tile';
-import { formatStat, isFailed, Unavailable } from '@/components/overview/figures';
+import { CoinRow, INTERVALS, type Interval } from '@/components/overview/markets-tile';
+import { isFailed, Unavailable } from '@/components/overview/figures';
 import { Panel } from '@/components/overview/panel';
 import {
   Select,
@@ -15,7 +15,8 @@ import {
 import type { LinkEntry, StandaloneWidget } from '@/lib/shared/contract';
 
 /**
- * A standalone tile as a card with one 44 px row per coin: name, symbol, price and the change.
+ * A standalone tile as a card with one 44 px row per coin: name, symbol, price and the coloured
+ * change.
  * The interval control only picks which of the four intervals in the reply to show.
  */
 export function MarketsCard({ widget }: { widget: StandaloneWidget }) {
@@ -52,18 +53,12 @@ export function MarketsCard({ widget }: { widget: StandaloneWidget }) {
       ) : (
         <ul>
           {widget.stats.map((s) => (
-            <li
+            <CoinRow
               key={s.key}
-              className="flex min-h-11 items-center gap-2 border-t border-hairline-raised px-4"
-            >
-              <span className="min-w-0 flex-1 truncate">
-                {s.label} <span className="ml-1 text-xs text-text-3">{s.key}</span>
-              </span>
-              <span className="font-semibold tabular-nums">{formatStat(s)}</span>
-              <span className="w-16 text-right text-text-2 tabular-nums">
-                {formatChange(s.changePercent?.[interval])}
-              </span>
-            </li>
+              stat={s}
+              interval={interval}
+              className="min-h-11 gap-3 border-t border-hairline-raised px-4"
+            />
           ))}
         </ul>
       )}

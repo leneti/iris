@@ -108,3 +108,18 @@ test('{zone} is filled', () => {
   expect(fillZone('https://a.example.invalid/', undefined)).toBe('https://a.example.invalid/');
   expect(fillZone('https://a.{zone}/', undefined)).toBeNull();
 });
+
+test('hidden and addresses default to nothing hidden and the automatic choice', () => {
+  const { config } = loadIrisConfig(dirWith({}));
+  expect(config.hidden).toEqual([]);
+  expect(config.addresses).toBe('auto');
+});
+
+test('hidden and addresses are read from iris.yaml', () => {
+  const { config, warnings } = loadIrisConfig(
+    dirWith({ 'iris.yaml': 'version: 1\nhidden: [vpn, tunnel]\naddresses: public\n' }),
+  );
+  expect(config.hidden).toEqual(['vpn', 'tunnel']);
+  expect(config.addresses).toBe('public');
+  expect(warnings).toEqual([]);
+});

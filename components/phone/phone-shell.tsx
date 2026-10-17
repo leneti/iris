@@ -10,6 +10,7 @@ import type { Frames } from '@/components/tabs/use-frames';
 import { useWidgets } from '@/lib/client/api';
 import { isPublicAddress, type AddressMode } from '@/lib/client/address';
 import { setAlwaysNewTab } from '@/lib/client/new-tab';
+import { shownGroups } from '@/lib/client/services';
 import { BUILTIN_JOBS, BUILTIN_OVERVIEW, isBuiltin } from '@/lib/client/tabs';
 import type { ServiceEntry } from '@/lib/shared/contract';
 import { BottomNav, type PhoneView } from './bottom-nav';
@@ -107,7 +108,7 @@ export function PhoneShell({
     } else if (view === 'services') {
       content = (
         <PhoneServices
-          groups={groups}
+          groups={shownGroups(groups)}
           statusById={shell.statusById}
           openIds={tabs.open}
           onOpenService={openService}
@@ -134,7 +135,7 @@ export function PhoneShell({
   }
 
   return (
-    <div className="flex h-dvh flex-col overflow-hidden overscroll-contain bg-page text-[15px] text-text">
+    <div className="flex h-svh flex-col overflow-hidden overscroll-contain bg-page text-[15px] text-text">
       {activeService !== undefined && activeId !== null ? (
         <ServiceBar
           service={activeService}

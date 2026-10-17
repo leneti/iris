@@ -9,8 +9,9 @@ export function LinksRow({ links }: { links: LinkEntry[] }) {
       <h2 className="flex h-[22px] items-center gap-1.5 text-[11px] font-semibold tracking-[0.06em] text-text-2 uppercase">
         Links
         <span className="font-normal tabular-nums">{links.length}</span>
+        <span aria-hidden className="ml-2 h-px flex-1 bg-hairline-strong" />
       </h2>
-      <ul className="mt-1 grid grid-cols-4 gap-2">
+      <ul className="mt-2 grid grid-cols-4 gap-2.5">
         {links.map((l) => (
           <li key={l.url} className="min-w-0">
             <a
@@ -18,7 +19,7 @@ export function LinksRow({ links }: { links: LinkEntry[] }) {
               target="_blank"
               rel="noopener noreferrer"
               title={l.url}
-              className="flex h-9 items-center gap-2 rounded-menu border border-hairline-raised bg-raised px-2 outline-none hover:bg-hover-raised focus-visible:ring-2 focus-visible:ring-ring"
+              className="flex h-10 items-center gap-2 rounded-panel border border-hairline-raised bg-raised px-2.5 outline-none transition-colors duration-150 hover:border-hairline-strong hover:bg-hover-raised focus-visible:ring-2 focus-visible:ring-ring"
             >
               <span
                 aria-hidden

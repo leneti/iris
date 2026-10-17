@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react';
 import { useWidgets } from '@/lib/client/api';
+import { shownGroups } from '@/lib/client/services';
 import { groupIcon, dockerText } from '@/components/shell/sidebar';
 import type { DockerState } from '@/components/shell/use-shell';
 import type { ServiceStatus, ServicesResponse, StandaloneWidget } from '@/lib/shared/contract';
@@ -30,6 +31,7 @@ function GroupLabel({ name, icon, count }: { name: string; icon: ReactNode; coun
       {icon}
       {name}
       <span className="font-normal tabular-nums">{count}</span>
+      <span aria-hidden className="ml-2 h-px flex-1 bg-hairline-strong" />
     </h2>
   );
 }
@@ -44,7 +46,7 @@ export function Overview({
   onOpenJobs,
 }: OverviewProps) {
   const { data: widgets } = useWidgets();
-  const groups = services?.groups ?? [];
+  const groups = shownGroups(services?.groups ?? []);
   const standalone = widgets?.standalone ?? [];
   const serviceCount = groups.reduce((n, g) => n + g.services.length, 0);
   const tabCount = openIds.filter((id) => !id.startsWith('builtin:')).length;
@@ -72,8 +74,12 @@ export function Overview({
     })),
   ];
 
+  const withWidget = (id: string) => widgets?.services[id] !== undefined;
+  const rich = (s: (typeof sections)[number]) => s.services.filter((x) => withWidget(x.id));
+  const plain = (s: (typeof sections)[number]) => s.services.filter((x) => !withWidget(x.id));
+
   return (
-    <div className="flex items-start gap-4 px-6 py-5">
+    <div className="flex items-start gap-5 px-6 py-5">
       <div className="min-w-0 flex-1">
         <header className="mb-3 flex items-center gap-3">
           <h1 className="text-lg font-semibold tracking-[-0.015em]">Overview</h1>
@@ -103,7 +109,7 @@ export function Overview({
             </p>
           </div>
         </header>
-        <div className="flex flex-col gap-3">
+        <div className="flex flex-col gap-5">
           {sections.map((section) => {
             const Icon = groupIcon(section.icon);
             return (
@@ -113,21 +119,27 @@ export function Overview({
                   icon={Icon ? <Icon aria-hidden className="size-3.5" /> : null}
                   count={section.services.length + section.tiles.length}
                 />
-                <div className="mt-1 grid grid-cols-3 gap-2">
-                  {section.services.map((s) => (
-                    <ServiceTile
-                      key={s.id}
-                      service={s}
-                      status={statusById[s.id] ?? 'unknown'}
-                      open={openIds.includes(s.id)}
-                      widget={widgets?.services[s.id]}
-                      onOpen={onOpenService}
-                    />
-                  ))}
-                  {section.tiles.map((w) => (
-                    <MarketsTile key={w.id} widget={w} />
-                  ))}
-                </div>
+                {/* Cards with figures first, two to a row so four figures fit; then the plain tiles. */}
+                {[rich(section), plain(section)].map((list, i) =>
+                  list.length === 0 && (i === 1 || section.tiles.length === 0) ? null : (
+                    <div
+                      key={i}
+                      className={cn('mt-2 grid gap-2.5', i === 0 ? 'grid-cols-2' : 'grid-cols-3')}
+                    >
+                      {list.map((s) => (
+                        <ServiceTile
+                          key={s.id}
+                          service={s}
+                          status={statusById[s.id] ?? 'unknown'}
+                          open={openIds.includes(s.id)}
+                          widget={widgets?.services[s.id]}
+                          onOpen={onOpenService}
+                        />
+                      ))}
+                      {i === 0 && section.tiles.map((w) => <MarketsTile key={w.id} widget={w} />)}
+                    </div>
+                  ),
+                )}
               </section>
             );
           })}

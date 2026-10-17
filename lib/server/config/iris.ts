@@ -67,6 +67,11 @@ const IrisSchema = z.object({
     })
     .optional(),
   links: z.array(z.object({ name: z.string(), abbr: z.string(), url: z.string() })).default([]),
+  // Service ids left off the Overview, the sidebar and Services; their health still counts.
+  hidden: z.array(z.string()).default([]),
+  // 'public': outside the zone, open services at their public address, the LAN port only as a
+  // fallback. 'auto' uses the LAN port whenever Iris is opened outside the zone.
+  addresses: z.enum(['auto', 'public']).default('auto'),
   widgets: z
     .object({
       refreshSeconds: z

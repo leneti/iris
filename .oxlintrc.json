@@ -3,5 +3,13 @@
   "plugins": ["typescript", "react", "nextjs", "import"],
   "categories": { "correctness": "error" },
   "env": { "browser": true, "node": true },
-  "ignorePatterns": [".llms", ".superpowers", ".tmp", ".next", "node_modules", "coverage"]
+  "ignorePatterns": [
+    ".claude",
+    ".llms",
+    ".superpowers",
+    ".tmp",
+    ".next",
+    "node_modules",
+    "coverage"
+  ]
 }

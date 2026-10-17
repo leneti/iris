@@ -37,6 +37,42 @@ export function ServiceTile({
     </span>
   );
 
+  const base =
+    'w-full rounded-panel border border-hairline-raised bg-raised text-left outline-none transition-colors duration-150 hover:border-hairline-strong hover:bg-hover-raised focus-visible:ring-2 focus-visible:ring-ring';
+
+  // With figures (or a failed read) the tile is a card: a header row, then the figures strip.
+  if (figures || failed) {
+    return (
+      <button
+        type="button"
+        data-slot="service-tile"
+        data-muted={muted}
+        onClick={() => onOpen(service.id)}
+        className={cn(base, 'flex flex-col gap-2.5 p-3', muted && 'text-text-2')}
+      >
+        <span className="flex items-center gap-2.5">
+          {icon}
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[14px] font-semibold">{service.name}</span>
+            {service.description && (
+              <span className="block truncate text-xs text-text-3">{service.description}</span>
+            )}
+          </span>
+          {marks}
+        </span>
+        <span className="block">
+          {figures ? (
+            <Figures stats={figures} />
+          ) : (
+            <span className="flex min-h-[52px] items-center rounded-tile border border-hairline-raised bg-well px-2.5">
+              <Unavailable />
+            </span>
+          )}
+        </span>
+      </button>
+    );
+  }
+
   return (
     <button
       type="button"
@@ -44,33 +80,19 @@ export function ServiceTile({
       data-muted={muted}
       onClick={() => onOpen(service.id)}
       className={cn(
-        'flex min-h-[52px] w-full flex-col justify-center rounded-menu border border-hairline-raised bg-raised px-3 py-2 text-left outline-none hover:bg-hover-raised focus-visible:ring-2 focus-visible:ring-ring',
+        base,
+        'flex min-h-[52px] items-center gap-2.5 px-3 py-2',
         muted && 'text-text-2',
       )}
     >
-      {figures || failed ? (
-        <>
-          <span className="flex h-7 items-center gap-2.5">
-            {icon}
-            <span className="min-w-0 flex-1 truncate font-semibold">{service.name}</span>
-            {marks}
-          </span>
-          <span className="mt-1.5 block min-h-[30px]">
-            {figures ? <Figures stats={figures} /> : <Unavailable />}
-          </span>
-        </>
-      ) : (
-        <span className="flex items-center gap-2.5">
-          {icon}
-          <span className="min-w-0 flex-1">
-            <span className="block truncate font-semibold">{service.name}</span>
-            {service.description && (
-              <span className="block truncate text-xs text-text-3">{service.description}</span>
-            )}
-          </span>
-          {marks}
-        </span>
-      )}
+      {icon}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate font-semibold">{service.name}</span>
+        {service.description && (
+          <span className="block truncate text-xs text-text-3">{service.description}</span>
+        )}
+      </span>
+      {marks}
     </button>
   );
 }
