@@ -148,6 +148,8 @@ scripts/dev.sh yarn verify         # lint, format check, typecheck, tests, build
 
 `dev:fixtures` starts mock upstreams on 127.0.0.1:47480-47484, fake framed apps on 47485-47499 and loads `dev/.env.fixtures` (allowed hosts `127.0.0.1:3000,localhost:3000`, zone `example.invalid`). Everything in it is invented.
 
+`IRIS_FIXTURE_SCENARIO=down|failed|strained|alt|outage scripts/dev.sh yarn dev:fixtures` shows one state for visual checks (default `normal`).
+
 ## Updates
 
 - **Renovate** keeps dependencies, GitHub Actions (pinned by commit SHA) and the Node base image (pinned by digest) current. Nothing newer than 14 days is proposed. Non-major updates are grouped into one weekly pull request and merged automatically when checks pass; major updates are one pull request each and reviewed by hand.

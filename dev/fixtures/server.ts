@@ -6,6 +6,15 @@ import http from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  containersFor,
+  cronJobsFor,
+  glancesFor,
+  hostStatusFor,
+  parseScenario,
+  upstreamFails,
+  type Scenario,
+} from './scenarios.ts';
 
 export const DEFAULT_PORTS = {
   docker: 47480,
@@ -282,8 +291,16 @@ export const LAN_APP_PORTS: Readonly<Record<string, number>> = {
 };
 
 /** The outside APIs, answered on the Traefik port when the Host is not one of the apps. */
-function external(req: Req): Reply | null {
+function external(req: Req, scenario?: Scenario): Reply | null {
   const tunnel = /^\/client\/v4\/accounts\/[A-Za-z0-9-]+\/cfd_tunnel\/[A-Za-z0-9-]+$/;
+  if (scenario && upstreamFails(scenario).external) {
+    if (
+      tunnel.test(req.path) ||
+      req.path === '/v1/cryptocurrency/quotes/latest' ||
+      req.path === '/v1/forecast'
+    )
+      return status(500, 'Internal Server Error');
+  }
   if (tunnel.test(req.path))
     return req.headers.authorization === `Bearer ${CLOUDFLARE_TOKEN}`
       ? fromFile('cloudflare-tunnel.json')
@@ -294,12 +311,12 @@ function external(req: Req): Reply | null {
   return null;
 }
 
-function traefik(req: Req): Reply {
+function traefik(req: Req, scenario?: Scenario): Reply {
   const host = req.host;
   const target = APPS[host];
   if (target) return target(req);
   if (!host.endsWith(`.${ZONE}`)) {
-    const reply = external(req);
+    const reply = external(req, scenario);
     if (reply) return reply;
   }
   // Traefik's own answer for a Host without a router.
@@ -309,10 +326,14 @@ function traefik(req: Req): Reply {
 // ---- the other upstreams ----
 
 const GLANCES = ['quicklook', 'mem', 'fs', 'network', 'sensors', 'uptime', 'load'];
-function glances(req: Req): Reply {
+function glances(req: Req, scenario?: Scenario): Reply {
+  if (scenario && upstreamFails(scenario).glances) return status(500, 'Internal Server Error');
   const name = /^\/api\/4\/([a-z]+)$/.exec(req.path)?.[1];
   if (name === 'status') return status(200, 'OK');
-  if (name && GLANCES.includes(name)) return fromFile(`glances-${name}.json`);
+  if (name && GLANCES.includes(name)) {
+    if (!scenario) return fromFile(`glances-${name}.json`);
+    return ok(glancesFor(scenario, name, readJson(`glances-${name}.json`)));
+  }
   return status(404, 'Not Found');
 }
 
@@ -324,8 +345,11 @@ function tautulli(req: Req): Reply {
 }
 
 const dockerList = /^\/v\d{1,3}\.\d{1,3}\/containers\/json$/;
-function docker(req: Req): Reply {
-  return dockerList.test(req.path) ? fromFile('containers.json') : status(404, 'page not found');
+function docker(req: Req, scenario?: Scenario): Reply {
+  if (scenario && upstreamFails(scenario).docker) return status(500, 'Internal Server Error');
+  if (!dockerList.test(req.path)) return status(404, 'page not found');
+  if (!scenario) return fromFile('containers.json');
+  return ok(containersFor(scenario, readJson('containers.json') as unknown[]));
 }
 
 // ---- servers ----
@@ -350,6 +374,8 @@ export type FixtureOptions = {
   lanApps?: 'default' | 'ephemeral' | 'none';
   /** Where the host status file is written at start and then every minute. */
   hostStatusFile?: string;
+  /** A patched variant of the base data; undefined serves the base data unchanged. */
+  scenario?: Scenario;
   log?: (line: string) => void;
 };
 
@@ -386,12 +412,17 @@ function listen(
 
 export async function startFixtures(options: FixtureOptions = {}): Promise<Fixtures> {
   const host = options.host ?? '127.0.0.1';
+  const scenario = options.scenario;
   const handlers: Record<FixtureName, (req: Req) => Reply> = {
-    docker,
-    traefik,
-    cron: (req) =>
-      req.path === '/cron-status' ? ok({ jobs: cronStatus(Date.now()) }) : status(404, 'Not Found'),
-    glances,
+    docker: (req) => docker(req, scenario),
+    traefik: (req) => traefik(req, scenario),
+    cron: (req) => {
+      if (req.path !== '/cron-status') return status(404, 'Not Found');
+      if (scenario && upstreamFails(scenario).cron) return status(500, 'Internal Server Error');
+      const jobs = cronStatus(Date.now());
+      return ok({ jobs: scenario ? cronJobsFor(scenario, jobs) : jobs });
+    },
+    glances: (req) => glances(req, scenario),
     tautulli,
   };
   const servers = {} as Record<FixtureName, http.Server>;
@@ -432,7 +463,10 @@ export async function startFixtures(options: FixtureOptions = {}): Promise<Fixtu
   const writeHostStatus = (): void => {
     if (!options.hostStatusFile) return;
     mkdirSync(dirname(options.hostStatusFile), { recursive: true });
-    writeFileSync(options.hostStatusFile, `${JSON.stringify(hostStatus(Date.now()), null, 2)}\n`);
+    // The outage writes a file generated an hour ago, which Iris ignores as stale.
+    const generated = hostStatus(scenario === 'outage' ? Date.now() - 60 * MINUTE : Date.now());
+    const body = scenario ? hostStatusFor(scenario, generated) : generated;
+    writeFileSync(options.hostStatusFile, `${JSON.stringify(body, null, 2)}\n`);
   };
   writeHostStatus();
   // The file is ignored once it is 15 minutes old, so keep it fresh while the fixtures run.
@@ -465,11 +499,14 @@ export async function startFixtures(options: FixtureOptions = {}): Promise<Fixtu
 // Started directly: `node --experimental-strip-types dev/fixtures/server.ts`.
 if (process.argv[1] !== undefined && fileURLToPath(import.meta.url) === process.argv[1]) {
   const statusFile = process.env.IRIS_HOST_STATUS_FILE;
+  const scenario = parseScenario(process.env.IRIS_FIXTURE_SCENARIO);
   const fixtures = await startFixtures({
     lanApps: 'default',
+    scenario,
     ...(statusFile ? { hostStatusFile: statusFile } : {}),
     log: (line) => console.log(line),
   });
+  console.log(`fixture scenario: ${scenario}`);
   const stop = (): void => {
     void fixtures.close().then(() => process.exit(0));
   };

@@ -4,6 +4,7 @@
     "paths": { "@/*": ["./*"] },
     "target": "ES2023",
     "allowJs": false,
+    "allowImportingTsExtensions": true,
     "types": ["node", "vitest/globals"],
     "noUncheckedIndexedAccess": true,
     "noImplicitOverride": true,
