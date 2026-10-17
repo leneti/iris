@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { PhoneJobs } from '@/components/phone/phone-jobs';
 import { cron, job } from '../overview/fixtures';
 import { data } from './mock-api';
@@ -21,6 +21,8 @@ const names = (container: HTMLElement) =>
   [...container.querySelectorAll('[data-slot="job-name"]')].map((n) => n.textContent);
 
 beforeEach(() => {
+  // The fixtures are timed on 2026-10-16; on a later real date the card adds a weekday.
+  vi.useFakeTimers({ toFake: ['Date'], now: new Date('2026-10-16T10:26:00.000Z') });
   data.cron = cron([
     job({ id: 'feed', name: 'feed-sync' }),
     job({ id: 'digest', name: 'report-digest', flag: 'warning', result: 'warning' }),
@@ -40,6 +42,7 @@ beforeEach(() => {
     maintenance,
   ]);
 });
+afterEach(() => vi.useRealTimers());
 
 describe('PhoneJobs', () => {
   test('failed and overdue cards come first, then the rest, then System maintenance', () => {
