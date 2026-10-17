@@ -45,7 +45,7 @@ test('warn and error go to stderr', () => {
 });
 
 test('loadEnv registers credentials', () => {
-  loadEnv({ DASHBOARD_GOTIFY_TOKEN: 'tok-from-env-123' });
+  loadEnv({ IRIS_GOTIFY_TOKEN: 'tok-from-env-123' });
   const out = capture('stdout', () => log.info('leak tok-from-env-123'));
   expect(out).not.toContain('tok-from-env-123');
 });

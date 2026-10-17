@@ -1,4 +1,4 @@
-import { defaultDashboardConfig, type DashboardConfig } from '@/lib/server/config/dashboard';
+import { defaultIrisConfig, type IrisConfig } from '@/lib/server/config/iris';
 import { discover } from '@/lib/server/discovery/discover';
 import type { AppState } from '@/lib/server/state';
 import { createState } from '@/lib/server/state';
@@ -13,15 +13,15 @@ export function stateWith(services: WidgetService[]): AppState {
     containers: services.map((s) =>
       container(s.id, {
         labels: {
-          'dashboard.enable': 'true',
+          'iris.enable': 'true',
           [`traefik.http.routers.${s.id}.rule`]: `Host(\`${s.id}.example.invalid\`)`,
-          'dashboard.widget': s.type,
-          ...(s.url ? { 'dashboard.widget.url': s.url } : {}),
-          ...(s.fields ? { 'dashboard.widget.fields': s.fields } : {}),
+          'iris.widget': s.type,
+          ...(s.url ? { 'iris.widget.url': s.url } : {}),
+          ...(s.fields ? { 'iris.widget.fields': s.fields } : {}),
         },
       }),
     ),
-    config: defaultDashboardConfig(),
+    config: defaultIrisConfig(),
     manual: { services: [], warnings: [], state: 'missing' },
     zone: 'example.invalid',
     resolveIcon: (i) => ({ kind: 'lucide', name: i.serviceName }),
@@ -29,4 +29,4 @@ export function stateWith(services: WidgetService[]): AppState {
   return state;
 }
 
-export const dashboard: DashboardConfig = defaultDashboardConfig();
+export const irisConfig: IrisConfig = defaultIrisConfig();

@@ -24,8 +24,8 @@ afterEach(async () => {
 
 const envFor = (url: string | undefined, version?: string) =>
   loadEnv({
-    DASHBOARD_DOCKER_URL: url,
-    ...(version ? { DASHBOARD_DOCKER_API_VERSION: version } : {}),
+    IRIS_DOCKER_URL: url,
+    ...(version ? { IRIS_DOCKER_API_VERSION: version } : {}),
   });
 
 describe('fetchContainers', () => {
@@ -57,7 +57,7 @@ describe('fetchContainers', () => {
   });
 
   it('throws when no Docker address is configured', async () => {
-    await expect(fetchContainers(envFor(undefined))).rejects.toThrow(/DASHBOARD_DOCKER_URL/);
+    await expect(fetchContainers(envFor(undefined))).rejects.toThrow(/IRIS_DOCKER_URL/);
   });
 
   it('throws on a non-200 reply', async () => {

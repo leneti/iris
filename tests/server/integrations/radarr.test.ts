@@ -25,8 +25,8 @@ describe('radarr adapter', () => {
   });
 
   test('an empty key is not configured', () => {
-    expect(adapter.credentials(envWith('DASHBOARD_RADARR_KEY', ''))).toBeNull();
-    expect(adapter.credentials(envWith('DASHBOARD_RADARR_KEY', KEY))).toEqual({ key: KEY });
+    expect(adapter.credentials(envWith('IRIS_RADARR_KEY', ''))).toBeNull();
+    expect(adapter.credentials(envWith('IRIS_RADARR_KEY', KEY))).toEqual({ key: KEY });
   });
 
   test.each(['nope', '{"movies":[]}', '[{"monitored":"yes"}]'])(

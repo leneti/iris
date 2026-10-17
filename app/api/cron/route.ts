@@ -15,7 +15,7 @@ const cache = createTtlCache();
 let env: ServerEnv | undefined;
 let wasDown = false;
 
-// No request input is read: the response depends only on the two sources and dashboard.yaml.
+// No request input is read: the response depends only on the two sources and iris.yaml.
 export async function GET() {
   env ??= loadEnv();
   const now = new Date();
@@ -43,7 +43,7 @@ export async function GET() {
 
   const body = buildCronResponse({
     now,
-    config: getConfigWatcher().get().dashboard.config,
+    config: getConfigWatcher().get().iris.config,
     cronStatus,
     hostStatus: readHostStatus(env.hostStatusFile, now),
   });

@@ -12,7 +12,7 @@ export default async function Page() {
   return (
     <AppShell
       mode={addressMode(host, loadEnv().zone)}
-      phoneMaxLive={getConfigWatcher().get().dashboard.config.phone.maxLiveFrames}
+      phoneMaxLive={getConfigWatcher().get().iris.config.phone.maxLiveFrames}
     />
   );
 }

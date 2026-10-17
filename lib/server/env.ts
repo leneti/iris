@@ -40,34 +40,34 @@ export function loadEnv(
     return v;
   };
   const env: ServerEnv = {
-    dockerUrl: opt('DASHBOARD_DOCKER_URL'),
-    dockerApiVersion: opt('DASHBOARD_DOCKER_API_VERSION') ?? '1.52',
-    traefikUrl: opt('DASHBOARD_TRAEFIK_URL'),
-    cronStatusUrl: opt('DASHBOARD_CRON_STATUS_URL'),
-    zone: opt('DASHBOARD_ZONE'),
+    dockerUrl: opt('IRIS_DOCKER_URL'),
+    dockerApiVersion: opt('IRIS_DOCKER_API_VERSION') ?? '1.52',
+    traefikUrl: opt('IRIS_TRAEFIK_URL'),
+    cronStatusUrl: opt('IRIS_CRON_STATUS_URL'),
+    zone: opt('IRIS_ZONE'),
     allowedHosts: Object.freeze(
-      (source.DASHBOARD_ALLOWED_HOSTS ?? '')
+      (source.IRIS_ALLOWED_HOSTS ?? '')
         .split(',')
         .map((h) => h.trim().toLowerCase())
         .filter(Boolean),
     ),
-    hostStatusFile: opt('DASHBOARD_HOST_STATUS_FILE'),
-    iconsBase: opt('DASHBOARD_ICONS_BASE'),
-    configDir: opt('DASHBOARD_CONFIG_DIR') ?? '/config',
-    cacheDir: opt('DASHBOARD_CACHE_DIR') ?? '/cache',
-    seerrKey: secret('DASHBOARD_SEERR_KEY'),
-    tautulliKey: secret('DASHBOARD_TAUTULLI_KEY'),
-    radarrKey: secret('DASHBOARD_RADARR_KEY'),
-    sonarrKey: secret('DASHBOARD_SONARR_KEY'),
-    prowlarrKey: secret('DASHBOARD_PROWLARR_KEY'),
-    autobrrKey: secret('DASHBOARD_AUTOBRR_KEY'),
-    qbittorrentUsername: secret('DASHBOARD_QBITTORRENT_USERNAME'),
-    qbittorrentPassword: secret('DASHBOARD_QBITTORRENT_PASSWORD'),
-    cloudflareAccountId: secret('DASHBOARD_CLOUDFLARE_ACCOUNT_ID'),
-    cloudflareTunnelId: secret('DASHBOARD_CLOUDFLARE_TUNNEL_ID'),
-    cloudflareToken: secret('DASHBOARD_CLOUDFLARE_TOKEN'),
-    coinmarketcapKey: secret('DASHBOARD_COINMARKETCAP_KEY'),
-    gotifyToken: secret('DASHBOARD_GOTIFY_TOKEN'),
+    hostStatusFile: opt('IRIS_HOST_STATUS_FILE'),
+    iconsBase: opt('IRIS_ICONS_BASE'),
+    configDir: opt('IRIS_CONFIG_DIR') ?? '/config',
+    cacheDir: opt('IRIS_CACHE_DIR') ?? '/cache',
+    seerrKey: secret('IRIS_SEERR_KEY'),
+    tautulliKey: secret('IRIS_TAUTULLI_KEY'),
+    radarrKey: secret('IRIS_RADARR_KEY'),
+    sonarrKey: secret('IRIS_SONARR_KEY'),
+    prowlarrKey: secret('IRIS_PROWLARR_KEY'),
+    autobrrKey: secret('IRIS_AUTOBRR_KEY'),
+    qbittorrentUsername: secret('IRIS_QBITTORRENT_USERNAME'),
+    qbittorrentPassword: secret('IRIS_QBITTORRENT_PASSWORD'),
+    cloudflareAccountId: secret('IRIS_CLOUDFLARE_ACCOUNT_ID'),
+    cloudflareTunnelId: secret('IRIS_CLOUDFLARE_TUNNEL_ID'),
+    cloudflareToken: secret('IRIS_CLOUDFLARE_TOKEN'),
+    coinmarketcapKey: secret('IRIS_COINMARKETCAP_KEY'),
+    gotifyToken: secret('IRIS_GOTIFY_TOKEN'),
   };
   return Object.freeze(env);
 }

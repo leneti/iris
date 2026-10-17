@@ -13,8 +13,8 @@ const matcher = (path: string): boolean =>
 
 describe('proxy', () => {
   beforeEach(() => {
-    vi.stubEnv('DASHBOARD_ALLOWED_HOSTS', '192.0.2.10:4747');
-    vi.stubEnv('DASHBOARD_ZONE', 'example.invalid');
+    vi.stubEnv('IRIS_ALLOWED_HOSTS', '192.0.2.10:4747');
+    vi.stubEnv('IRIS_ZONE', 'example.invalid');
   });
   afterEach(() => vi.unstubAllEnvs());
 
@@ -49,13 +49,13 @@ describe('proxy', () => {
 
   test('host variants are normalised before the comparison', () => {
     expect(proxy(request('/', '192.0.2.10.:4747')).status).toBe(200);
-    vi.stubEnv('DASHBOARD_ALLOWED_HOSTS', 'iris.example.invalid');
+    vi.stubEnv('IRIS_ALLOWED_HOSTS', 'iris.example.invalid');
     expect(proxy(request('/', 'IRIS.Example.Invalid.')).status).toBe(200);
     expect(proxy(request('/', 'www.example.invalid')).status).toBe(400);
   });
 
   test('the zone joins the allowlist with no code change', () => {
-    vi.stubEnv('DASHBOARD_ALLOWED_HOSTS', '192.0.2.10:4747,example.invalid');
+    vi.stubEnv('IRIS_ALLOWED_HOSTS', '192.0.2.10:4747,example.invalid');
     const res = proxy(request('/_next/static/x', 'example.invalid'));
     expect(res.status).toBe(200);
     expect(res.headers.get('content-security-policy')).not.toContain('http://');

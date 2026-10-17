@@ -30,9 +30,9 @@ type Route = typeof import('@/app/api/cron/route');
 async function load(env: Record<string, string | undefined> = {}): Promise<Route> {
   vi.resetModules();
   globalThis.__irisConfig = undefined;
-  vi.stubEnv('DASHBOARD_CONFIG_DIR', dir);
-  vi.stubEnv('DASHBOARD_CRON_STATUS_URL', 'http://cron-status.example.invalid:9876/cron-status');
-  vi.stubEnv('DASHBOARD_HOST_STATUS_FILE', hostFile);
+  vi.stubEnv('IRIS_CONFIG_DIR', dir);
+  vi.stubEnv('IRIS_CRON_STATUS_URL', 'http://cron-status.example.invalid:9876/cron-status');
+  vi.stubEnv('IRIS_HOST_STATUS_FILE', hostFile);
   for (const [k, v] of Object.entries(env)) vi.stubEnv(k, v as string);
   const mod = await import('@/lib/server/cron/cron-status');
   vi.mocked(mod.fetchCronStatus).mockResolvedValue(jobs);
@@ -46,7 +46,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  rmSync(join(dir, 'dashboard.yaml'), { force: true });
+  rmSync(join(dir, 'iris.yaml'), { force: true });
   globalThis.__irisConfig = undefined;
   vi.useRealTimers();
   vi.unstubAllEnvs();
@@ -113,7 +113,7 @@ describe('GET /api/cron', () => {
   });
 
   test('no cron-status address: not-configured and nothing is fetched', async () => {
-    const { GET } = await load({ DASHBOARD_CRON_STATUS_URL: '' });
+    const { GET } = await load({ IRIS_CRON_STATUS_URL: '' });
     const { fetchCronStatus: fetch } = await import('@/lib/server/cron/cron-status');
     const body = CronResponse.parse(await (await GET()).json());
     expect(body.sources[0]).toEqual({
@@ -133,13 +133,13 @@ describe('GET /api/cron', () => {
     expect(body.jobs.find((j) => j.id === 'backup')?.summary).toBe('Not monitored');
   });
 
-  test('dashboard.yaml overrides are read through the config watcher and reloaded on change', async () => {
+  test('iris.yaml overrides are read through the config watcher and reloaded on change', async () => {
     const { GET } = await load();
     const read = async () => CronResponse.parse(await (await GET()).json());
     expect((await read()).jobs.find((j) => j.id === 'feed-sync')?.schedule.source).toBe(
       'host-status',
     );
-    const yaml = join(dir, 'dashboard.yaml');
+    const yaml = join(dir, 'iris.yaml');
     writeFileSync(
       yaml,
       'cron:\n  jobs:\n    - match: feed-sync\n      schedule: "0 * * * *"\n      label: Hourly\n',

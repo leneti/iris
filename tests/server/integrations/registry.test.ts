@@ -1,9 +1,9 @@
 import { WidgetsResponse, type StandaloneWidget } from '@/lib/shared/contract';
-import { defaultDashboardConfig, type DashboardConfig } from '@/lib/server/config/dashboard';
+import { defaultIrisConfig, type IrisConfig } from '@/lib/server/config/iris';
 import { loadEnv } from '@/lib/server/env';
 import type { Adapter, AdapterContext, AdapterValues } from '@/lib/server/integrations/fetcher';
 import { buildStatusResponse } from '@/lib/server/state';
-import { dashboard, stateWith } from '../../helpers/widgets';
+import { irisConfig, stateWith } from '../../helpers/widgets';
 
 // Raw log calls, before any scrubbing: a leak must not be hidden by the redactor.
 const logs = vi.hoisted(() => [] as string[]);
@@ -52,8 +52,8 @@ function fake(over: Partial<Adapter> = {}, values: AdapterValues = { wanted: 3, 
   return { adapter, loads };
 }
 const withKey = loadEnv({
-  DASHBOARD_RADARR_KEY: 'radarr-key-77d1',
-  DASHBOARD_TRAEFIK_URL: 'http://t.example.invalid',
+  IRIS_RADARR_KEY: 'radarr-key-77d1',
+  IRIS_TRAEFIK_URL: 'http://t.example.invalid',
 });
 
 describe('getWidgets', () => {
@@ -70,8 +70,8 @@ describe('getWidgets', () => {
     reg.registerAdapter(adapter);
     const state = stateWith([{ id: 'radarr', type: 'radarr' }]);
     const [a, b] = await Promise.all([
-      reg.getWidgets(state, dashboard, withKey, T0),
-      reg.getWidgets(state, dashboard, withKey, T0),
+      reg.getWidgets(state, irisConfig, withKey, T0),
+      reg.getWidgets(state, irisConfig, withKey, T0),
     ]);
     expect(loads.count).toBe(1);
     expect(a.services.radarr).toEqual(b.services.radarr);
@@ -89,8 +89,8 @@ describe('getWidgets', () => {
       { id: 'radarr', type: 'radarr' },
       { id: 'seerr', type: 'seerr' },
     ]);
-    const e = loadEnv({ DASHBOARD_RADARR_KEY: 'r1', DASHBOARD_SEERR_KEY: 's1' });
-    const ask = () => reg.getWidgets(state, dashboard, e, Date.now());
+    const e = loadEnv({ IRIS_RADARR_KEY: 'r1', IRIS_SEERR_KEY: 's1' });
+    const ask = () => reg.getWidgets(state, irisConfig, e, Date.now());
     await ask();
     await vi.advanceTimersByTimeAsync(59_000); // default 60 s, radarr 300 s
     await ask();
@@ -108,7 +108,7 @@ describe('getWidgets', () => {
     reg.registerAdapter(adapter);
     const res = await reg.getWidgets(
       stateWith([{ id: 'radarr', type: 'radarr' }]),
-      dashboard,
+      irisConfig,
       withKey,
       T0,
     );
@@ -128,7 +128,7 @@ describe('getWidgets', () => {
   });
 
   test('services without a widget are not listed', async () => {
-    const res = await reg.getWidgets(stateWith([]), dashboard, withKey, T0);
+    const res = await reg.getWidgets(stateWith([]), irisConfig, withKey, T0);
     expect(res.services).toEqual({});
   });
 
@@ -137,7 +137,7 @@ describe('getWidgets', () => {
     reg.registerAdapter(adapter);
     const res = await reg.getWidgets(
       stateWith([{ id: 'radarr', type: 'radarr' }]),
-      dashboard,
+      irisConfig,
       loadEnv({}),
       T0,
     );
@@ -153,7 +153,7 @@ describe('getWidgets', () => {
   test('a type with no registered adapter reads as not-configured', async () => {
     const res = await reg.getWidgets(
       stateWith([{ id: 'gotify', type: 'gotify' }]),
-      dashboard,
+      irisConfig,
       withKey,
       T0,
     );
@@ -177,7 +177,7 @@ describe('getWidgets', () => {
         reg.registerAdapter(adapter);
         const app = stateWith([{ id: 'radarr', type: 'radarr' }]);
         const before = JSON.stringify(buildStatusResponse(app, T0));
-        const res = await reg.getWidgets(app, dashboard, withKey, T0);
+        const res = await reg.getWidgets(app, irisConfig, withKey, T0);
         expect(res.services.radarr).toEqual({ type: 'radarr', state, fetchedAt: null, stats: [] });
         expect(JSON.stringify(buildStatusResponse(app, T0))).toBe(before);
       },
@@ -188,7 +188,7 @@ describe('getWidgets', () => {
       reg.registerAdapter(adapter);
       const res = await reg.getWidgets(
         stateWith([{ id: 'radarr', type: 'radarr' }]),
-        dashboard,
+        irisConfig,
         withKey,
         T0,
       );
@@ -205,10 +205,10 @@ describe('getWidgets', () => {
       });
       reg.registerAdapter(adapter);
       const app = stateWith([{ id: 'radarr', type: 'radarr' }]);
-      await reg.getWidgets(app, dashboard, withKey, T0);
+      await reg.getWidgets(app, irisConfig, withKey, T0);
       fail = true;
       await vi.advanceTimersByTimeAsync(301_000);
-      const res = await reg.getWidgets(app, dashboard, withKey, Date.now());
+      const res = await reg.getWidgets(app, irisConfig, withKey, Date.now());
       expect(res.services.radarr).toEqual({
         type: 'radarr',
         state: 'unreachable',
@@ -228,12 +228,12 @@ describe('getWidgets', () => {
       });
       reg.registerAdapter(adapter);
       const app = stateWith([{ id: 'radarr', type: 'radarr' }]);
-      expect((await reg.getWidgets(app, dashboard, withKey, T0)).services.radarr!.state).toBe(
+      expect((await reg.getWidgets(app, irisConfig, withKey, T0)).services.radarr!.state).toBe(
         'unreachable',
       );
       await vi.advanceTimersByTimeAsync(31_000);
       expect(
-        (await reg.getWidgets(app, dashboard, withKey, Date.now())).services.radarr!.state,
+        (await reg.getWidgets(app, irisConfig, withKey, Date.now())).services.radarr!.state,
       ).toBe('ok');
     });
 
@@ -247,7 +247,7 @@ describe('getWidgets', () => {
           { id: 'radarr', type: 'radarr' },
           { id: 'seerr', type: 'seerr' },
         ]),
-        dashboard,
+        irisConfig,
         withKey,
         T0,
       );
@@ -264,7 +264,7 @@ describe('getWidgets', () => {
       reg.registerAdapter(adapter);
       return reg.getWidgets(
         stateWith([{ id: 'radarr', type: 'radarr', fields }]),
-        dashboard,
+        irisConfig,
         withKey,
         T0,
       );
@@ -289,7 +289,7 @@ describe('getWidgets', () => {
       reg.registerAdapter(adapter);
       const app = stateWith([{ id: 'radarr', type: 'radarr', fields: 'nope' }]);
       for (let i = 0; i < 3; i++) {
-        await reg.getWidgets(app, dashboard, withKey, Date.now());
+        await reg.getWidgets(app, irisConfig, withKey, Date.now());
         await vi.advanceTimersByTimeAsync(400_000);
       }
       expect(logs.filter((l) => /unknown field/.test(l))).toHaveLength(1);
@@ -341,8 +341,8 @@ describe('getWidgets', () => {
         };
       });
       const app = stateWith([]);
-      const first = WidgetsResponse.parse(await reg.getWidgets(app, dashboard, withKey, T0));
-      await reg.getWidgets(app, dashboard, withKey, T0);
+      const first = WidgetsResponse.parse(await reg.getWidgets(app, irisConfig, withKey, T0));
+      await reg.getWidgets(app, irisConfig, withKey, T0);
       expect(first.standalone).toEqual([widget]);
       expect(first.weather?.label).toBe('Hometown');
       expect(loads).toBe(1);
@@ -360,7 +360,7 @@ describe('getWidgets', () => {
       });
       const res = await reg.getWidgets(
         stateWith([{ id: 'radarr', type: 'radarr' }]),
-        dashboard,
+        irisConfig,
         withKey,
         T0,
       );
@@ -381,13 +381,13 @@ describe('getWidgets', () => {
     reg.registerAdapter(adapter);
     await reg.getWidgets(
       stateWith([{ id: 'radarr', type: 'radarr', url: 'http://a.example.invalid' }]),
-      dashboard,
+      irisConfig,
       withKey,
       T0,
     );
     const res = await reg.getWidgets(
       stateWith([{ id: 'radarr', type: 'radarr', url: 'http://b.example.invalid' }]),
-      dashboard,
+      irisConfig,
       withKey,
       T0,
     );
@@ -411,7 +411,7 @@ describe('ctx.cached (ruling R26)', () => {
     const loads = { series: 0 };
     reg.registerAdapter(sonarr(loads));
     const app = stateWith([{ id: 'sonarr', type: 'sonarr' }]);
-    const ask = () => reg.getWidgets(app, dashboard, withKey, Date.now());
+    const ask = () => reg.getWidgets(app, irisConfig, withKey, Date.now());
     const first = await ask();
     expect(first.services.sonarr!.state).toBe('ok');
     await vi.advanceTimersByTimeAsync(61_000);
@@ -454,7 +454,7 @@ describe('ctx.cached (ruling R26)', () => {
       { id: 'radarr', type: 'radarr' },
       { id: 'radarr2', type: 'radarr' },
     ]);
-    await reg.getWidgets(app, dashboard, withKey, T0);
+    await reg.getWidgets(app, irisConfig, withKey, T0);
     expect(loads).toHaveLength(2);
   });
 
@@ -472,15 +472,15 @@ describe('ctx.cached (ruling R26)', () => {
     };
     reg.registerAdapter(adapter);
     const app = stateWith([{ id: 'radarr', type: 'radarr' }]);
-    expect((await reg.getWidgets(app, dashboard, withKey, T0)).services.radarr).toMatchObject({
+    expect((await reg.getWidgets(app, irisConfig, withKey, T0)).services.radarr).toMatchObject({
       state: 'unreachable',
       stats: [],
     });
     fail = false;
     await vi.advanceTimersByTimeAsync(31_000);
-    expect((await reg.getWidgets(app, dashboard, withKey, Date.now())).services.radarr!.state).toBe(
-      'ok',
-    );
+    expect(
+      (await reg.getWidgets(app, irisConfig, withKey, Date.now())).services.radarr!.state,
+    ).toBe('ok');
   });
 
   async function captureContext(): Promise<AdapterContext> {
@@ -492,7 +492,7 @@ describe('ctx.cached (ruling R26)', () => {
         return { wanted: 1, movies: 1 };
       },
     });
-    await reg.getWidgets(stateWith([{ id: 'radarr', type: 'radarr' }]), dashboard, withKey, T0);
+    await reg.getWidgets(stateWith([{ id: 'radarr', type: 'radarr' }]), irisConfig, withKey, T0);
     return captured!;
   }
 });
@@ -576,17 +576,17 @@ describe('credentials never leave the server (criterion 11.3)', () => {
   const secrets = Object.fromEntries(TYPES.map((t, i) => [t, `cred-${t}-9a8b7c6d5e4f30${i}1`]));
   const cloud = 'cred-cloudflare-example';
   const leakEnv = loadEnv({
-    DASHBOARD_SEERR_KEY: secrets.seerr,
-    DASHBOARD_TAUTULLI_KEY: secrets.tautulli,
-    DASHBOARD_RADARR_KEY: secrets.radarr,
-    DASHBOARD_SONARR_KEY: secrets.sonarr,
-    DASHBOARD_PROWLARR_KEY: secrets.prowlarr,
-    DASHBOARD_AUTOBRR_KEY: secrets.autobrr,
-    DASHBOARD_GOTIFY_TOKEN: secrets.gotify,
-    DASHBOARD_QBITTORRENT_USERNAME: 'cred-user-5544',
-    DASHBOARD_QBITTORRENT_PASSWORD: secrets.qbittorrent,
-    DASHBOARD_CLOUDFLARE_TOKEN: cloud,
-    DASHBOARD_TRAEFIK_URL: 'http://t.example.invalid',
+    IRIS_SEERR_KEY: secrets.seerr,
+    IRIS_TAUTULLI_KEY: secrets.tautulli,
+    IRIS_RADARR_KEY: secrets.radarr,
+    IRIS_SONARR_KEY: secrets.sonarr,
+    IRIS_PROWLARR_KEY: secrets.prowlarr,
+    IRIS_AUTOBRR_KEY: secrets.autobrr,
+    IRIS_GOTIFY_TOKEN: secrets.gotify,
+    IRIS_QBITTORRENT_USERNAME: 'cred-user-5544',
+    IRIS_QBITTORRENT_PASSWORD: secrets.qbittorrent,
+    IRIS_CLOUDFLARE_TOKEN: cloud,
+    IRIS_TRAEFIK_URL: 'http://t.example.invalid',
   });
 
   test('not in the output or any log line, for ok, thrown and malformed replies', async () => {
@@ -642,7 +642,7 @@ describe('credentials never leave the server (criterion 11.3)', () => {
       ...TYPES.map((t) => ({ id: t, type: t })),
       { id: 'cloudflared', type: 'cloudflared' },
     ]);
-    const res = await reg.getWidgets(app, defaultDashboardConfig(), leakEnv, T0);
+    const res = await reg.getWidgets(app, defaultIrisConfig(), leakEnv, T0);
     expect(Object.values(res.services).map((s) => s.state)).toContain('unreachable');
     const everything = JSON.stringify(res) + logs.join('');
     for (const secret of [...Object.values(secrets), cloud, 'cred-user-5544'])
@@ -651,7 +651,7 @@ describe('credentials never leave the server (criterion 11.3)', () => {
   });
 });
 
-test('config type is the dashboard config', () => {
-  const c: DashboardConfig = dashboard;
+test('config type is the Iris config', () => {
+  const c: IrisConfig = irisConfig;
   expect(c.widgets.refreshSeconds.default).toBe(60);
 });

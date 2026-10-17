@@ -102,7 +102,7 @@ describe('buildRouterMap', () => {
           'traefik.http.routers.r.entrypoints': 'websecure',
           'traefik.http.routers.r.rule.extra': 'Host(`x.example.invalid`)',
           'traefik.tcp.routers.r.rule': 'Host(`x.example.invalid`)',
-          'dashboard.name': 'x',
+          'iris.name': 'x',
         },
       },
     ]);

@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { WidgetsResponse } from '@/lib/shared/contract';
-import { defaultDashboardConfig } from '@/lib/server/config/dashboard';
+import { defaultIrisConfig } from '@/lib/server/config/iris';
 import { loadEnv } from '@/lib/server/env';
 import { httpRequest } from '@/lib/server/http';
 import { stateWith } from '../../helpers/widgets';
@@ -16,7 +16,7 @@ vi.mock('@/lib/server/http', async (importActual) => {
 vi.mock('@/lib/server/config/services', () => ({
   getConfigWatcher: () => ({
     get: () => ({
-      dashboard: {
+      iris: {
         config: { streams: { url: 'http://tautulli.example.invalid:8181', showUsers: true } },
       },
     }),
@@ -29,8 +29,8 @@ const activity = readFileSync(
 );
 const T0 = new Date('2026-10-16T12:00:00.000Z').getTime();
 const KEY = 'tautulli-key-3b9d';
-const env = loadEnv({ DASHBOARD_TAUTULLI_KEY: KEY });
-const config = defaultDashboardConfig();
+const env = loadEnv({ IRIS_TAUTULLI_KEY: KEY });
+const config = defaultIrisConfig();
 
 type Registry = typeof import('@/lib/server/integrations/registry');
 type Panel = typeof import('@/lib/server/panels/tautulli');
@@ -40,7 +40,7 @@ let panel: Panel;
 beforeEach(async () => {
   vi.useFakeTimers();
   vi.setSystemTime(T0);
-  vi.stubEnv('DASHBOARD_TAUTULLI_KEY', KEY);
+  vi.stubEnv('IRIS_TAUTULLI_KEY', KEY);
   vi.resetModules();
   vi.mocked(httpRequest).mockReset();
   vi.mocked(httpRequest).mockResolvedValue({

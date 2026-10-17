@@ -37,8 +37,8 @@ describe('gotify adapter', () => {
     expect(adapter.type).toBe('gotify');
     expect(adapter.defaultFields).toEqual(['apps', 'clients', 'messages']);
     expect(adapter.labels).toEqual({ apps: 'Apps', clients: 'Clients', messages: 'Messages' });
-    expect(adapter.credentials(envWith('DASHBOARD_GOTIFY_TOKEN', ''))).toBeNull();
-    expect(adapter.credentials(envWith('DASHBOARD_GOTIFY_TOKEN', KEY))).toEqual({ key: KEY });
+    expect(adapter.credentials(envWith('IRIS_GOTIFY_TOKEN', ''))).toBeNull();
+    expect(adapter.credentials(envWith('IRIS_GOTIFY_TOKEN', KEY))).toEqual({ key: KEY });
   });
 
   test.each(['not json', '{}', '{"messages":"x"}'])(

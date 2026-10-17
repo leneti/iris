@@ -1,6 +1,6 @@
 import 'server-only';
 import type { CronJob, CronResponse, CronSource, HostStatusFile } from '@/lib/shared/contract';
-import type { DashboardConfig } from '../config/dashboard';
+import type { IrisConfig } from '../config/iris';
 import type { CronStatusJob } from './cron-status';
 import { flagFor, isValidSchedule, isValidTimezone, type Flag } from './flags';
 import type { HostStatusState } from './host-status';
@@ -13,7 +13,7 @@ const NOT_MONITORED = 'Not monitored';
 
 export type BuildInput = {
   now: Date;
-  config: Pick<DashboardConfig, 'cron' | 'maintenance'>;
+  config: Pick<IrisConfig, 'cron' | 'maintenance'>;
   cronStatus: {
     state: 'ok' | 'unreachable' | 'not-configured';
     /** When the list was fetched; for `unreachable`, when the last good one was. */
@@ -23,7 +23,7 @@ export type BuildInput = {
   hostStatus: { state: HostStatusState; file: HostStatusFile | null };
 };
 
-type Maintenance = DashboardConfig['maintenance'][number];
+type Maintenance = IrisConfig['maintenance'][number];
 
 // ---- text ----
 // Control characters (and the bidi controls that can reorder text) become spaces or vanish,
@@ -155,7 +155,7 @@ function maintenanceRow(row: Maintenance, i: BuildInput, tz: string): CronJob {
   const { cron } = i.config;
   const seen =
     i.hostStatus.state === 'ok' && i.hostStatus.file ? observed(i.hostStatus.file, row.id) : null;
-  // The exporter's schedule first; the one in dashboard.yaml fills in when the file has none.
+  // The exporter's schedule first; the one in iris.yaml fills in when the file has none.
   const schedule = pickSchedule(
     [
       [seen?.schedule, 'host-status'],

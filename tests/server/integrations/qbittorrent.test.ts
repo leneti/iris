@@ -93,11 +93,11 @@ describe('qbittorrent adapter', () => {
 
   test('credentials are optional: never null, and carry the pair only when both are set', () => {
     expect(adapter.credentials(loadEnv({}))).toEqual({});
-    expect(adapter.credentials(loadEnv({ DASHBOARD_QBITTORRENT_USERNAME: USER }))).toEqual({});
-    expect(adapter.credentials(loadEnv({ DASHBOARD_QBITTORRENT_PASSWORD: PASS }))).toEqual({});
+    expect(adapter.credentials(loadEnv({ IRIS_QBITTORRENT_USERNAME: USER }))).toEqual({});
+    expect(adapter.credentials(loadEnv({ IRIS_QBITTORRENT_PASSWORD: PASS }))).toEqual({});
     expect(
       adapter.credentials(
-        loadEnv({ DASHBOARD_QBITTORRENT_USERNAME: USER, DASHBOARD_QBITTORRENT_PASSWORD: PASS }),
+        loadEnv({ IRIS_QBITTORRENT_USERNAME: USER, IRIS_QBITTORRENT_PASSWORD: PASS }),
       ),
     ).toEqual(both);
   });

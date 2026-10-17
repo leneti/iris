@@ -29,8 +29,8 @@ describe('seerr adapter', () => {
   });
 
   test('an empty or missing key is not configured', () => {
-    expect(adapter.credentials(envWith('DASHBOARD_SEERR_KEY', ''))).toBeNull();
-    expect(adapter.credentials(envWith('DASHBOARD_SEERR_KEY', KEY))).toEqual({ key: KEY });
+    expect(adapter.credentials(envWith('IRIS_SEERR_KEY', ''))).toBeNull();
+    expect(adapter.credentials(envWith('IRIS_SEERR_KEY', KEY))).toEqual({ key: KEY });
   });
 
   test.each(['not json', '{"pending":"3","available":1}', '[]', '{"pending":1}'])(

@@ -66,8 +66,8 @@ describe('normalizeHost', () => {
 
 describe('securityHeaders', () => {
   const env = loadEnv({
-    DASHBOARD_ZONE: 'example.invalid',
-    DASHBOARD_ALLOWED_HOSTS: '192.0.2.10:4747,example.invalid',
+    IRIS_ZONE: 'example.invalid',
+    IRIS_ALLOWED_HOSTS: '192.0.2.10:4747,example.invalid',
   });
   const csp = (host: string, e = env) => securityHeaders(host, e)['Content-Security-Policy'] ?? '';
 
@@ -81,8 +81,8 @@ describe('securityHeaders', () => {
 
   test('a host that is under the zone is not a LAN host', () => {
     const e = loadEnv({
-      DASHBOARD_ZONE: 'example.invalid',
-      DASHBOARD_ALLOWED_HOSTS: 'iris.example.invalid:8080',
+      IRIS_ZONE: 'example.invalid',
+      IRIS_ALLOWED_HOSTS: 'iris.example.invalid:8080',
     });
     expect(csp('iris.example.invalid:8080', e)).toContain('frame-src https://*.example.invalid;');
     expect(csp('iris.example.invalid:8080', e)).not.toContain('http://');
@@ -93,7 +93,7 @@ describe('securityHeaders', () => {
   });
 
   test('no zone and a LAN host: frame-src is just the LAN host, never undefined', () => {
-    const e = loadEnv({ DASHBOARD_ALLOWED_HOSTS: '192.0.2.10:4747' });
+    const e = loadEnv({ IRIS_ALLOWED_HOSTS: '192.0.2.10:4747' });
     const value = csp('192.0.2.10:4747', e);
     expect(value).toContain('frame-src http://192.0.2.10:*;');
     expect(value).not.toContain('undefined');
@@ -106,14 +106,14 @@ describe('securityHeaders', () => {
   });
 
   test('IPv6 LAN host keeps its brackets', () => {
-    const e = loadEnv({ DASHBOARD_ALLOWED_HOSTS: '[2001:db8::1]:4747' });
+    const e = loadEnv({ IRIS_ALLOWED_HOSTS: '[2001:db8::1]:4747' });
     expect(csp('[2001:db8::1]:4747', e)).toContain('frame-src http://[2001:db8::1]:*;');
   });
 
   test('a zone or host with CSP-significant characters is left out', () => {
     const e = loadEnv({
-      DASHBOARD_ZONE: 'example.invalid; script-src *',
-      DASHBOARD_ALLOWED_HOSTS: '192.0.2.10:4747',
+      IRIS_ZONE: 'example.invalid; script-src *',
+      IRIS_ALLOWED_HOSTS: '192.0.2.10:4747',
     });
     expect(csp('192.0.2.10:4747', e)).not.toContain('script-src *');
   });
@@ -137,7 +137,7 @@ describe('securityHeaders', () => {
 });
 
 describe('script-src and unsafe-eval', () => {
-  const env = loadEnv({ DASHBOARD_ALLOWED_HOSTS: '192.0.2.10:4747' });
+  const env = loadEnv({ IRIS_ALLOWED_HOSTS: '192.0.2.10:4747' });
   const scriptSrc = () =>
     securityHeaders('192.0.2.10:4747', env)
       ['Content-Security-Policy']!.split('; ')

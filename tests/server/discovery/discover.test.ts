@@ -3,7 +3,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { describe, expect, it, vi } from 'vitest';
 import { ServiceEntry } from '@/lib/shared/contract';
-import { defaultDashboardConfig, type DashboardConfig } from '@/lib/server/config/dashboard';
+import { defaultIrisConfig, type IrisConfig } from '@/lib/server/config/iris';
 import { loadManualServices, type ManualService } from '@/lib/server/config/services';
 import { parseContainers, type ContainerSummary } from '@/lib/server/docker/parse';
 import {
@@ -20,8 +20,8 @@ const containers = parseContainers(fixture);
 type Manual = ReturnType<typeof loadManualServices>;
 const noManual: Manual = { services: [], warnings: [], state: 'missing' };
 
-const config: DashboardConfig = {
-  ...defaultDashboardConfig(),
+const config: IrisConfig = {
+  ...defaultIrisConfig(),
   groups: [
     { name: 'Media', icon: 'lucide:clapperboard' },
     { name: 'Automation', icon: 'lucide:workflow' },
@@ -40,7 +40,7 @@ const resolveIcon = (s: IconInput) => {
 function run(
   overrides: Partial<{
     containers: ContainerSummary[];
-    config: DashboardConfig;
+    config: IrisConfig;
     manual: Manual;
     zone: string | undefined;
     docker: 'ok' | 'unreachable';
@@ -85,7 +85,7 @@ const rule = (name: string, host: string) => ({
 });
 
 describe('discover: what is listed (criterion 1.6)', () => {
-  it('lists only containers with dashboard.enable=true, with no name list', () => {
+  it('lists only containers with iris.enable=true, with no name list', () => {
     const ids = flat(run())
       .map((s) => s.id)
       .sort();
@@ -107,12 +107,12 @@ describe('discover: what is listed (criterion 1.6)', () => {
         'watchlog',
       ].sort(),
     );
-    for (const absent of ['dashboard', 'vpn-gateway', 'cron-status', 'edge-tunnel'])
+    for (const absent of ['iris', 'vpn-gateway', 'cron-status', 'edge-tunnel'])
       expect(ids).not.toContain(absent);
   });
 
-  it('warns about an invalid dashboard.enable and does not list it', () => {
-    const r = run({ containers: [ctr('odd', { 'dashboard.enable': 'yes' })] });
+  it('warns about an invalid iris.enable and does not list it', () => {
+    const r = run({ containers: [ctr('odd', { 'iris.enable': 'yes' })] });
     expect(flat(r)).toHaveLength(0);
     expect(r.warnings).toContainEqual(
       expect.objectContaining({ code: 'LABEL_INVALID', serviceId: 'odd' }),
@@ -122,8 +122,8 @@ describe('discover: what is listed (criterion 1.6)', () => {
   it('keeps the first of two containers with the same Compose service, with a warning', () => {
     const r = run({
       containers: [
-        ctr('b-1', { 'dashboard.enable': 'true', 'dashboard.name': 'Second' }, { service: 'b' }),
-        ctr('a-1', { 'dashboard.enable': 'true', 'dashboard.name': 'First' }, { service: 'b' }),
+        ctr('b-1', { 'iris.enable': 'true', 'iris.name': 'Second' }, { service: 'b' }),
+        ctr('a-1', { 'iris.enable': 'true', 'iris.name': 'First' }, { service: 'b' }),
       ],
     });
     expect(flat(r).map((s) => s.name)).toEqual(['First']);
@@ -134,7 +134,7 @@ describe('discover: what is listed (criterion 1.6)', () => {
 
   it('uses the container name when there is no Compose service', () => {
     const r = run({
-      containers: [ctr('loose', { 'dashboard.enable': 'true' }, { service: null })],
+      containers: [ctr('loose', { 'iris.enable': 'true' }, { service: null })],
     });
     expect(flat(r)[0]).toMatchObject({ id: 'loose', container: 'loose' });
   });
@@ -151,7 +151,7 @@ describe('discover: address (criterion 1.3)', () => {
     });
   });
 
-  it('resolves qbittorrent-style entries through dashboard.router on another container', () => {
+  it('resolves qbittorrent-style entries through iris.router on another container', () => {
     const s = svc(run(), 'torrent-client');
     expect(s).toMatchObject({
       url: 'https://torrent-client.example.invalid/',
@@ -165,12 +165,12 @@ describe('discover: address (criterion 1.3)', () => {
     });
   });
 
-  it('lets dashboard.url win over a router', () => {
+  it('lets iris.url win over a router', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.url': 'https://elsewhere.example.invalid/x',
+          'iris.enable': 'true',
+          'iris.url': 'https://elsewhere.example.invalid/x',
           ...rule('a', 'a.example.invalid'),
         }),
       ],
@@ -183,7 +183,7 @@ describe('discover: address (criterion 1.3)', () => {
 
   it('takes the only router when none is named like the service', () => {
     const r = run({
-      containers: [ctr('a', { 'dashboard.enable': 'true', ...rule('web', 'a.example.invalid') })],
+      containers: [ctr('a', { 'iris.enable': 'true', ...rule('web', 'a.example.invalid') })],
     });
     expect(svc(r, 'a').url).toBe('https://a.example.invalid/');
   });
@@ -192,7 +192,7 @@ describe('discover: address (criterion 1.3)', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
+          'iris.enable': 'true',
           ...rule('other', 'other.example.invalid'),
           ...rule('a', 'a.example.invalid'),
         }),
@@ -206,7 +206,7 @@ describe('discover: address (criterion 1.3)', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
+          'iris.enable': 'true',
           ...rule('x', 'x.example.invalid'),
           ...rule('y', 'y.example.invalid'),
         }),
@@ -219,18 +219,18 @@ describe('discover: address (criterion 1.3)', () => {
   });
 
   it('warns ROUTER_NOT_FOUND when there is no url label and no router at all', () => {
-    const r = run({ containers: [ctr('a', { 'dashboard.enable': 'true' })] });
+    const r = run({ containers: [ctr('a', { 'iris.enable': 'true' })] });
     expect(svc(r, 'a')).toMatchObject({ url: null, urlSource: 'none' });
     expect(r.warnings).toContainEqual(
       expect.objectContaining({ code: 'ROUTER_NOT_FOUND', serviceId: 'a' }),
     );
   });
 
-  it('does not warn about a missing router when dashboard.url is set or none', () => {
+  it('does not warn about a missing router when iris.url is set or none', () => {
     const r = run({
       containers: [
-        ctr('a', { 'dashboard.enable': 'true', 'dashboard.url': 'none' }),
-        ctr('b', { 'dashboard.enable': 'true', 'dashboard.url': 'https://b.example.invalid/' }),
+        ctr('a', { 'iris.enable': 'true', 'iris.url': 'none' }),
+        ctr('b', { 'iris.enable': 'true', 'iris.url': 'https://b.example.invalid/' }),
       ],
     });
     expect(r.warnings).toHaveLength(0);
@@ -240,7 +240,7 @@ describe('discover: address (criterion 1.3)', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
+          'iris.enable': 'true',
           'traefik.http.routers.a.rule': 'HostRegexp(`{sub:[a-z]+}.example.invalid`)',
         }),
       ],
@@ -251,11 +251,11 @@ describe('discover: address (criterion 1.3)', () => {
     );
   });
 
-  it('warns when dashboard.router names a router whose rule gives no Host', () => {
+  it('warns when iris.router names a router whose rule gives no Host', () => {
     const r = run({
       containers: [
         ctr('gate', { 'traefik.http.routers.t.rule': 'HostRegexp(`{x:.+}`)' }),
-        ctr('a', { 'dashboard.enable': 'true', 'dashboard.router': 't' }),
+        ctr('a', { 'iris.enable': 'true', 'iris.router': 't' }),
       ],
     });
     expect(svc(r, 'a').url).toBeNull();
@@ -264,9 +264,9 @@ describe('discover: address (criterion 1.3)', () => {
     );
   });
 
-  it('warns when dashboard.router names a router that does not exist', () => {
+  it('warns when iris.router names a router that does not exist', () => {
     const r = run({
-      containers: [ctr('a', { 'dashboard.enable': 'true', 'dashboard.router': 'ghost' })],
+      containers: [ctr('a', { 'iris.enable': 'true', 'iris.router': 'ghost' })],
     });
     expect(svc(r, 'a').url).toBeNull();
     expect(r.warnings).toContainEqual(
@@ -274,13 +274,13 @@ describe('discover: address (criterion 1.3)', () => {
     );
   });
 
-  it('warns about an unresolved dashboard.router even when dashboard.url is set', () => {
+  it('warns about an unresolved iris.router even when iris.url is set', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.router': 'ghost',
-          'dashboard.url': 'https://a.example.invalid/',
+          'iris.enable': 'true',
+          'iris.router': 'ghost',
+          'iris.url': 'https://a.example.invalid/',
         }),
       ],
     });
@@ -309,7 +309,7 @@ describe('discover: LAN port (criterion 1.7)', () => {
   it('gives none with no published port, and with several and no label', () => {
     expect(svc(run(), 'notify').lan).toBeNull();
     const r = run({
-      containers: [ctr('a', { 'dashboard.enable': 'true' }, { publicPorts: [1001, 1002] })],
+      containers: [ctr('a', { 'iris.enable': 'true' }, { publicPorts: [1001, 1002] })],
     });
     expect(svc(r, 'a').lan).toBeNull();
   });
@@ -320,8 +320,8 @@ describe('discover: unsafe paths', () => {
     run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.lan.port': port,
+          'iris.enable': 'true',
+          'iris.lan.port': port,
           ...rule('a', 'a.example.invalid'),
           ...labels,
         }),
@@ -329,7 +329,7 @@ describe('discover: unsafe paths', () => {
     });
 
   it('drops a lan.path that would leave the origin, with LABEL_INVALID', () => {
-    const r = withPath({ 'dashboard.lan.path': '/\\evil.example.invalid/x' });
+    const r = withPath({ 'iris.lan.path': '/\\evil.example.invalid/x' });
     expect(svc(r, 'a').lan).toEqual({ port: 8080, path: '/', source: 'label' });
     expect(r.warnings).toContainEqual(
       expect.objectContaining({ code: 'LABEL_INVALID', serviceId: 'a' }),
@@ -338,7 +338,7 @@ describe('discover: unsafe paths', () => {
   });
 
   it('drops a health.path that would leave the origin, with LABEL_INVALID', () => {
-    const r = withPath({ 'dashboard.health.path': '/\\evil.example.invalid/x' });
+    const r = withPath({ 'iris.health.path': '/\\evil.example.invalid/x' });
     expect(svc(r, 'a').health).toEqual({
       kind: 'traefik',
       host: 'a.example.invalid',
@@ -351,8 +351,8 @@ describe('discover: unsafe paths', () => {
 
   it('keeps a path with .. that stays on the origin, normalised', () => {
     const r = withPath({
-      'dashboard.lan.path': '/a/../b?x=1',
-      'dashboard.health.path': '/up/../ping',
+      'iris.lan.path': '/a/../b?x=1',
+      'iris.health.path': '/up/../ping',
     });
     expect(svc(r, 'a').lan?.path).toBe('/b?x=1');
     expect(svc(r, 'a').health).toMatchObject({ path: '/ping' });
@@ -361,7 +361,7 @@ describe('discover: unsafe paths', () => {
 });
 
 describe('discover: health target and widget', () => {
-  it('uses dashboard.health.url as a url target', () => {
+  it('uses iris.health.url as a url target', () => {
     expect(svc(run(), 'sysmon').health).toEqual({
       kind: 'url',
       url: 'http://sysmon:61208/api/4/status',
@@ -385,20 +385,20 @@ describe('discover: health target and widget', () => {
     });
   });
 
-  it('probes through the router even when dashboard.url=none', () => {
+  it('probes through the router even when iris.url=none', () => {
     expect(svc(run(), 'subtitle-sync')).toMatchObject({
       url: null,
       health: { kind: 'traefik', host: 'subtitle-sync.example.invalid', path: '/' },
     });
   });
 
-  it('probes a file-provider route (Plex) through Traefik at the dashboard.url hostname', () => {
+  it('probes a file-provider route (Plex) through Traefik at the iris.url hostname', () => {
     const r = run({
       containers: [
         ctr('plex', {
-          'dashboard.enable': 'true',
-          'dashboard.url': 'https://plex.example.invalid/web',
-          'dashboard.health.path': '/web',
+          'iris.enable': 'true',
+          'iris.url': 'https://plex.example.invalid/web',
+          'iris.health.path': '/web',
         }),
       ],
     });
@@ -410,51 +410,51 @@ describe('discover: health target and widget', () => {
     expect(r.warnings).toEqual([]);
   });
 
-  it('gives no target when the dashboard.url hostname is off the zone or no zone is set', () => {
+  it('gives no target when the iris.url hostname is off the zone or no zone is set', () => {
     const labels = {
-      'dashboard.enable': 'true',
-      'dashboard.url': 'https://other.example.org/',
-      'dashboard.health.path': '/web',
+      'iris.enable': 'true',
+      'iris.url': 'https://other.example.org/',
+      'iris.health.path': '/web',
     };
     expect(svc(run({ containers: [ctr('a', labels)] }), 'a').health).toEqual({ kind: 'none' });
     const onZone = {
       ...labels,
-      'dashboard.url': 'https://plex.example.invalid/web',
+      'iris.url': 'https://plex.example.invalid/web',
     };
     expect(svc(run({ containers: [ctr('a', onZone)], zone: undefined }), 'a').health).toEqual({
       kind: 'none',
     });
     // a lookalike suffix is not a subdomain, the zone itself is
-    const lookalike = { ...labels, 'dashboard.url': 'https://notexample.invalid/' };
+    const lookalike = { ...labels, 'iris.url': 'https://notexample.invalid/' };
     expect(svc(run({ containers: [ctr('a', lookalike)] }), 'a').health).toEqual({ kind: 'none' });
-    const apex = { ...labels, 'dashboard.url': 'https://example.invalid/' };
+    const apex = { ...labels, 'iris.url': 'https://example.invalid/' };
     expect(svc(run({ containers: [ctr('a', apex)] }), 'a').health).toMatchObject({
       kind: 'traefik',
       host: 'example.invalid',
     });
   });
 
-  it('defaults the dashboard.url fallback path to / and prefers a router host over it', () => {
+  it('defaults the iris.url fallback path to / and prefers a router host over it', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.url': 'https://public.example.invalid/x',
+          'iris.enable': 'true',
+          'iris.url': 'https://public.example.invalid/x',
         }),
         ctr('b', {
-          'dashboard.enable': 'true',
-          'dashboard.url': 'https://public.example.invalid/x',
+          'iris.enable': 'true',
+          'iris.url': 'https://public.example.invalid/x',
           ...rule('b', 'b.example.invalid'),
         }),
         ctr('c', {
-          'dashboard.enable': 'true',
-          'dashboard.url': 'https://public.example.invalid/x',
-          'dashboard.health.url': 'http://c:80/up',
+          'iris.enable': 'true',
+          'iris.url': 'https://public.example.invalid/x',
+          'iris.health.url': 'http://c:80/up',
         }),
         ctr('d', {
-          'dashboard.enable': 'true',
-          'dashboard.url': 'https://public.example.invalid/x',
-          'dashboard.health.url': 'none',
+          'iris.enable': 'true',
+          'iris.url': 'https://public.example.invalid/x',
+          'iris.health.url': 'none',
         }),
       ],
     });
@@ -468,13 +468,13 @@ describe('discover: health target and widget', () => {
     expect(svc(r, 'd').health).toEqual({ kind: 'none' });
   });
 
-  it('drops an unsafe health.path on the dashboard.url fallback too', () => {
+  it('drops an unsafe health.path on the iris.url fallback too', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.url': 'https://a.example.invalid/',
-          'dashboard.health.path': '/\\evil.example.invalid/x',
+          'iris.enable': 'true',
+          'iris.url': 'https://a.example.invalid/',
+          'iris.health.path': '/\\evil.example.invalid/x',
         }),
       ],
     });
@@ -486,12 +486,12 @@ describe('discover: health target and widget', () => {
     expect(svc(run(), 'self-heal').health).toEqual({ kind: 'none' });
   });
 
-  it('treats dashboard.health.url=none as no probe even with a router', () => {
+  it('treats iris.health.url=none as no probe even with a router', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.health.url': 'none',
+          'iris.enable': 'true',
+          'iris.health.url': 'none',
           ...rule('a', 'a.example.invalid'),
         }),
       ],
@@ -499,7 +499,7 @@ describe('discover: health target and widget', () => {
     expect(svc(r, 'a').health).toEqual({ kind: 'none' });
   });
 
-  it('puts the widget on the router host unless dashboard.widget.url is set', () => {
+  it('puts the widget on the router host unless iris.widget.url is set', () => {
     expect(svc(run(), 'moviebox').widget).toEqual({
       type: 'radarr',
       url: null,
@@ -522,17 +522,17 @@ describe('discover: health target and widget', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.widget': 'radarr',
-          'dashboard.widget.fields': 'wanted, missing',
+          'iris.enable': 'true',
+          'iris.widget': 'radarr',
+          'iris.widget.fields': 'wanted, missing',
           ...rule('a', 'a.example.invalid'),
         }),
         ctr('b', {
-          'dashboard.enable': 'true',
-          'dashboard.widget': 'none',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.widget': 'none',
+          'iris.url': 'none',
         }),
-        ctr('c', { 'dashboard.enable': 'true', 'dashboard.url': 'none' }),
+        ctr('c', { 'iris.enable': 'true', 'iris.url': 'none' }),
       ],
     });
     expect(svc(r, 'a').widget?.fields).toEqual(['wanted', 'missing']);
@@ -544,9 +544,9 @@ describe('discover: health target and widget', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.widget': 'radarr',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.widget': 'radarr',
+          'iris.url': 'none',
         }),
       ],
     });
@@ -685,58 +685,58 @@ describe('discover: manual entries (criterion 1.4)', () => {
 });
 
 describe('discover: groups and order (criterion 1.5)', () => {
-  it('follows dashboard.yaml order, unknown groups alphabetically, default Other', () => {
+  it('follows iris.yaml order, unknown groups alphabetically, default Other', () => {
     const r = run({
       containers: [
         ctr('z', {
-          'dashboard.enable': 'true',
-          'dashboard.group': 'Zeta',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.group': 'Zeta',
+          'iris.url': 'none',
         }),
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.group': 'Alpha',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.group': 'Alpha',
+          'iris.url': 'none',
         }),
-        ctr('o', { 'dashboard.enable': 'true', 'dashboard.url': 'none' }),
+        ctr('o', { 'iris.enable': 'true', 'iris.url': 'none' }),
         ctr('h', {
-          'dashboard.enable': 'true',
-          'dashboard.group': 'Home',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.group': 'Home',
+          'iris.url': 'none',
         }),
         ctr('m', {
-          'dashboard.enable': 'true',
-          'dashboard.group': 'Media',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.group': 'Media',
+          'iris.url': 'none',
         }),
       ],
     });
     expect(r.groups.map((g) => g.name)).toEqual(['Media', 'Home', 'Alpha', 'Other', 'Zeta']);
   });
 
-  it('orders services by dashboard.order, then name', () => {
+  it('orders services by iris.order, then name', () => {
     const r = run({
       containers: [
         ctr('c', {
-          'dashboard.enable': 'true',
-          'dashboard.name': 'Charlie',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.name': 'Charlie',
+          'iris.url': 'none',
         }),
         ctr('b', {
-          'dashboard.enable': 'true',
-          'dashboard.name': 'bravo',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.name': 'bravo',
+          'iris.url': 'none',
         }),
         ctr('d', {
-          'dashboard.enable': 'true',
-          'dashboard.name': 'Delta',
-          'dashboard.order': '5',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.name': 'Delta',
+          'iris.order': '5',
+          'iris.url': 'none',
         }),
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.name': 'Alpha',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.name': 'Alpha',
+          'iris.url': 'none',
         }),
       ],
     });
@@ -766,14 +766,14 @@ describe('discover: groups and order (criterion 1.5)', () => {
     const r = run({
       containers: [
         ctr('a', {
-          'dashboard.enable': 'true',
-          'dashboard.group': 'Media',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.group': 'Media',
+          'iris.url': 'none',
         }),
         ctr('b', {
-          'dashboard.enable': 'true',
-          'dashboard.group': 'Nowhere',
-          'dashboard.url': 'none',
+          'iris.enable': 'true',
+          'iris.group': 'Nowhere',
+          'iris.url': 'none',
         }),
       ],
     });
@@ -805,7 +805,7 @@ describe('discover: fields and defaults', () => {
     });
   });
 
-  it('marks dashboard.embed=false as blocked by label', () => {
+  it('marks iris.embed=false as blocked by label', () => {
     expect(svc(run(), 'torrent-client').embed).toEqual({
       mode: 'false',
       verdict: 'blocked',
@@ -849,7 +849,7 @@ describe('discover: health-only entries', () => {
 });
 
 describe('discover: links, sources and warnings', () => {
-  it('fills links from dashboard.yaml and reports bad ones', () => {
+  it('fills links from iris.yaml and reports bad ones', () => {
     const r = run({
       config: {
         ...config,

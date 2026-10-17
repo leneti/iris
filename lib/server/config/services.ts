@@ -5,15 +5,15 @@ import { z } from 'zod';
 import type { Warning } from '@/lib/shared/contract';
 import { loadEnv } from '../env';
 import {
-  FILE_DASHBOARD,
+  FILE_IRIS,
   fillZone,
   isHttpUrl,
-  readDashboardConfig,
+  readIrisConfig,
   readYamlFile,
   schemaProblem,
   unknownKeyWarnings,
-  type DashboardLoad,
-} from './dashboard';
+  type IrisLoad,
+} from './iris';
 
 export const FILE_SERVICES = 'services.yaml';
 
@@ -94,7 +94,7 @@ export function loadManualServices(dir: string, zone: string | undefined): Manua
           serviceId: s.id,
           message:
             filled === null
-              ? `Service "${s.id}" needs {zone} but DASHBOARD_ZONE is not set; it has no address`
+              ? `Service "${s.id}" needs {zone} but IRIS_ZONE is not set; it has no address`
               : `Service "${s.id}" has an address that is not http or https; it has no address`,
         });
     }
@@ -106,7 +106,7 @@ export function loadManualServices(dir: string, zone: string | undefined): Manua
 
 // ---- watcher ----
 export interface ConfigSnapshot {
-  dashboard: ReturnType<typeof import('./dashboard').loadDashboardConfig>;
+  iris: ReturnType<typeof import('./iris').loadIrisConfig>;
   manual: ReturnType<typeof loadManualServices>;
 }
 
@@ -127,22 +127,21 @@ export function createConfigWatcher(
   dir: string,
   zone: string | undefined = loadEnv().zone,
 ): ConfigWatcher {
-  let dashSig: number | undefined;
+  let irisSig: number | undefined;
   let servSig: number | undefined;
-  let dashboard: DashboardLoad | undefined;
+  let iris: IrisLoad | undefined;
   let manual: ManualLoad | undefined;
-  let goodDashboard: DashboardLoad | undefined;
+  let goodIris: IrisLoad | undefined;
   let goodManual: ManualLoad | undefined;
 
   return {
     get() {
-      const d = mtime(join(dir, FILE_DASHBOARD));
-      if (dashboard === undefined || d !== dashSig) {
-        dashSig = d;
-        const next = readDashboardConfig(dir);
-        if (next.ok) goodDashboard = next;
-        dashboard =
-          next.ok || !goodDashboard ? next : { ...goodDashboard, warnings: next.warnings };
+      const d = mtime(join(dir, FILE_IRIS));
+      if (iris === undefined || d !== irisSig) {
+        irisSig = d;
+        const next = readIrisConfig(dir);
+        if (next.ok) goodIris = next;
+        iris = next.ok || !goodIris ? next : { ...goodIris, warnings: next.warnings };
       }
       const s = mtime(join(dir, FILE_SERVICES));
       if (manual === undefined || s !== servSig) {
@@ -155,7 +154,7 @@ export function createConfigWatcher(
             : { ...goodManual, warnings: next.warnings, state: 'invalid' };
       }
       return {
-        dashboard: { config: dashboard.config, warnings: dashboard.warnings },
+        iris: { config: iris.config, warnings: iris.warnings },
         manual,
       };
     },

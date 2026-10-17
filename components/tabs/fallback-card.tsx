@@ -20,7 +20,7 @@ const DETECTED: Record<CardKind, string> = {
   'x-frame-options': 'X-Frame-Options',
   'csp-frame-ancestors': 'Content-Security-Policy: frame-ancestors',
   'mixed-content': 'Mixed content: an http:// address on an https:// page',
-  label: 'dashboard.embed=false',
+  label: 'iris.embed=false',
   'no-url': 'No address',
   'probe-failed': 'The check could not read the response headers',
   'home-only': 'No public address',

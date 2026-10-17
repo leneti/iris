@@ -51,7 +51,7 @@ describe('GET /api/services', () => {
   test('serves the discovered services and parses with the contract schema', async () => {
     run(async () => [
       container('radarr', {
-        labels: { ...container('radarr').labels, 'dashboard.group': 'Automation' },
+        labels: { ...container('radarr').labels, 'iris.group': 'Automation' },
       }),
     ]);
     await vi.advanceTimersByTimeAsync(1000);
@@ -78,7 +78,7 @@ describe('GET /api/services', () => {
     let list = [container('radarr')];
     run(async () => list);
     await vi.advanceTimersByTimeAsync(1000);
-    list = [container('radarr'), container('probe', { labels: { 'dashboard.enable': 'true' } })];
+    list = [container('radarr'), container('probe', { labels: { 'iris.enable': 'true' } })];
     await vi.advanceTimersByTimeAsync(14_000);
     const body = ServicesResponse.parse(await (await GET()).json());
     const all = body.groups.flatMap((g) => g.services.map((s) => [g.name, s.id]));

@@ -232,7 +232,7 @@ describe('probe poller', () => {
     const { probe } = start({
       list: async () => [
         container('radarr', {
-          labels: { 'dashboard.enable': 'true', 'dashboard.health.url': 'none' },
+          labels: { 'iris.enable': 'true', 'iris.health.url': 'none' },
         }),
       ],
     });
@@ -327,7 +327,7 @@ describe('probe poller', () => {
   describe('while a probe is pending', () => {
     const withUrl = (url: string) =>
       container('radarr', {
-        labels: { 'dashboard.enable': 'true', 'dashboard.health.url': url },
+        labels: { 'iris.enable': 'true', 'iris.health.url': url },
       });
 
     function pending() {

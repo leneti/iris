@@ -40,8 +40,8 @@ describe('sonarr adapter', () => {
   });
 
   test('an empty key is not configured', () => {
-    expect(adapter.credentials(envWith('DASHBOARD_SONARR_KEY', ''))).toBeNull();
-    expect(adapter.credentials(envWith('DASHBOARD_SONARR_KEY', KEY))).toEqual({ key: KEY });
+    expect(adapter.credentials(envWith('IRIS_SONARR_KEY', ''))).toBeNull();
+    expect(adapter.credentials(envWith('IRIS_SONARR_KEY', KEY))).toEqual({ key: KEY });
   });
 
   test.each([

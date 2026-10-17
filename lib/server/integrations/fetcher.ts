@@ -58,7 +58,7 @@ export type AdapterContext = {
 export type Adapter = {
   type: AdapterType;
   defaultFields: string[];
-  /** Fields that come free in the same reply; allowed in `dashboard.widget.fields`. */
+  /** Fields that come free in the same reply; allowed in `iris.widget.fields`. */
   extraFields: string[];
   /** The dashboard's own field names. A label never comes from an upstream. */
   labels: Record<string, string>;
@@ -88,7 +88,7 @@ export const DEFAULT_MAX_BYTES = 8 * 1024 * 1024;
 const SAFE_PATH = /^\/(?!\/)[^\s\\#]*$/;
 
 /** Development only: stands in for every adapter's external API origin (see `externalBase`). */
-export const DEV_EXTERNAL_BASE_VAR = 'DASHBOARD_DEV_EXTERNAL_BASE';
+export const DEV_EXTERNAL_BASE_VAR = 'IRIS_DEV_EXTERNAL_BASE';
 
 /**
  * A bare origin: https on any host, or http on 127.0.0.1 or localhost only. Anything else
@@ -109,7 +109,7 @@ function devOrigin(raw: string | undefined): string | null {
 }
 
 /**
- * The single place that reads `Adapter.baseUrl`. Outside production, `DASHBOARD_DEV_EXTERNAL_BASE`
+ * The single place that reads `Adapter.baseUrl`. Outside production, `IRIS_DEV_EXTERNAL_BASE`
  * replaces it, so the fixture server can stand in for Cloudflare, CoinMarketCap and Open-Meteo.
  * The variable is never read in production, and an invalid value is ignored.
  */

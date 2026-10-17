@@ -20,5 +20,5 @@ services:
     name: Example link
     group: Home
     icon: 'lucide:link'
-    url: 'https://example.{zone}/' # {zone} is replaced from DASHBOARD_ZONE
+    url: 'https://example.{zone}/' # {zone} is replaced from IRIS_ZONE
     embed: false

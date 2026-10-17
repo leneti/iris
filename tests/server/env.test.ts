@@ -3,10 +3,10 @@ import { loadEnv } from '@/lib/server/env';
 
 describe('loadEnv', () => {
   test('empty credential is not configured', () => {
-    expect(loadEnv({ DASHBOARD_RADARR_KEY: '' }).radarrKey).toBeUndefined();
+    expect(loadEnv({ IRIS_RADARR_KEY: '' }).radarrKey).toBeUndefined();
   });
   test('credential is read', () => {
-    expect(loadEnv({ DASHBOARD_RADARR_KEY: 'abc' }).radarrKey).toBe('abc');
+    expect(loadEnv({ IRIS_RADARR_KEY: 'abc' }).radarrKey).toBe('abc');
   });
   test('docker api version defaults to 1.52', () => {
     expect(loadEnv({}).dockerApiVersion).toBe('1.52');
@@ -18,7 +18,7 @@ describe('loadEnv', () => {
   });
   test('allowed hosts are split, trimmed and lower-cased', () => {
     expect(
-      loadEnv({ DASHBOARD_ALLOWED_HOSTS: ' Iris.Example.invalid:8080, ,Other.example.invalid ' })
+      loadEnv({ IRIS_ALLOWED_HOSTS: ' Iris.Example.invalid:8080, ,Other.example.invalid ' })
         .allowedHosts,
     ).toEqual(['iris.example.invalid:8080', 'other.example.invalid']);
     expect(loadEnv({}).allowedHosts).toEqual([]);

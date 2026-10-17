@@ -1,7 +1,7 @@
 // Dev script: prints the handoff §11 coverage table for the §6 slugs. Uses the network.
 // Run: scripts/dev.sh node --experimental-strip-types scripts/icon-coverage.ts
 const BASE =
-  process.env.DASHBOARD_ICONS_BASE ??
+  process.env.IRIS_ICONS_BASE ??
   'https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons@f1d048d9885b97a7319e0a51e508217459f212df';
 
 const SLUGS = [

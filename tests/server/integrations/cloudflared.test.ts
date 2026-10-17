@@ -1,5 +1,5 @@
 import { WidgetsResponse } from '@/lib/shared/contract';
-import { defaultDashboardConfig } from '@/lib/server/config/dashboard';
+import { defaultIrisConfig } from '@/lib/server/config/iris';
 import { loadEnv } from '@/lib/server/env';
 import { httpRequest } from '@/lib/server/http';
 import { createContext, type Adapter } from '@/lib/server/integrations/fetcher';
@@ -24,9 +24,9 @@ const TUNNEL = '11111111-2222-3333-4444-555555555555';
 const TOKEN = 'cf-token-9e41b7c2d05a';
 const PATH = `/client/v4/accounts/${ACCOUNT}/cfd_tunnel/${TUNNEL}`;
 const env = loadEnv({
-  DASHBOARD_CLOUDFLARE_ACCOUNT_ID: ACCOUNT,
-  DASHBOARD_CLOUDFLARE_TUNNEL_ID: TUNNEL,
-  DASHBOARD_CLOUDFLARE_TOKEN: TOKEN,
+  IRIS_CLOUDFLARE_ACCOUNT_ID: ACCOUNT,
+  IRIS_CLOUDFLARE_TUNNEL_ID: TUNNEL,
+  IRIS_CLOUDFLARE_TOKEN: TOKEN,
 });
 const T0 = new Date('2026-10-16T12:00:00.000Z').getTime();
 
@@ -82,9 +82,9 @@ describe('cloudflared adapter', () => {
   test('all three variables are needed; any empty one is not configured', () => {
     const e = (a: string, t: string, k: string) =>
       loadEnv({
-        DASHBOARD_CLOUDFLARE_ACCOUNT_ID: a,
-        DASHBOARD_CLOUDFLARE_TUNNEL_ID: t,
-        DASHBOARD_CLOUDFLARE_TOKEN: k,
+        IRIS_CLOUDFLARE_ACCOUNT_ID: a,
+        IRIS_CLOUDFLARE_TUNNEL_ID: t,
+        IRIS_CLOUDFLARE_TOKEN: k,
       });
     expect(adapter.credentials(e('', TUNNEL, TOKEN))).toBeNull();
     expect(adapter.credentials(e(ACCOUNT, '', TOKEN))).toBeNull();
@@ -137,7 +137,7 @@ describe('cloudflared through /api/widgets (criterion 11.7)', () => {
     const service = state.discovery!.groups.flatMap((g) => g.services)[0]!;
     service.widget = { type: 'cloudflared', url: null, host: null, fields: null };
 
-    const res = await reg.getWidgets(state, defaultDashboardConfig(), env, T0);
+    const res = await reg.getWidgets(state, defaultIrisConfig(), env, T0);
     const body = JSON.stringify(WidgetsResponse.parse(res));
     expect(res.services.cloudflared).toMatchObject({
       type: 'cloudflared',
@@ -166,7 +166,7 @@ describe('cloudflared through /api/widgets (criterion 11.7)', () => {
       host: null,
       fields: null,
     };
-    const res = await reg.getWidgets(state, defaultDashboardConfig(), env, T0);
+    const res = await reg.getWidgets(state, defaultIrisConfig(), env, T0);
     expect(res.services.cloudflared!.state).toBe('unreachable');
     const all = logs.join('\n') + JSON.stringify(res);
     for (const s of [ACCOUNT, TUNNEL, TOKEN, '198.51.100.7']) expect(all).not.toContain(s);

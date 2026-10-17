@@ -16,7 +16,7 @@ export const WIDGET_TYPES = [
 ] as const;
 export type WidgetType = (typeof WIDGET_TYPES)[number];
 
-export type DashboardLabels = {
+export type IrisLabels = {
   enable?: boolean;
   name?: string;
   group?: string;
@@ -99,7 +99,7 @@ function list(item: z.ZodString) {
 
 type Spec = {
   label: string;
-  field: keyof DashboardLabels;
+  field: keyof IrisLabels;
   expect: string;
   schema: z.ZodType<unknown>;
   /** The list is cut to this many entries, with a warning. */
@@ -191,38 +191,38 @@ const WIDGET_SCHEMA = z.enum([...WIDGET_TYPES, 'none']);
 export function parseLabels(
   serviceId: string,
   labels: Record<string, string>,
-): { labels: DashboardLabels; warnings: Warning[] } {
+): { labels: IrisLabels; warnings: Warning[] } {
   const out: Record<string, unknown> = {};
   const warnings: Warning[] = [];
   const warn = (code: string, message: string) => warnings.push({ code, serviceId, message });
 
   for (const spec of SPECS) {
-    const raw = labels[`dashboard.${spec.label}`];
+    const raw = labels[`iris.${spec.label}`];
     if (raw === undefined) continue;
     const value = raw.trim();
     if (value === '' && spec.emptyOk) continue;
     const parsed = spec.schema.safeParse(value);
     if (!parsed.success) {
-      warn('LABEL_INVALID', `dashboard.${spec.label} must be ${spec.expect}; the default is used`);
+      warn('LABEL_INVALID', `iris.${spec.label} must be ${spec.expect}; the default is used`);
       continue;
     }
     let result = parsed.data;
     if (spec.max !== undefined && Array.isArray(result) && result.length > spec.max) {
       warn(
         'LABEL_INVALID',
-        `dashboard.${spec.label} allows up to ${spec.max} entries; the first ${spec.max} are used`,
+        `iris.${spec.label} allows up to ${spec.max} entries; the first ${spec.max} are used`,
       );
       result = result.slice(0, spec.max);
     }
     out[spec.field] = result;
   }
 
-  const widget = labels['dashboard.widget']?.trim();
+  const widget = labels['iris.widget']?.trim();
   if (widget !== undefined) {
     const parsed = WIDGET_SCHEMA.safeParse(widget);
     if (parsed.success) out.widget = parsed.data;
-    else warn('WIDGET_UNKNOWN', 'dashboard.widget names a widget type that is not supported');
+    else warn('WIDGET_UNKNOWN', 'iris.widget names a widget type that is not supported');
   }
 
-  return { labels: out as DashboardLabels, warnings };
+  return { labels: out as IrisLabels, warnings };
 }

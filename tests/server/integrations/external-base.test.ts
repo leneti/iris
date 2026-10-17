@@ -3,7 +3,7 @@ import { externalBase, type Adapter } from '@/lib/server/integrations/fetcher';
 
 const external = { type: 'cloudflared', baseUrl: 'https://api.example.invalid' } as Adapter;
 const internal = { type: 'radarr' } as Adapter;
-const NAME = 'DASHBOARD_DEV_EXTERNAL_BASE';
+const NAME = 'IRIS_DEV_EXTERNAL_BASE';
 
 afterEach(() => vi.unstubAllEnvs());
 

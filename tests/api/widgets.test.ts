@@ -1,6 +1,6 @@
 import { globSync, readFileSync } from 'node:fs';
 import { WidgetsResponse } from '@/lib/shared/contract';
-import { defaultDashboardConfig } from '@/lib/server/config/dashboard';
+import { defaultIrisConfig } from '@/lib/server/config/iris';
 import { stateWith } from '../helpers/widgets';
 
 const KEY = 'radarr-key-5d2e8a41c7b3f960';
@@ -11,15 +11,15 @@ vi.mock('@/lib/server/log', () => ({
 }));
 vi.mock('@/lib/server/config/services', () => ({
   getConfigWatcher: () => ({
-    get: () => ({ dashboard: { config: defaultDashboardConfig(), warnings: [] } }),
+    get: () => ({ iris: { config: defaultIrisConfig(), warnings: [] } }),
   }),
 }));
 
 beforeEach(() => {
   vi.resetModules();
   globalThis.__iris = undefined;
-  vi.stubEnv('DASHBOARD_RADARR_KEY', KEY);
-  vi.stubEnv('DASHBOARD_TRAEFIK_URL', 'http://traefik.example.invalid');
+  vi.stubEnv('IRIS_RADARR_KEY', KEY);
+  vi.stubEnv('IRIS_TRAEFIK_URL', 'http://traefik.example.invalid');
 });
 afterEach(() => {
   vi.unstubAllEnvs();
@@ -76,7 +76,7 @@ test('serves registered adapters through the cache, without the key', async () =
 });
 
 test('with the variable empty the service reports not-configured and nothing is fetched', async () => {
-  vi.stubEnv('DASHBOARD_RADARR_KEY', '');
+  vi.stubEnv('IRIS_RADARR_KEY', '');
   const registry = await import('@/lib/server/integrations/registry');
   const fetchSpy = vi.fn(async () => ({}));
   registry.registerAdapter({

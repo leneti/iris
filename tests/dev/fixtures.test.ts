@@ -39,12 +39,12 @@ describe('Docker fixture', () => {
     const res = await get(fx.ports.docker, '/v1.52/containers/json?all=true');
     expect(res.status).toBe(200);
     const containers = parseContainers(json(res));
-    const enabled = containers.filter((c) => c.labels['dashboard.enable'] === 'true');
+    const enabled = containers.filter((c) => c.labels['iris.enable'] === 'true');
     // 17 labelled containers plus Edge Tunnel, which is a services.yaml entry: handoff 12.1's 18 services.
     expect(enabled).toHaveLength(17);
     expect(containers.map((c) => c.name)).not.toContain('captcha-solver');
     expect(containers.map((c) => c.name)).toContain('edge-tunnel');
-    expect(new Set(enabled.map((c) => c.labels['dashboard.group']))).toEqual(
+    expect(new Set(enabled.map((c) => c.labels['iris.group']))).toEqual(
       new Set(['Media', 'Automation', 'Downloads', 'Infrastructure', 'Home']),
     );
   });
@@ -55,7 +55,7 @@ describe('Docker fixture', () => {
     );
     const vpn = containers.find((c) => c.name === 'vpn-gateway')!;
     const torrent = containers.find((c) => c.name === 'torrent-client')!;
-    expect(torrent.labels['dashboard.router']).toBe('torrent');
+    expect(torrent.labels['iris.router']).toBe('torrent');
     expect(vpn.labels['traefik.http.routers.torrent.rule']).toContain('torrent.example.invalid');
     expect(Object.keys(torrent.labels).some((k) => k.startsWith('traefik.'))).toBe(false);
   });
@@ -201,10 +201,10 @@ describe('frame apps (Ruling R38)', () => {
     const containers = parseContainers(
       json(await get(fx.ports.docker, '/v1.52/containers/json?all=true')),
     );
-    const enabled = containers.filter((c) => c.labels['dashboard.enable'] === 'true');
+    const enabled = containers.filter((c) => c.labels['iris.enable'] === 'true');
     const used = new Set<number>();
     for (const c of enabled) {
-      const label = c.labels['dashboard.lan.port'];
+      const label = c.labels['iris.lan.port'];
       if (label === 'none') continue;
       const ports = label === undefined ? c.publicPorts : [Number(label)];
       for (const port of ports) {

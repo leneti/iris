@@ -1,9 +1,9 @@
 import 'server-only';
 import type { EmbedInfo, IconRef, LinkEntry, ServiceEntry, Warning } from '@/lib/shared/contract';
-import { isHttpUrl, resolveLinks, type DashboardConfig } from '../config/dashboard';
+import { isHttpUrl, resolveLinks, type IrisConfig } from '../config/iris';
 import type { ManualService, loadManualServices } from '../config/services';
 import type { ContainerSummary } from '../docker/parse';
-import { parseLabels, WIDGET_TYPES, type DashboardLabels, type WidgetType } from './labels';
+import { parseLabels, WIDGET_TYPES, type IrisLabels, type WidgetType } from './labels';
 import { buildRouterMap } from './routers';
 
 // Handoff §7.1 steps 3-6 and §8.1.
@@ -35,7 +35,7 @@ export type ResolvedService = ServiceEntry & {
 
 export type DiscoverInput = {
   containers: ContainerSummary[];
-  config: DashboardConfig;
+  config: IrisConfig;
   manual: ReturnType<typeof loadManualServices>;
   zone: string | undefined;
   resolveIcon: (s: IconInput) => IconRef;
@@ -109,7 +109,7 @@ type Warn = (code: string, message: string) => void;
 function resolveHost(
   container: ContainerSummary,
   serviceId: string,
-  labels: DashboardLabels,
+  labels: IrisLabels,
   routerMap: ReturnType<typeof buildRouterMap>,
   ruleRouters: ReadonlySet<string>,
   warn: Warn,
@@ -121,7 +121,7 @@ function resolveHost(
       ruleRouters.has(labels.router) ? 'ROUTER_NO_HOST' : 'ROUTER_NOT_FOUND',
       ruleRouters.has(labels.router)
         ? `Router "${labels.router}" has no plain Host rule, so it gives no address`
-        : `Router "${labels.router}" named by dashboard.router was not found`,
+        : `Router "${labels.router}" named by iris.router was not found`,
     );
     return null;
   }
@@ -134,10 +134,7 @@ function resolveHost(
   }
   const chosen = own.includes(serviceId) ? serviceId : own.length === 1 ? own[0] : undefined;
   if (chosen === undefined) {
-    warn(
-      'ROUTER_AMBIGUOUS',
-      'Several routers and none is named like the service; set dashboard.router',
-    );
+    warn('ROUTER_AMBIGUOUS', 'Several routers and none is named like the service; set iris.router');
     return null;
   }
   const host = buildRouterMap([{ container: container.name, labels: container.labels }]).get(
@@ -158,11 +155,11 @@ function inZone(hostname: string, zone: string | undefined): boolean {
   return h === z || h.endsWith(`.${z}`);
 }
 
-function labelWidget(labels: DashboardLabels, host: string | null, warn: Warn): WidgetSpec | null {
+function labelWidget(labels: IrisLabels, host: string | null, warn: Warn): WidgetSpec | null {
   if (labels.widget === undefined || labels.widget === 'none') return null;
   const url = labels.widgetUrl ?? null;
   if (url === null && host === null) {
-    warn('WIDGET_NO_TARGET', 'The widget has no router and no dashboard.widget.url; it is dropped');
+    warn('WIDGET_NO_TARGET', 'The widget has no router and no iris.widget.url; it is dropped');
     return null;
   }
   return {
@@ -219,12 +216,12 @@ export function discover(input: DiscoverInput): DiscoverResult {
   const services: ResolvedService[] = [];
   const ids = new Set<string>();
 
-  // Step 4: only dashboard.enable=true is listed.
+  // Step 4: only iris.enable=true is listed.
   for (const container of sorted) {
     const id = container.service ?? container.name;
-    const rawEnable = container.labels['dashboard.enable'];
+    const rawEnable = container.labels['iris.enable'];
     if (rawEnable === undefined) continue;
-    const gate = parseLabels(id, { 'dashboard.enable': rawEnable });
+    const gate = parseLabels(id, { 'iris.enable': rawEnable });
     warnings.push(...gate.warnings);
     if (gate.labels.enable !== true) continue;
 
@@ -268,7 +265,7 @@ export function discover(input: DiscoverInput): DiscoverResult {
           if (safe === null)
             warn(
               'LABEL_INVALID',
-              'dashboard.lan.path must stay on the same address; the default is used',
+              'iris.lan.path must stay on the same address; the default is used',
             );
           else path = safe;
         }
@@ -294,7 +291,7 @@ export function discover(input: DiscoverInput): DiscoverResult {
         if (safe === null)
           warn(
             'LABEL_INVALID',
-            'dashboard.health.path must stay on the same address; the default is used',
+            'iris.health.path must stay on the same address; the default is used',
           );
         else path = safe;
       }
@@ -368,7 +365,7 @@ export function discover(input: DiscoverInput): DiscoverResult {
     });
   }
 
-  // Step 6: groups in dashboard.yaml order, unknown ones alphabetically; services by order, name.
+  // Step 6: groups in iris.yaml order, unknown ones alphabetically; services by order, name.
   const byGroup = new Map<string, ResolvedService[]>();
   for (const s of services) {
     const list = byGroup.get(s.group);

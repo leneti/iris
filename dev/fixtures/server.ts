@@ -261,7 +261,7 @@ const APPS: Record<string, App> = {
 
 /**
  * A browser frame cannot send a Host header, so each app that Iris frames also answers on its own
- * 127.0.0.1 port (Ruling R38). The ports match `dashboard.lan.port` and the published ports in
+ * 127.0.0.1 port (Ruling R38). The ports match `iris.lan.port` and the published ports in
  * data/containers.json. They stay in 47485-47499, a range that is not a well-known service port,
  * so no fixture ever points at a real local service.
  */
@@ -464,7 +464,7 @@ export async function startFixtures(options: FixtureOptions = {}): Promise<Fixtu
 
 // Started directly: `node --experimental-strip-types dev/fixtures/server.ts`.
 if (process.argv[1] !== undefined && fileURLToPath(import.meta.url) === process.argv[1]) {
-  const statusFile = process.env.DASHBOARD_HOST_STATUS_FILE;
+  const statusFile = process.env.IRIS_HOST_STATUS_FILE;
   const fixtures = await startFixtures({
     lanApps: 'default',
     ...(statusFile ? { hostStatusFile: statusFile } : {}),

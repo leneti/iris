@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { CronResponse, HostStatusFile } from '@/lib/shared/contract';
-import { defaultDashboardConfig, type DashboardConfig } from '@/lib/server/config/dashboard';
+import { defaultIrisConfig, type IrisConfig } from '@/lib/server/config/iris';
 import { buildCronResponse } from '@/lib/server/cron/build';
 import type { CronStatusJob } from '@/lib/server/cron/cron-status';
 
@@ -22,10 +22,8 @@ const hostFile = HostStatusFile.parse(fixture('host-status'));
 const okCron = { state: 'ok', fetchedAt: new Date('2026-10-16T11:59:30Z'), jobs } as const;
 const okHost = { state: 'ok', file: hostFile } as const;
 
-function config(
-  over: Partial<DashboardConfig> = {},
-): Pick<DashboardConfig, 'cron' | 'maintenance'> {
-  const base = defaultDashboardConfig();
+function config(over: Partial<IrisConfig> = {}): Pick<IrisConfig, 'cron' | 'maintenance'> {
+  const base = defaultIrisConfig();
   return { cron: base.cron, maintenance: base.maintenance, ...over };
 }
 
@@ -120,7 +118,7 @@ describe('buildCronResponse with everything available', () => {
 });
 
 describe('schedule source order: config, then host status, then none', () => {
-  test('a dashboard.yaml entry wins over the host status file and carries label and grace', () => {
+  test('a iris.yaml entry wins over the host status file and carries label and grace', () => {
     const cfg = config();
     cfg.cron = {
       ...cfg.cron,
@@ -149,7 +147,7 @@ describe('schedule source order: config, then host status, then none', () => {
     });
   });
 
-  test('an invalid expression in dashboard.yaml is ignored in favour of the next source', () => {
+  test('an invalid expression in iris.yaml is ignored in favour of the next source', () => {
     const cfg = config();
     cfg.cron = { ...cfg.cron, jobs: [{ match: 'feed-sync', schedule: 'every day' }] };
     expect(row(build({ config: cfg }), 'feed-sync').schedule.source).toBe('host-status');
@@ -303,7 +301,7 @@ describe('maintenance rows with the host status file', () => {
     });
   });
 
-  test('an unknown maintenance id from dashboard.yaml is listed as not monitored', () => {
+  test('an unknown maintenance id from iris.yaml is listed as not monitored', () => {
     const cfg = config({
       maintenance: [{ id: 'scrub', name: 'Disk scrub', schedule: '0 3 * * 0' }],
     });

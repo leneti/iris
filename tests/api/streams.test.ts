@@ -9,7 +9,7 @@ let showUsers = true;
 vi.mock('@/lib/server/config/services', () => ({
   getConfigWatcher: () => ({
     get: () => ({
-      dashboard: {
+      iris: {
         config: { streams: { url: 'http://tautulli.example.invalid:8181', showUsers } },
       },
     }),
@@ -23,7 +23,7 @@ beforeEach(() => {
   vi.spyOn(process.stdout, 'write').mockImplementation(() => true);
   vi.resetModules();
   showUsers = true;
-  vi.stubEnv('DASHBOARD_TAUTULLI_KEY', KEY);
+  vi.stubEnv('IRIS_TAUTULLI_KEY', KEY);
   vi.mocked(httpRequest).mockReset();
   vi.mocked(httpRequest).mockResolvedValue({
     status: 200,
@@ -65,7 +65,7 @@ test('showUsers false hides the names', async () => {
 });
 
 test('empty key: not-configured and Tautulli is not called', async () => {
-  vi.stubEnv('DASHBOARD_TAUTULLI_KEY', '');
+  vi.stubEnv('IRIS_TAUTULLI_KEY', '');
   const { GET } = await import('@/app/api/streams/route');
   const body = StreamsResponse.parse(await (await GET()).json());
   expect(body.source.state).toBe('not-configured');

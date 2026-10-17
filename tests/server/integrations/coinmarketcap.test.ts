@@ -1,5 +1,5 @@
 import { WidgetsResponse } from '@/lib/shared/contract';
-import { defaultDashboardConfig, type DashboardConfig } from '@/lib/server/config/dashboard';
+import { defaultIrisConfig, type IrisConfig } from '@/lib/server/config/iris';
 import { loadEnv } from '@/lib/server/env';
 import { httpRequest } from '@/lib/server/http';
 import { adapter } from '@/lib/server/integrations/coinmarketcap';
@@ -19,12 +19,12 @@ vi.mock('@/lib/server/http', async (importActual) => {
 });
 
 const KEY = 'cmc-key-5d8e0a13c7';
-const env = loadEnv({ DASHBOARD_COINMARKETCAP_KEY: KEY });
+const env = loadEnv({ IRIS_COINMARKETCAP_KEY: KEY });
 const T0 = new Date('2026-10-16T12:00:00.000Z').getTime();
 const ROUTE = '/v1/cryptocurrency/quotes/latest?symbol=AAA,BBB,CCC&convert=GBP';
 
-function config(over: Record<string, unknown> = {}): DashboardConfig {
-  const base = defaultDashboardConfig();
+function config(over: Record<string, unknown> = {}): IrisConfig {
+  const base = defaultIrisConfig();
   return {
     ...base,
     widgets: {

@@ -10,7 +10,7 @@ vi.mock('@/lib/server/log', () => ({
 vi.mock('@/lib/server/config/services', () => ({
   getConfigWatcher: () => ({
     get: () => ({
-      dashboard: {
+      iris: {
         config: {
           system: {
             url: 'http://glances.example.invalid:61208',

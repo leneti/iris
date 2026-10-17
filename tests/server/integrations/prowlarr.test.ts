@@ -35,8 +35,8 @@ describe('prowlarr adapter', () => {
   });
 
   test('an empty key is not configured', () => {
-    expect(adapter.credentials(envWith('DASHBOARD_PROWLARR_KEY', ''))).toBeNull();
-    expect(adapter.credentials(envWith('DASHBOARD_PROWLARR_KEY', KEY))).toEqual({ key: KEY });
+    expect(adapter.credentials(envWith('IRIS_PROWLARR_KEY', ''))).toBeNull();
+    expect(adapter.credentials(envWith('IRIS_PROWLARR_KEY', KEY))).toEqual({ key: KEY });
   });
 
   test.each(['nope', '[]', '{"indexers":"x"}', '{"indexers":[{"numberOfGrabs":"5"}]}'])(

@@ -7,7 +7,7 @@ import { z } from 'zod';
 export type ContainerSummary = {
   name: string;
   service: string | null;
-  /** Only `dashboard.*` and `traefik.http.routers.*.rule` labels. */
+  /** Only `iris.*` and `traefik.http.routers.*.rule` labels. */
   labels: Record<string, string>;
   state: string;
   statusText: string;
@@ -17,7 +17,7 @@ export type ContainerSummary = {
   publicPorts: number[];
 };
 
-const KEPT_LABEL = /^(dashboard\.|traefik\.http\.routers\.[^.]+\.rule$)/;
+const KEPT_LABEL = /^(iris\.|traefik\.http\.routers\.[^.]+\.rule$)/;
 const COMPOSE_SERVICE = 'com.docker.compose.service';
 
 const RawContainer = z.object({

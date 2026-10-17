@@ -66,17 +66,17 @@ export function startPollers(deps: PollerDeps): { stop(): void } {
       const snapshot = config.get();
       const result = discover({
         containers: [...state.containers.values()],
-        config: snapshot.dashboard.config,
+        config: snapshot.iris.config,
         manual: snapshot.manual,
         zone: env.zone,
         resolveIcon: (input) => resolveIcon(input, catalogue, localFiles),
         docker: state.dockerError ? 'unreachable' : 'ok',
       });
       if (stopped) return;
-      // `discover` leaves the dashboard.yaml problems to its caller.
+      // `discover` leaves the iris.yaml problems to its caller.
       state.discovery = {
         ...result,
-        warnings: [...snapshot.dashboard.warnings, ...result.warnings],
+        warnings: [...snapshot.iris.warnings, ...result.warnings],
       };
     } catch (err) {
       // Keep the last discovery.

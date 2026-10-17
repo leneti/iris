@@ -39,7 +39,7 @@ export function AppShell({
   phoneMaxLive = DEFAULT_PHONE_MAX_LIVE,
 }: {
   mode: AddressMode;
-  /** `phone.maxLiveFrames` from dashboard.yaml: the live-frame limit below 640 px. */
+  /** `phone.maxLiveFrames` from iris.yaml: the live-frame limit below 640 px. */
   phoneMaxLive?: number;
 }) {
   const isPhone = useIsPhone();

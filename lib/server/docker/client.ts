@@ -7,11 +7,11 @@ const TIMEOUT_MS = 5_000;
 const MAX_BYTES = 8 * 1024 * 1024;
 const API_VERSION = /^\d{1,3}\.\d{1,3}$/;
 
-/** `GET {DASHBOARD_DOCKER_URL}/v{version}/containers/json?all=true` through the socket proxy. */
+/** `GET {IRIS_DOCKER_URL}/v{version}/containers/json?all=true` through the socket proxy. */
 export async function fetchContainers(env: ServerEnv): Promise<ContainerSummary[]> {
-  if (env.dockerUrl === undefined) throw new Error('DASHBOARD_DOCKER_URL is not set');
+  if (env.dockerUrl === undefined) throw new Error('IRIS_DOCKER_URL is not set');
   if (!API_VERSION.test(env.dockerApiVersion))
-    throw new Error('DASHBOARD_DOCKER_API_VERSION must look like 1.52');
+    throw new Error('IRIS_DOCKER_API_VERSION must look like 1.52');
 
   const base = env.dockerUrl.replace(/\/+$/, '');
   const res = await httpRequest({

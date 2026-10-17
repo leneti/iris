@@ -120,7 +120,7 @@ function logChange(state: ActivityState): void {
 
 export async function getActivity(): Promise<Activity> {
   env ??= loadEnv();
-  const url = getConfigWatcher().get().dashboard.config.streams?.url.trim();
+  const url = getConfigWatcher().get().iris.config.streams?.url.trim();
   const key = env.tautulliKey;
   if (!url || key === undefined) return { state: 'not-configured', fetchedAt: null, raw: null };
 

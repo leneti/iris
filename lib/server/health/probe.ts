@@ -55,7 +55,7 @@ function nothingAnswered(err: unknown): boolean {
 }
 
 /**
- * One HTTP probe. `null` means there is nothing to judge: no target, no `DASHBOARD_TRAEFIK_URL`
+ * One HTTP probe. `null` means there is nothing to judge: no target, no `IRIS_TRAEFIK_URL`
  * for a Traefik target, or Traefik did not answer at connection level (refused, unresolved,
  * unreachable, reset before any response; §7.4 calls that `unknown`, which the caller reads from
  * a null result for a configured probe). A timeout, any error after a response started, and any

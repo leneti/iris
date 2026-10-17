@@ -26,7 +26,7 @@ afterEach(async () => {
   );
 });
 
-const envFor = (traefikUrl: string | undefined) => loadEnv({ DASHBOARD_TRAEFIK_URL: traefikUrl });
+const envFor = (traefikUrl: string | undefined) => loadEnv({ IRIS_TRAEFIK_URL: traefikUrl });
 
 function clock(...times: number[]): ProbeDeps {
   let i = 0;
@@ -40,7 +40,7 @@ describe('probe targets', () => {
     expect(await probe({ kind: 'none' }, envFor(undefined))).toBeNull();
   });
 
-  test('traefik target without DASHBOARD_TRAEFIK_URL gives null (not configured)', async () => {
+  test('traefik target without IRIS_TRAEFIK_URL gives null (not configured)', async () => {
     expect(await probe(traefikTarget, envFor(undefined))).toBeNull();
   });
 

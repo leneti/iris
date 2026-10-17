@@ -1,4 +1,4 @@
-# /config/dashboard.yaml (placeholder data only)
+# /config/iris.yaml (placeholder data only)
 version: 1
 title: Iris
 defaultGroup: Other
@@ -55,7 +55,7 @@ weather: # Open-Meteo, no key. Leave the block out to show no weather.
 links: # http or https only; always opened in a new browser tab
   - { name: Example Forum, abbr: EF, url: 'https://forum.example.invalid/' }
   - { name: Example Wiki, abbr: EW, url: 'https://wiki.example.invalid/' }
-  - { name: Project Staging, abbr: PS, url: 'https://staging.{zone}/' } # {zone} is replaced from DASHBOARD_ZONE
+  - { name: Project Staging, abbr: PS, url: 'https://staging.{zone}/' } # {zone} is replaced from IRIS_ZONE
 widgets: # service integrations
   refreshSeconds:
     {

@@ -3,12 +3,7 @@ import { join } from 'node:path';
 import { expect, test, vi } from 'vitest';
 
 vi.mock('@/lib/server/log', () => ({ log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() } }));
-import {
-  fillZone,
-  loadDashboardConfig,
-  resolveLinks,
-  type DashboardConfig,
-} from '@/lib/server/config/dashboard';
+import { fillZone, loadIrisConfig, resolveLinks, type IrisConfig } from '@/lib/server/config/iris';
 
 const tmp = join(process.cwd(), '.tmp');
 function dirWith(files: Record<string, string>): string {
@@ -17,16 +12,16 @@ function dirWith(files: Record<string, string>): string {
   for (const [name, text] of Object.entries(files)) writeFileSync(join(dir, name), text);
   return dir;
 }
-function cfg(patch: Partial<DashboardConfig>): DashboardConfig {
-  return { ...loadDashboardConfig(dirWith({})).config, ...patch };
+function cfg(patch: Partial<IrisConfig>): IrisConfig {
+  return { ...loadIrisConfig(dirWith({})).config, ...patch };
 }
 
-test('examples/dashboard.yaml loads with no warnings', () => {
-  expect(loadDashboardConfig('examples').warnings).toEqual([]);
+test('examples/iris.yaml loads with no warnings', () => {
+  expect(loadIrisConfig('examples').warnings).toEqual([]);
 });
 
-test('a missing dashboard.yaml gives defaults', () => {
-  const { config, warnings } = loadDashboardConfig(dirWith({}));
+test('a missing iris.yaml gives defaults', () => {
+  const { config, warnings } = loadIrisConfig(dirWith({}));
   expect(config.defaultGroup).toBe('Other');
   expect(config.version).toBe(1);
   expect(config.phone.maxLiveFrames).toBe(3);
@@ -45,9 +40,7 @@ test('a missing dashboard.yaml gives defaults', () => {
 });
 
 test('system block gets its defaults', () => {
-  const { config } = loadDashboardConfig(
-    dirWith({ 'dashboard.yaml': 'system:\n  url: http://x\n' }),
-  );
+  const { config } = loadIrisConfig(dirWith({ 'iris.yaml': 'system:\n  url: http://x\n' }));
   expect(config.system).toEqual({
     url: 'http://x',
     interface: 'auto',
@@ -58,9 +51,9 @@ test('system block gets its defaults', () => {
 });
 
 test('an unknown key is a warning, not a failure', () => {
-  const { config, warnings } = loadDashboardConfig(
+  const { config, warnings } = loadIrisConfig(
     dirWith({
-      'dashboard.yaml': 'title: Mine\nphone:\n  maxLiveFrames: 2\n  bogus: 1\nextra: 1\n',
+      'iris.yaml': 'title: Mine\nphone:\n  maxLiveFrames: 2\n  bogus: 1\nextra: 1\n',
     }),
   );
   expect(config.title).toBe('Mine');
@@ -69,11 +62,11 @@ test('an unknown key is a warning, not a failure', () => {
   expect(warnings.map((w) => w.message).join()).toMatch(/phone\.bogus/);
 });
 
-test('an invalid dashboard.yaml gives defaults and a warning', () => {
-  const a = loadDashboardConfig(dirWith({ 'dashboard.yaml': 'phone: [1\n' }));
+test('an invalid iris.yaml gives defaults and a warning', () => {
+  const a = loadIrisConfig(dirWith({ 'iris.yaml': 'phone: [1\n' }));
   expect(a.warnings[0]?.code).toBe('CONFIG_INVALID');
   expect(a.config.defaultGroup).toBe('Other');
-  const b = loadDashboardConfig(dirWith({ 'dashboard.yaml': 'version: 2\n' }));
+  const b = loadIrisConfig(dirWith({ 'iris.yaml': 'version: 2\n' }));
   expect(b.warnings[0]?.code).toBe('CONFIG_INVALID');
 });
 

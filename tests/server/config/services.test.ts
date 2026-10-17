@@ -74,44 +74,44 @@ services:
 
 test('watcher reloads on mtime change and keeps the last good config', () => {
   const dir = dirWith({});
-  put(dir, 'dashboard.yaml', 'title: One\n', 1000);
+  put(dir, 'iris.yaml', 'title: One\n', 1000);
   put(dir, 'services.yaml', 'services:\n  - { id: a, name: A, url: none }\n', 1000);
   const w = createConfigWatcher(dir, 'example.invalid');
-  expect(w.get().dashboard.config.title).toBe('One');
+  expect(w.get().iris.config.title).toBe('One');
   expect(w.get().manual.services).toHaveLength(1);
 
-  put(dir, 'dashboard.yaml', 'title: Two\n', 2000);
-  expect(w.get().dashboard.config.title).toBe('Two');
+  put(dir, 'iris.yaml', 'title: Two\n', 2000);
+  expect(w.get().iris.config.title).toBe('Two');
 
-  put(dir, 'dashboard.yaml', 'title: [broken\n', 3000);
+  put(dir, 'iris.yaml', 'title: [broken\n', 3000);
   put(dir, 'services.yaml', 'services: [\n', 3000);
   const bad = w.get();
-  expect(bad.dashboard.config.title).toBe('Two');
-  expect(bad.dashboard.warnings.map((x) => x.code)).toContain('CONFIG_INVALID');
+  expect(bad.iris.config.title).toBe('Two');
+  expect(bad.iris.warnings.map((x) => x.code)).toContain('CONFIG_INVALID');
   expect(bad.manual.services).toHaveLength(1);
   expect(bad.manual.state).toBe('invalid');
 
-  put(dir, 'dashboard.yaml', 'title: Three\n', 4000);
-  expect(w.get().dashboard.config.title).toBe('Three');
+  put(dir, 'iris.yaml', 'title: Three\n', 4000);
+  expect(w.get().iris.config.title).toBe('Three');
 });
 
 test('watcher without a good config falls back to defaults', () => {
-  const dir = dirWith({ 'dashboard.yaml': 'title: [x\n' });
+  const dir = dirWith({ 'iris.yaml': 'title: [x\n' });
   const w = createConfigWatcher(dir, undefined);
-  expect(w.get().dashboard.config.title).toBe('Iris');
+  expect(w.get().iris.config.title).toBe('Iris');
   expect(w.get().manual.state).toBe('missing');
 });
 
 test('getConfigWatcher is one lazy process-wide watcher built from the environment', () => {
   const dir = dirWith({});
-  put(dir, 'dashboard.yaml', 'title: Shared\n', 1000);
+  put(dir, 'iris.yaml', 'title: Shared\n', 1000);
   globalThis.__irisConfig = undefined;
-  vi.stubEnv('DASHBOARD_CONFIG_DIR', dir);
+  vi.stubEnv('IRIS_CONFIG_DIR', dir);
   try {
     const a = getConfigWatcher();
     expect(getConfigWatcher()).toBe(a);
     expect(globalThis.__irisConfig).toBe(a);
-    expect(a.get().dashboard.config.title).toBe('Shared');
+    expect(a.get().iris.config.title).toBe('Shared');
   } finally {
     vi.unstubAllEnvs();
     globalThis.__irisConfig = undefined;

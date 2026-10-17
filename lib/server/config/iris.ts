@@ -10,7 +10,7 @@ import { log } from '../log';
 const positive = z.number().positive();
 const refresh = (n: number) => positive.default(n);
 
-const DashboardSchema = z.object({
+const IrisSchema = z.object({
   version: z.literal(1).default(1),
   title: z.string().default('Iris'),
   defaultGroup: z.string().default('Other'),
@@ -99,12 +99,12 @@ const DashboardSchema = z.object({
     .prefault({}),
 });
 
-export type DashboardConfig = z.infer<typeof DashboardSchema>;
+export type IrisConfig = z.infer<typeof IrisSchema>;
 
-export const FILE_DASHBOARD = 'dashboard.yaml';
+export const FILE_IRIS = 'iris.yaml';
 
-export function defaultDashboardConfig(): DashboardConfig {
-  return DashboardSchema.parse({});
+export function defaultIrisConfig(): IrisConfig {
+  return IrisSchema.parse({});
 }
 
 // ---- shared helpers (also used by services.ts) ----
@@ -171,31 +171,31 @@ export function unknownKeyWarnings(
   );
 }
 
-// ---- dashboard.yaml ----
-export type DashboardLoad = { config: DashboardConfig; warnings: Warning[]; ok: boolean };
+// ---- iris.yaml ----
+export type IrisLoad = { config: IrisConfig; warnings: Warning[]; ok: boolean };
 
-/** Like loadDashboardConfig, but says whether the file parsed (the watcher keeps the last good one). */
-export function readDashboardConfig(dir: string): DashboardLoad {
-  const read = readYamlFile(dir, FILE_DASHBOARD);
-  if (read.state === 'missing') return { config: defaultDashboardConfig(), warnings: [], ok: true };
+/** Like loadIrisConfig, but says whether the file parsed (the watcher keeps the last good one). */
+export function readIrisConfig(dir: string): IrisLoad {
+  const read = readYamlFile(dir, FILE_IRIS);
+  if (read.state === 'missing') return { config: defaultIrisConfig(), warnings: [], ok: true };
   if (read.state === 'invalid')
-    return { config: defaultDashboardConfig(), warnings: [read.warning], ok: false };
-  const result = DashboardSchema.safeParse(read.data);
+    return { config: defaultIrisConfig(), warnings: [read.warning], ok: false };
+  const result = IrisSchema.safeParse(read.data);
   if (!result.success)
     return {
-      config: defaultDashboardConfig(),
-      warnings: [schemaProblem(FILE_DASHBOARD, result.error)],
+      config: defaultIrisConfig(),
+      warnings: [schemaProblem(FILE_IRIS, result.error)],
       ok: false,
     };
   return {
     config: result.data,
-    warnings: unknownKeyWarnings(FILE_DASHBOARD, read.data, result.data),
+    warnings: unknownKeyWarnings(FILE_IRIS, read.data, result.data),
     ok: true,
   };
 }
 
-export function loadDashboardConfig(dir: string): { config: DashboardConfig; warnings: Warning[] } {
-  const { config, warnings } = readDashboardConfig(dir);
+export function loadIrisConfig(dir: string): { config: IrisConfig; warnings: Warning[] } {
+  const { config, warnings } = readIrisConfig(dir);
   return { config, warnings };
 }
 
@@ -216,7 +216,7 @@ export function isHttpUrl(url: string): boolean {
 }
 
 export function resolveLinks(
-  config: Pick<DashboardConfig, 'links'>,
+  config: Pick<IrisConfig, 'links'>,
   zone: string | undefined,
 ): { links: LinkEntry[]; warnings: Warning[] } {
   const links: LinkEntry[] = [];
@@ -225,7 +225,7 @@ export function resolveLinks(
     const url = fillZone(link.url, zone);
     const problem =
       url === null
-        ? 'needs {zone} but DASHBOARD_ZONE is not set'
+        ? 'needs {zone} but IRIS_ZONE is not set'
         : !isHttpUrl(url)
           ? 'is not an http or https address'
           : link.abbr.length === 0 || link.abbr.length > 3

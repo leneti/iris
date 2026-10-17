@@ -26,7 +26,7 @@ type Cfg = typeof system;
 
 let cfg: Cfg | undefined;
 vi.mock('@/lib/server/config/services', () => ({
-  getConfigWatcher: () => ({ get: () => ({ dashboard: { config: { system: cfg } } }) }),
+  getConfigWatcher: () => ({ get: () => ({ iris: { config: { system: cfg } } }) }),
 }));
 
 type Overrides = Record<string, unknown | Error>;

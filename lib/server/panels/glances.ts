@@ -153,7 +153,7 @@ function percentOf(percent: number | null, used: number | null, size: number | n
 }
 
 type SystemConfig = NonNullable<
-  ReturnType<ReturnType<typeof getConfigWatcher>['get']>['dashboard']['config']['system']
+  ReturnType<ReturnType<typeof getConfigWatcher>['get']>['iris']['config']['system']
 >;
 
 function pickSensor(s: Snapshot, wanted: string) {
@@ -235,7 +235,7 @@ let wasDown = false;
 
 export async function getSystem(
   now: Date,
-  cfg: SystemConfig | undefined = getConfigWatcher().get().dashboard.config.system,
+  cfg: SystemConfig | undefined = getConfigWatcher().get().iris.config.system,
 ): Promise<SystemResponse> {
   if (cfg === undefined || cfg.url.trim() === '') {
     return build(

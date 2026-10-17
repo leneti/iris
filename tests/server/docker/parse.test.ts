@@ -38,23 +38,23 @@ describe('parseContainers', () => {
     expect(all.every((c) => !c.name.startsWith('/'))).toBe(true);
   });
 
-  it('keeps only dashboard.* labels and traefik router rules', () => {
+  it('keeps only iris.* labels and traefik router rules', () => {
     expect(Object.keys(byName('moviebox').labels).sort()).toEqual([
-      'dashboard.description',
-      'dashboard.enable',
-      'dashboard.group',
-      'dashboard.health.path',
-      'dashboard.icon',
-      'dashboard.name',
-      'dashboard.order',
-      'dashboard.widget',
+      'iris.description',
+      'iris.enable',
+      'iris.group',
+      'iris.health.path',
+      'iris.icon',
+      'iris.name',
+      'iris.order',
+      'iris.widget',
       'traefik.http.routers.moviebox.rule',
     ]);
     expect(Object.keys(byName('edge-tunnel').labels)).toEqual([]);
   });
 
   it('reads the Compose service name, null when the label is missing', () => {
-    expect(byName('iris').service).toBe('dashboard');
+    expect(byName('iris').service).toBe('iris');
     const [c] = parseContainers([{ Names: ['/loose'], State: 'running', Status: 'Up' }]);
     expect(c?.service).toBeNull();
   });
@@ -119,7 +119,7 @@ describe('parseContainers', () => {
 
   it('ignores label values that are not strings', () => {
     const [c] = parseContainers([
-      { Names: ['/a'], State: 'running', Status: 'Up', Labels: { 'dashboard.enable': true } },
+      { Names: ['/a'], State: 'running', Status: 'Up', Labels: { 'iris.enable': true } },
     ]);
     expect(c?.labels).toEqual({});
   });

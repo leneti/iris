@@ -13,7 +13,7 @@ const fixture = readFileSync(
 
 let streamsCfg: { url: string; showUsers: boolean } | undefined;
 vi.mock('@/lib/server/config/services', () => ({
-  getConfigWatcher: () => ({ get: () => ({ dashboard: { config: { streams: streamsCfg } } }) }),
+  getConfigWatcher: () => ({ get: () => ({ iris: { config: { streams: streamsCfg } } }) }),
 }));
 
 function reply(body: string | object, status = 200) {
@@ -28,7 +28,7 @@ function reply(body: string | object, status = 200) {
 
 async function load(key: string | undefined = KEY) {
   vi.resetModules();
-  vi.stubEnv('DASHBOARD_TAUTULLI_KEY', key ?? '');
+  vi.stubEnv('IRIS_TAUTULLI_KEY', key ?? '');
   const log = await import('@/lib/server/log');
   const mod = await import('@/lib/server/panels/tautulli');
   return { ...mod, log };

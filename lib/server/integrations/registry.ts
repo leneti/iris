@@ -8,7 +8,7 @@ import type {
   WidgetsResponse,
 } from '@/lib/shared/contract';
 import { createTtlCache, type TtlCache } from '../cache';
-import type { DashboardConfig } from '../config/dashboard';
+import type { IrisConfig } from '../config/iris';
 import type { ResolvedService } from '../discovery/discover';
 import type { ServerEnv } from '../env';
 import { log } from '../log';
@@ -124,7 +124,7 @@ export function selectStats(
 // ---- standalone and weather providers (Task 16) ----
 
 export type WidgetDeps = {
-  config: DashboardConfig;
+  config: IrisConfig;
   env: ServerEnv;
   now: number;
   /** The shared TTL cache: a provider uses its own keys, e.g. `coinmarketcap:<id>`. */
@@ -161,7 +161,7 @@ const cache = createTtlCache();
 const lastState = new Map<string, WidgetState>();
 const warned = new Set<string>();
 
-function refreshMsOf(config: DashboardConfig, type: string): number {
+function refreshMsOf(config: IrisConfig, type: string): number {
   const table = config.widgets.refreshSeconds as Record<string, number>;
   const seconds = Object.hasOwn(table, type) ? table[type] : undefined;
   return (seconds ?? config.widgets.refreshSeconds.default) * 1000;
@@ -198,7 +198,7 @@ const iso = (ms: number | null): string | null => (ms === null ? null : new Date
 
 async function serviceWidget(
   service: ResolvedService,
-  config: DashboardConfig,
+  config: IrisConfig,
   env: ServerEnv,
 ): Promise<ServiceWidget> {
   const spec = service.widget;
@@ -257,7 +257,7 @@ async function serviceWidget(
   if (plan.unknown > 0 || plan.cut.length > 0)
     warnOnce(
       `fields:${service.id}|${(spec.fields ?? []).join(',')}`,
-      `dashboard.widget.fields: ${plan.unknown} unknown field(s) ignored` +
+      `iris.widget.fields: ${plan.unknown} unknown field(s) ignored` +
         (plan.cut.length > 0
           ? `; a tile shows at most ${MAX_FIELDS} (left out: ${plan.cut.join(', ')})`
           : ''),
@@ -273,7 +273,7 @@ async function serviceWidget(
 
 export async function getWidgets(
   state: AppState,
-  config: DashboardConfig,
+  config: IrisConfig,
   env: ServerEnv,
   now: number,
 ): Promise<WidgetsResponse> {

@@ -1,5 +1,5 @@
 import { WidgetsResponse } from '@/lib/shared/contract';
-import { defaultDashboardConfig, type DashboardConfig } from '@/lib/server/config/dashboard';
+import { defaultIrisConfig, type IrisConfig } from '@/lib/server/config/iris';
 import { loadEnv } from '@/lib/server/env';
 import { httpRequest } from '@/lib/server/http';
 import { adapter, conditionOf } from '@/lib/server/integrations/openmeteo';
@@ -26,8 +26,8 @@ const T0 = new Date('2026-10-16T12:00:00.000Z').getTime();
 const ROUTE = (tz = 'Europe%2FLondon', unit = 'celsius') =>
   `/v1/forecast?latitude=0.74&longitude=-0.58&current=temperature_2m,weather_code,is_day&timezone=${tz}&temperature_unit=${unit}`;
 
-function config(weather: Record<string, unknown> | null = {}): DashboardConfig {
-  const base = defaultDashboardConfig();
+function config(weather: Record<string, unknown> | null = {}): IrisConfig {
+  const base = defaultIrisConfig();
   return {
     ...base,
     weather:
