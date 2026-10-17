@@ -1,13 +1,13 @@
 # Iris
 
-Iris is a self-hosted dashboard for a Docker media server. It finds services from container labels, shows their health, opens them in tabs inside one page, and adds panels for host load, now-playing streams and scheduled jobs. It is a Next.js app that runs as one container.
+Iris is a self-hosted dashboard for a Docker media server. It finds services from container labels, shows their health, opens them in tabs inside one page, and shows the whole stack as one dark reading around a glowing crystal ball. It is a Next.js app that runs as one container.
 
 ![Iris overview, with fixture data](docs/screenshot.png)
 
 - **Discovery from labels.** A container with `iris.enable=true` appears with its name, group, icon and address. A YAML file covers services that cannot carry labels.
 - **Health.** Docker state plus an HTTP probe give one status per service.
-- **Tabs.** Services open in iframes when they allow it, and in a new browser tab when they do not. When an app sends its frame to a sign-in page (for example Cloudflare Access), Iris opens the sign-in in a small window, closes it once the app answers and shows the app in its tab. Keyboard palette, phone layout, light and dark themes.
-- **Panels.** System (Glances), Now playing (Tautulli), Scheduled jobs (cron-status and a host status file).
+- **Tabs.** Services open in iframes when they allow it, and in a new browser tab when they do not. When an app sends its frame to a sign-in page (for example Cloudflare Access), Iris opens the sign-in in a small window, closes it once the app answers and shows the app in its tab. Keyboard palette, phone layout, a dark look.
+- **The reading.** The Overview is one single-screen reading of the stack around a WebGL crystal ball that reacts to host load and failed jobs (with a static fallback where WebGL is missing). It has three parts: The circle (a chip for every service, with its health), The hours (scheduled jobs, from cron-status and a host status file, as a timeline) and Omens (markets, host load from Glances, and the sky), plus a footer. Now playing is no longer shown; `/api/streams` stays.
 - **Integrations.** Small stat tiles for Seerr, Tautulli, Radarr, Sonarr, Prowlarr, autobrr, Gotify, qBittorrent, a Cloudflare tunnel, CoinMarketCap markets and Open-Meteo weather.
 
 The contract (labels, config files, environment variables, endpoints) is in [docs/contract.md](docs/contract.md).
