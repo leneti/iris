@@ -10,21 +10,10 @@ import {
   Moon,
   Sun,
 } from 'lucide-react';
+import { conditionWord } from '@/lib/client/weather';
 import type { Weather as WeatherData } from '@/lib/shared/contract';
 
 type Condition = NonNullable<WeatherData['condition']>;
-
-const WORD: Record<Condition, string> = {
-  clear: 'Clear',
-  'partly-cloudy': 'Partly cloudy',
-  cloudy: 'Cloudy',
-  fog: 'Fog',
-  drizzle: 'Drizzle',
-  rain: 'Rain',
-  snow: 'Snow',
-  showers: 'Showers',
-  thunderstorm: 'Thunderstorm',
-};
 
 function Glyph({ condition, isDay }: { condition: Condition | null; isDay: boolean | null }) {
   const cls = 'size-4';
@@ -78,7 +67,7 @@ export function Weather({
     <p className="flex items-center gap-2 text-xs text-text-2">
       <Glyph condition={weather.condition} isDay={weather.isDay} />
       <span className="font-semibold text-text tabular-nums">{temperature}</span>
-      {weather.condition && <span>{WORD[weather.condition]}</span>}
+      {weather.condition && <span>{conditionWord(weather.condition)}</span>}
       <span aria-hidden>·</span>
       <span>{weather.label}</span>
     </p>

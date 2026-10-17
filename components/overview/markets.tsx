@@ -11,7 +11,8 @@ import {
 } from '@/components/ui/select';
 import type { StandaloneWidget } from '@/lib/shared/contract';
 import { cn } from '@/lib/utils';
-import { formatStat, isFailed, Unavailable } from './figures';
+import { formatStat, isFailed } from '@/lib/client/stats';
+import { Unavailable } from './figures';
 import { Panel } from './panel';
 
 export type Interval = StandaloneWidget['interval'];

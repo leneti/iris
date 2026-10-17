@@ -9,6 +9,7 @@ import {
   WidgetsResponse,
   parseTolerant,
 } from '@/lib/shared/contract';
+import { markOk } from './source-health';
 
 /** Browser polling intervals in milliseconds (Global Constraints, Timing). */
 export const POLL_MS = {
@@ -42,6 +43,7 @@ export async function fetchValidated<T>(schema: z.ZodType<T>, url: string): Prom
   }
   const parsed = parseTolerant(schema, body);
   if (!parsed.success) throw new Error(`${url} did not match the contract`);
+  markOk(url);
   return parsed.data;
 }
 

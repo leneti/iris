@@ -2,7 +2,7 @@
 
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { HealthMark } from '@/components/health-mark';
-import { formatStat, isFailed } from '@/components/overview/figures';
+import { formatStat, isFailed } from '@/lib/client/stats';
 import { groupIcon, COLLAPSED_GROUPS_PREF } from '@/components/shell/sidebar';
 import { ServiceIcon } from '@/components/service-icon';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';

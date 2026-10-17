@@ -1,25 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { zone } from '@/lib/client/format';
 
-function zone(tz: string): string {
-  try {
-    new Intl.DateTimeFormat('en-GB', { timeZone: tz });
-    return tz;
-  } catch {
-    return 'UTC';
-  }
-}
-
-/** "10:15" in the given zone, 24-hour. */
-export function clock(iso: string, tz: string): string {
-  return new Intl.DateTimeFormat('en-GB', {
-    timeZone: zone(tz),
-    hour: '2-digit',
-    minute: '2-digit',
-    hourCycle: 'h23',
-  }).format(new Date(iso));
-}
+export { clock } from '@/lib/client/format';
 
 function day(ms: number, tz: string): number {
   const [y, m, d] = new Intl.DateTimeFormat('en-CA', { timeZone: zone(tz) })

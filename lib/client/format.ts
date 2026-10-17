@@ -63,3 +63,23 @@ export function formatAge(seconds: number | null | undefined): string {
 export function formatDuration(seconds: number | null | undefined): string {
   return valid(seconds) ? parts(seconds) : DASH;
 }
+
+/** The zone itself, or UTC when it is empty or not a real zone. */
+export function zone(tz: string): string {
+  try {
+    new Intl.DateTimeFormat('en-GB', { timeZone: tz });
+    return tz;
+  } catch {
+    return 'UTC';
+  }
+}
+
+/** "10:15" in the given zone, 24-hour. */
+export function clock(iso: string, tz: string): string {
+  return new Intl.DateTimeFormat('en-GB', {
+    timeZone: zone(tz),
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+  }).format(new Date(iso));
+}
