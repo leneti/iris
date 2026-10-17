@@ -390,7 +390,7 @@ export async function startFixtures(options: FixtureOptions = {}): Promise<Fixtu
     docker,
     traefik,
     cron: (req) =>
-      req.path === '/cron-status' ? ok(cronStatus(Date.now())) : status(404, 'Not Found'),
+      req.path === '/cron-status' ? ok({ jobs: cronStatus(Date.now()) }) : status(404, 'Not Found'),
     glances,
     tautulli,
   };

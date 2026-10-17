@@ -1,43 +1,45 @@
-[
-  {
-    "name": "feed-sync",
-    "status": "success",
-    "lastRun": "2026-10-16T11:45:03.000Z",
-    "message": "Nothing to do.",
-    "url": "https://feed-sync.example.invalid/",
-    "dot": "green",
-    "details": "feed-sync: ok"
-  },
-  {
-    "name": "price-watch",
-    "status": "failed",
-    "lastRun": "2026-10-16T11:30:01.000Z",
-    "message": "Upstream answered 503 three times.",
-    "dot": "red",
-    "details": "price-watch: failed"
-  },
-  {
-    "name": "photo-index",
-    "status": "success",
-    "lastRun": "2026-10-15T06:00:02.000Z",
-    "message": "Indexed 12 files.",
-    "dot": "green",
-    "details": "photo-index: ok"
-  },
-  {
-    "name": "report-digest",
-    "status": "warning",
-    "lastRun": "2026-10-16T08:00:04.000Z",
-    "message": "One section was empty.",
-    "dot": "yellow",
-    "details": "report-digest: warning"
-  },
-  {
-    "name": "cert-check",
-    "status": "success",
-    "lastRun": "2026-10-16T03:00:00.000Z",
-    "message": "All certificates are valid.",
-    "dot": "green",
-    "details": "cert-check: ok"
-  }
-]
+{
+  "jobs": [
+    {
+      "name": "feed-sync",
+      "status": "success",
+      "lastRun": "2026-10-16T11:45:03.000Z",
+      "message": "Nothing to do.",
+      "url": "https://feed-sync.example.invalid/",
+      "dot": "green",
+      "details": "feed-sync: ok"
+    },
+    {
+      "name": "price-watch",
+      "status": "failed",
+      "lastRun": "2026-10-16T11:30:01.000Z",
+      "message": "Upstream answered 503 three times.",
+      "dot": "red",
+      "details": "price-watch: failed"
+    },
+    {
+      "name": "photo-index",
+      "status": "success",
+      "lastRun": "2026-10-15T06:00:02.000Z",
+      "message": "Indexed 12 files.",
+      "dot": "green",
+      "details": "photo-index: ok"
+    },
+    {
+      "name": "report-digest",
+      "status": "warning",
+      "lastRun": "2026-10-16T08:00:04.000Z",
+      "message": "One section was empty.",
+      "dot": "yellow",
+      "details": "report-digest: warning"
+    },
+    {
+      "name": "cert-check",
+      "status": "success",
+      "lastRun": "2026-10-16T03:00:00.000Z",
+      "message": "All certificates are valid.",
+      "dot": "green",
+      "details": "cert-check: ok"
+    }
+  ]
+}

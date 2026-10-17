@@ -143,10 +143,9 @@ describe('Traefik fixture', () => {
 
 describe('cron-status, Glances and Tautulli fixtures', () => {
   test('cron-status lists the five placeholder jobs', async () => {
-    const jobs = json(await get(fx.ports.cron, '/cron-status')) as {
-      name: string;
-      status: string;
-    }[];
+    const { jobs } = json(await get(fx.ports.cron, '/cron-status')) as {
+      jobs: { name: string; status: string }[];
+    };
     expect(jobs.map((j) => [j.name, j.status])).toEqual([
       ['feed-sync', 'success'],
       ['price-watch', 'failed'],

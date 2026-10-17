@@ -9,7 +9,7 @@ const fixture = (name: string) =>
 
 const NOW = new Date('2026-10-16T12:00:00Z');
 
-const rawJobs: any[] = fixture('cron-status');
+const rawJobs: any[] = fixture('cron-status').jobs;
 const jobs: CronStatusJob[] = rawJobs.map((j) => ({
   name: j.name,
   status: j.status,

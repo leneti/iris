@@ -58,12 +58,14 @@ describe('fetchCronStatus', () => {
   });
 
   test('tolerates a missing message, a null or bad lastRun and an unknown status word', async () => {
-    reply([
-      { name: 'a', status: 'success' },
-      { name: 'b', status: 'success', lastRun: null, message: null },
-      { name: 'c', status: 'success', lastRun: 'yesterday-ish' },
-      { name: 'd', status: 'sleeping', lastRun: '2026-10-16T11:00:00Z' },
-    ]);
+    reply({
+      jobs: [
+        { name: 'a', status: 'success' },
+        { name: 'b', status: 'success', lastRun: null, message: null },
+        { name: 'c', status: 'success', lastRun: 'yesterday-ish' },
+        { name: 'd', status: 'sleeping', lastRun: '2026-10-16T11:00:00Z' },
+      ],
+    });
     const jobs = await fetchCronStatus(URL_);
     expect(jobs.map((j) => [j.status, j.lastRun, j.message])).toEqual([
       ['success', null, null],
@@ -73,11 +75,17 @@ describe('fetchCronStatus', () => {
     ]);
   });
 
+  test('also accepts a bare list of jobs', async () => {
+    reply([{ name: 'a', status: 'failed' }]);
+    const jobs = await fetchCronStatus(URL_);
+    expect(jobs.map((j) => [j.name, j.status])).toEqual([['a', 'failed']]);
+  });
+
   test.each([
-    ['a non-200 answer', () => reply('[]', 503)],
+    ['a non-200 answer', () => reply('{"jobs":[]}', 503)],
     ['text that is not JSON', () => reply('<html>')],
-    ['an object instead of a list', () => reply({ jobs: [] })],
-    ['a job without a name', () => reply([{ status: 'success' }])],
+    ['an object without a jobs list', () => reply({ items: [] })],
+    ['a job without a name', () => reply({ jobs: [{ status: 'success' }] })],
   ])('rejects %s', async (_name, arrange) => {
     arrange();
     await expect(fetchCronStatus(URL_)).rejects.toThrow();

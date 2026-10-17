@@ -2,8 +2,8 @@ import 'server-only';
 import { z } from 'zod';
 import { httpRequest } from '../http';
 
-// GET <cron-status>/cron-status (handoff D1.5): a list of jobs with name, status, lastRun,
-// message and optionally url, plus two presentation fields (`dot`, `details`) that Iris
+// GET <cron-status>/cron-status (handoff D1.5): `{ "jobs": [...] }`, each job with name, status,
+// lastRun, message and optionally url, plus two presentation fields (`dot`, `details`) that Iris
 // ignores. One read-only GET with a 3 s timeout; the cache above it makes it one per minute.
 
 export const CRON_STATUS_TIMEOUT_MS = 3000;
@@ -28,6 +28,11 @@ const JobSchema = z.object({
   url: z.string().nullish(),
 });
 const ListSchema = z.array(JobSchema);
+// cron-status wraps the list in `jobs`; a bare list is accepted too.
+const ResponseSchema = z.union([
+  z.object({ jobs: ListSchema }).transform((r) => r.jobs),
+  ListSchema,
+]);
 
 function parseDate(text: string | null | undefined): Date | null {
   if (!text) return null;
@@ -43,7 +48,7 @@ export async function fetchCronStatus(url: string): Promise<CronStatusJob[]> {
     maxBytes: MAX_BYTES,
   });
   if (res.status !== 200) throw new Error(`cron-status answered ${res.status}`);
-  const list = ListSchema.parse(JSON.parse(res.body.toString('utf8')));
+  const list = ResponseSchema.parse(JSON.parse(res.body.toString('utf8')));
   return list.map((job) => ({
     name: job.name,
     status:

@@ -13,7 +13,7 @@ vi.mock('@/lib/server/cron/cron-status', () => ({ fetchCronStatus: vi.fn() }));
 const fixture = (name: string) =>
   readFileSync(new URL(`../fixtures/cron/${name}.json`, import.meta.url), 'utf8');
 
-const jobs: CronStatusJob[] = JSON.parse(fixture('cron-status')).map((j: any) => ({
+const jobs: CronStatusJob[] = JSON.parse(fixture('cron-status')).jobs.map((j: any) => ({
   name: j.name,
   status: j.status,
   lastRun: new Date(j.lastRun),

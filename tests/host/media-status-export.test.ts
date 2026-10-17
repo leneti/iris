@@ -585,7 +585,8 @@ describe('the exporter file', () => {
       'ExecStart=@NODE@ --disable-warning=ExperimentalWarning @EXPORTER@ --jobs-dir @JOBS_DIR@ --out /var/lib/media-status/status.json',
     );
     expect(service).toMatch(/^Type=oneshot$/m);
-    expect(service).toMatch(/^NoNewPrivileges=yes$/m);
+    // crontab -l is setgid; NoNewPrivileges would leave the exporter with an empty crontab.
+    expect(service).not.toMatch(/^NoNewPrivileges=/m);
     expect(service).toMatch(/^Nice=10$/m);
     expect(timer).toMatch(/^OnBootSec=1min$/m);
     expect(timer).toMatch(/^OnUnitActiveSec=5min$/m);
