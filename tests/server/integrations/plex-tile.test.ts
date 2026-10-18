@@ -4,6 +4,7 @@ import { defaultIrisConfig } from '@/lib/server/config/iris';
 import { loadEnv } from '@/lib/server/env';
 import { httpRequest } from '@/lib/server/http';
 import { stateWith } from '../../helpers/widgets';
+import { resetShared } from '../../reset-shared';
 
 vi.mock('@/lib/server/log', () => ({
   log: { info: vi.fn(), warn: vi.fn(), error: vi.fn() },
@@ -101,6 +102,7 @@ describe('Plex tile (tautulli adapter)', () => {
     expect(res.services.plex).toMatchObject({ state: 'unreachable', stats: [] });
 
     vi.resetModules();
+    resetShared();
     vi.mocked(httpRequest).mockResolvedValue({
       status: 401,
       headers: {},

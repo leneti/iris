@@ -1,6 +1,7 @@
 import 'server-only';
 import { z } from 'zod';
 import { createTtlCache } from '../cache';
+import { shared } from '../shared';
 import { getConfigWatcher } from '../config/services';
 import { httpRequest } from '../http';
 import { log } from '../log';
@@ -230,8 +231,8 @@ function build(
 
 const EMPTY_CONFIG = { interface: 'auto', sensor: 'auto', thresholds: { warn: 80, bad: 90 } };
 
-const cache = createTtlCache();
-let wasDown = false;
+const cache = shared('glances:cache', createTtlCache);
+const outage = shared('glances:outage', () => ({ wasDown: false }));
 
 export async function getSystem(
   now: Date,
@@ -249,12 +250,12 @@ export async function getSystem(
   const r = await cache.get(`glances:${base}`, TTL_MS, () => fetchSnapshot(base));
   const down = r.error !== null;
   // One line per outage, name only: an error message can carry the address.
-  if (down && !wasDown)
+  if (down && !outage.wasDown)
     log.warn('glances unreachable', {
       error: r.error instanceof Error ? r.error.name : typeof r.error,
     });
-  if (!down && wasDown) log.info('glances recovered');
-  wasDown = down;
+  if (!down && outage.wasDown) log.info('glances recovered');
+  outage.wasDown = down;
 
   const fresh = r.fetchedAt !== null && now.getTime() - r.fetchedAt <= KEEP_MS;
   const snap = !down || fresh ? r.value : null;

@@ -1,8 +1,9 @@
 import 'server-only';
+import { shared } from './shared';
 
 const REDACTED = '[redacted]';
 const SENSITIVE_KEY = /key|token|password|authorization|cookie/i;
-const secrets = new Set<string>();
+const secrets = shared('log:secrets', () => new Set<string>());
 
 export function registerSecret(value: string): void {
   if (value) secrets.add(value);

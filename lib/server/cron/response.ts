@@ -7,17 +7,21 @@ import { log } from '../log';
 import { buildCronResponse } from './build';
 import { fetchCronStatus } from './cron-status';
 import { readHostStatus } from './host-status';
+import { shared } from '../shared';
 
 const CRON_STATUS_TTL_MS = 60_000;
 
-const cache = createTtlCache();
+// Shared on `globalThis`: the page and the route are compiled into separate chunks, and each
+// would otherwise get its own cache and its own idea of whether the outage was already logged.
+const cache = shared('cron:cache', createTtlCache);
+const outage = shared('cron:outage', () => ({ wasDown: false }));
 let env: ServerEnv | undefined;
-let wasDown = false;
 
 /**
- * The body of `/api/cron`. The route and the page's first render both call it, so they share the
- * cron-status cache and the outage log line. No request input is read: the response depends only
- * on the two sources and iris.yaml.
+ * The body of `/api/cron`. The route and the page's first render both call it. In production
+ * they are compiled into separate chunks, so the cron-status cache and the outage flag live on
+ * `globalThis` (`shared`); a module-level `const` would give each chunk its own. No request
+ * input is read: the response depends only on the two sources and iris.yaml.
  */
 export async function getCronResponse(now: Date): Promise<CronResponse> {
   env ??= loadEnv();
@@ -30,12 +34,12 @@ export async function getCronResponse(now: Date): Promise<CronResponse> {
     const r = await cache.get('cron-status', CRON_STATUS_TTL_MS, () => fetchCronStatus(url));
     const down = r.error !== null;
     // One line per outage, not one per poll. Name only: a message can carry the address.
-    if (down && !wasDown)
+    if (down && !outage.wasDown)
       log.warn('cron-status unreachable', {
         error: r.error instanceof Error ? r.error.name : typeof r.error,
       });
-    if (!down && wasDown) log.info('cron-status recovered');
-    wasDown = down;
+    if (!down && outage.wasDown) log.info('cron-status recovered');
+    outage.wasDown = down;
     cronStatus = {
       state: down ? 'unreachable' : 'ok',
       fetchedAt: r.fetchedAt === null ? null : new Date(r.fetchedAt),

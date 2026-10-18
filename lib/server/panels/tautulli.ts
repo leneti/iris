@@ -1,6 +1,7 @@
 import 'server-only';
 import { z } from 'zod';
 import { createTtlCache } from '../cache';
+import { shared } from '../shared';
 import { getConfigWatcher } from '../config/services';
 import { loadEnv, type ServerEnv } from '../env';
 import { httpRequest } from '../http';
@@ -106,16 +107,16 @@ export type Activity = {
   raw: TautulliActivity | null;
 };
 
-const cache = createTtlCache();
+const cache = shared('tautulli:cache', createTtlCache);
+const last = shared('tautulli:last', () => ({ state: undefined as ActivityState | undefined }));
 let env: ServerEnv | undefined;
-let lastState: ActivityState | undefined;
 
 function logChange(state: ActivityState): void {
-  if (state === lastState) return;
+  if (state === last.state) return;
   if (state === 'unreachable' || state === 'unauthorized') log.warn(`tautulli ${state}`);
-  else if (lastState === 'unreachable' || lastState === 'unauthorized')
+  else if (last.state === 'unreachable' || last.state === 'unauthorized')
     log.info('tautulli recovered');
-  lastState = state;
+  last.state = state;
 }
 
 export async function getActivity(): Promise<Activity> {

@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { StreamsResponse } from '@/lib/shared/contract';
 import { httpRequest } from '@/lib/server/http';
+import { resetShared } from '../../reset-shared';
 
 vi.mock('@/lib/server/http', () => ({ httpRequest: vi.fn() }));
 
@@ -28,6 +29,7 @@ function reply(body: string | object, status = 200) {
 
 async function load(key: string | undefined = KEY) {
   vi.resetModules();
+  resetShared();
   vi.stubEnv('IRIS_TAUTULLI_KEY', key ?? '');
   const log = await import('@/lib/server/log');
   const mod = await import('@/lib/server/panels/tautulli');

@@ -19,6 +19,7 @@ export default defineConfig({
         test: {
           name: 'dom',
           globals: true,
+          setupFiles: ['tests/reset-shared.ts'],
           environment: 'jsdom',
           include: ['tests/components/**/*.test.{ts,tsx}', 'tests/client/**/*.test.{ts,tsx}'],
         },
@@ -28,6 +29,7 @@ export default defineConfig({
         test: {
           name: 'node',
           globals: true,
+          setupFiles: ['tests/reset-shared.ts'],
           environment: 'node',
           include: ['tests/**/*.test.{ts,tsx}'],
           exclude: ['tests/components/**', 'tests/client/**'],

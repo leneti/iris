@@ -2,6 +2,7 @@ import 'server-only';
 import { z } from 'zod';
 import { IntegrationError, LOGIN_PATH, type Adapter, type AdapterContext } from './fetcher';
 import { parseReply } from './reply';
+import { shared } from '../shared';
 
 // qBittorrent (D1.12). It may answer without a sign-in (the user's does today), so every read
 // starts without credentials. Only a 403 triggers `POST /api/v2/auth/login`, and only when both
@@ -13,11 +14,11 @@ const transfer = z.object({
   up_info_speed: z.number().finite().nonnegative(),
 });
 
-const sessions = new Map<string, string>();
+const sessions = shared('qbittorrent:sessions', () => new Map<string, string>());
 // qBittorrent bans a client address after about 5 failed sign-ins (1 h by default). After a
 // refused or ineffective sign-in, none is tried again for this long; the tile says `unauthorized`.
 const COOL_DOWN_MS = 5 * 60_000;
-const blockedUntil = new Map<string, number>();
+const blockedUntil = shared('qbittorrent:blockedUntil', () => new Map<string, number>());
 const keyOf = (ctx: AdapterContext): string => ctx.widget?.url ?? ctx.widget?.host ?? '';
 
 /** The value of `SID` in a (possibly joined) Set-Cookie header, or null. */

@@ -8,6 +8,7 @@ import type {
   WidgetsResponse,
 } from '@/lib/shared/contract';
 import { createTtlCache, type TtlCache } from '../cache';
+import { shared } from '../shared';
 import type { IrisConfig } from '../config/iris';
 import type { ResolvedService } from '../discovery/discover';
 import type { ServerEnv } from '../env';
@@ -157,9 +158,9 @@ export function stateOf(error: unknown): Exclude<WidgetState, 'ok' | 'not-config
 
 // ---- getWidgets ----
 
-const cache = createTtlCache();
-const lastState = new Map<string, WidgetState>();
-const warned = new Set<string>();
+const cache = shared('widgets:cache', createTtlCache);
+const lastState = shared('widgets:lastState', () => new Map<string, WidgetState>());
+const warned = shared('widgets:warned', () => new Set<string>());
 
 function refreshMsOf(config: IrisConfig, type: string): number {
   const table = config.widgets.refreshSeconds as Record<string, number>;
