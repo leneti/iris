@@ -88,6 +88,16 @@ describe('GET /api/cron', () => {
     expect(fetch).toHaveBeenCalledTimes(2);
   });
 
+  test("the page's seed and the route share one cache and answer alike", async () => {
+    const { GET } = await load();
+    const { getCronResponse } = await import('@/lib/server/cron/response');
+    const fromRoute = await (await GET()).json();
+    const fromPage = JSON.parse(JSON.stringify(await getCronResponse(new Date())));
+    expect(fromPage).toEqual(fromRoute);
+    const { fetchCronStatus: fetch } = await import('@/lib/server/cron/cron-status');
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   test('cron-status down: source unreachable, maintenance rows still there (5.5)', async () => {
     const { GET } = await load();
     const { fetchCronStatus: fetch } = await import('@/lib/server/cron/cron-status');
