@@ -5,6 +5,7 @@ import type { HourRow } from '@/lib/client/reading';
 import { cn } from '@/lib/utils';
 import { REGION } from './focus-region';
 import { Heading, Quiet } from './heading';
+import { Bar } from './placeholder';
 
 const ROW = 'relative flex items-baseline gap-[10px] text-[14px]';
 const DOT =
@@ -48,13 +49,50 @@ function Row({ row }: { row: HourRow }) {
   );
 }
 
+const PLACEHOLDER_ROWS = 5;
+
+/** Rows as tall as real ones, so the list does not grow when the schedule arrives. */
+function Placeholder() {
+  return (
+    <ul
+      aria-hidden
+      data-slot="hours-placeholder"
+      className={cn(
+        'relative pl-[22px]',
+        'before:absolute before:top-2 before:bottom-2 before:left-1 before:w-px before:bg-line',
+      )}
+    >
+      {Array.from({ length: PLACEHOLDER_ROWS }, (_, i) => (
+        <li key={i} className={cn(ROW, 'py-1 lg:py-[3px]')}>
+          <span className="w-[42px] flex-none font-mono text-[13px]">
+            <Bar className="w-8" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <Bar className={i % 2 === 0 ? 'w-3/5' : 'w-2/5'} />
+          </span>
+          <small className="font-mono text-xs">
+            <Bar className="w-7" />
+          </small>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
 /** Maintenance, the quiet hours, now, and what is next. */
 export function Hours({ touch: _touch = false }: { touch?: boolean }) {
   const { hours } = useReading();
   return (
-    <section id="ov-hours" tabIndex={-1} className={cn(REGION, 'min-w-0')}>
+    <section
+      id="ov-hours"
+      tabIndex={-1}
+      aria-busy={'loading' in hours || undefined}
+      className={cn(REGION, 'min-w-0')}
+    >
       <Heading>The hours</Heading>
-      {'unavailable' in hours ? (
+      {'loading' in hours ? (
+        <Placeholder />
+      ) : 'unavailable' in hours ? (
         <Quiet>the schedule isn&apos;t answering</Quiet>
       ) : (
         <ul

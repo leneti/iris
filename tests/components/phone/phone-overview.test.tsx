@@ -103,3 +103,30 @@ describe('PhoneOverview', () => {
     expect(screen.getByText('Omens')).toBeTruthy();
   });
 });
+
+describe('PhoneOverview placeholders', () => {
+  test('hours and omens hold their places, busy and without visible text', () => {
+    const input = calm();
+    delete input.cron;
+    delete input.widgets;
+    delete input.system;
+    show(deriveReading(input));
+    expect(document.querySelectorAll('[data-slot="hours-placeholder"] > li').length).toBe(5);
+    expect(document.querySelectorAll('[data-slot="omen-placeholder"]').length).toBe(3);
+    expect(document.getElementById('ov-hours')?.getAttribute('aria-busy')).toBe('true');
+    expect(
+      document.querySelector('[data-slot="phone-overview"] section[aria-busy="true"]'),
+    ).not.toBeNull();
+    expect(document.body.textContent).not.toMatch(/loading/i);
+  });
+
+  test('the circle without services is a touch-sized placeholder block', () => {
+    const input = calm();
+    delete input.services;
+    show(deriveReading(input));
+    const block = one('[data-slot="circle-placeholder"]');
+    expect(block.className).toContain('grid-cols-2');
+    expect(block.className).toContain('h-[200px]');
+    expect(block.firstElementChild?.className).toContain('min-h-11');
+  });
+});

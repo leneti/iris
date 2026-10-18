@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, within } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import { Overview } from '@/components/overview/overview';
 import { ReadingStateContext } from '@/components/reading/reading-context';
@@ -414,5 +414,97 @@ describe('layout', () => {
     show();
     expect(screen.queryByText('Now playing')).toBeNull();
     expect(screen.queryByText('System')).toBeNull();
+  });
+});
+
+describe('placeholders', () => {
+  const loading = (...keys: (keyof ReadingInput)[]) => {
+    const input = calm();
+    for (const k of keys) delete input[k];
+    return read(input);
+  };
+  const busy = () => [...document.querySelectorAll('[aria-busy="true"]')];
+
+  test('hours: five faint rows, aria-busy, no visible "loading"', () => {
+    show(loading('cron'));
+    const rows = document.querySelectorAll('[data-slot="hours-placeholder"] > li');
+    expect(rows.length).toBe(5);
+    expect(document.getElementById('ov-hours')?.getAttribute('aria-busy')).toBe('true');
+    expect(document.body.textContent).not.toMatch(/loading/i);
+    expect(screen.getByText('The hours')).toBeTruthy();
+    expect(screen.queryByText("the schedule isn't answering")).toBeNull();
+  });
+
+  test('a placeholder row has the same box classes as a real row', () => {
+    show();
+    const real = document.querySelector('#ov-hours ul > li:not([class*="font-semibold"])');
+    cleanup();
+    show(loading('cron'));
+    const fake = document.querySelector('[data-slot="hours-placeholder"] > li');
+    for (const name of [
+      'relative',
+      'flex',
+      'items-baseline',
+      'gap-[10px]',
+      'text-[14px]',
+      'py-1',
+    ]) {
+      expect(real?.className.split(' ')).toContain(name);
+      expect(fake?.className.split(' ')).toContain(name);
+    }
+    expect(fake?.className).toContain('lg:py-[3px]');
+  });
+
+  test('the bars pulse only under motion-safe', () => {
+    show(loading('cron'));
+    const bars = document.querySelectorAll('[data-slot="hours-placeholder"] span[aria-hidden]');
+    expect(bars.length).toBeGreaterThan(0);
+    for (const bar of bars) {
+      expect(bar.className).toContain('motion-safe:animate-pulse');
+      expect(bar.className.split(' ')).not.toContain('animate-pulse');
+    }
+  });
+
+  test('omens: one faint line each for markets, the host and the sky', () => {
+    show(loading('widgets', 'system'));
+    expect(document.querySelectorAll('[data-slot="omen-placeholder"]').length).toBe(3);
+    expect(screen.getByText('Markets · 24h')).toBeTruthy();
+    expect(screen.getByText('The host')).toBeTruthy();
+    expect(screen.getByText('The sky')).toBeTruthy();
+    expect(busy().some((el) => el.querySelector('[data-slot="omen-placeholder"]'))).toBe(true);
+    expect(document.getElementById('ov-host')).not.toBeNull();
+    expect(document.body.textContent).not.toMatch(/loading/i);
+  });
+
+  test('omens: only the group still loading is a placeholder', () => {
+    show(loading('widgets'));
+    expect(document.querySelectorAll('[data-slot="omen-placeholder"]').length).toBe(2);
+    expect(screen.getByText(/^Calm/)).toBeTruthy();
+  });
+
+  test('nothing is busy once everything has answered', () => {
+    show();
+    expect(busy()).toEqual([]);
+    expect(document.querySelector('[data-slot="hours-placeholder"]')).toBeNull();
+    expect(document.querySelector('[data-slot="omen-placeholder"]')).toBeNull();
+  });
+
+  test('the circle with services but no status shows real chips with idle dots', () => {
+    show(loading('status'));
+    expect(screen.getByRole('button', { name: 'Alpha' })).toBeTruthy();
+    expect(document.querySelectorAll('#ov-circle button').length).toBe(3);
+    const dots = document.querySelectorAll('#ov-circle button > span.rounded-full');
+    expect(dots.length).toBe(3);
+    for (const dot of dots) expect(dot.className).toContain('bg-faint');
+    expect(document.querySelector('[data-slot="circle-placeholder"]')).toBeNull();
+    expect(document.getElementById('ov-circle')?.getAttribute('aria-busy')).toBeNull();
+  });
+
+  test('the circle with no services is a fixed-height busy block', () => {
+    show(loading('services'));
+    const block = document.querySelector('[data-slot="circle-placeholder"]');
+    expect(block?.className).toContain('h-[200px]');
+    expect(document.getElementById('ov-circle')?.getAttribute('aria-busy')).toBe('true');
+    expect(document.querySelectorAll('#ov-circle button').length).toBe(0);
   });
 });

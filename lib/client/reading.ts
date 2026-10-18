@@ -71,11 +71,15 @@ export type Reading = {
   colour: string;
   meters: { cpu: Meter; memory: Meter };
   ball: BallState;
-  circle: { shown: number | null; rows: CircleRow[] } | { unavailable: true };
-  hours: { rows: HourRow[] } | { unavailable: true };
+  /** `loading`: no services yet, so nothing to draw but a placeholder block. */
+  circle: { shown: number | null; rows: CircleRow[] } | { unavailable: true } | { loading: true };
+  /** `loading`: the cron answer has not arrived (and has not failed); `unavailable`: it failed. */
+  hours: { rows: HourRow[] } | { unavailable: true } | { loading: true };
+  /** Per omen: `null` is absent (nothing to show), `loading` is not known yet. */
   omens: {
     markets:
       | { unavailable: true }
+      | { loading: true }
       | {
           lines: {
             name: string;
@@ -84,8 +88,11 @@ export type Reading = {
           }[];
         }
       | null;
-    host: { unavailable: true } | { word: 'Calm' | 'Straining'; parts: string[] };
-    sky: { unavailable: true } | { text: string } | null;
+    host:
+      | { unavailable: true }
+      | { loading: true }
+      | { word: 'Calm' | 'Straining'; parts: string[] };
+    sky: { unavailable: true } | { loading: true } | { text: string } | null;
   };
   foot: { links: { name: string; url: string }[]; quiet: string[] };
 };
@@ -482,13 +489,9 @@ function circle(
 
 // ---- hours ----
 
-function hours(
-  cron: CronResponse | undefined,
-  now: Date,
-  down: boolean,
-): { rows: HourRow[] } | { unavailable: true } {
+function hours(cron: CronResponse | undefined, now: Date, down: boolean): Reading['hours'] {
   if (down) return { unavailable: true };
-  if (!cron) return { rows: [] };
+  if (!cron) return { loading: true };
   // Every source down and no job has ever been seen to run (a stale host file leaves only "unknown"
   // rows): the schedule is not answering, rather than a list of dashes.
   if (
@@ -546,8 +549,9 @@ function hours(
 // ---- omens ----
 
 function markets(widgets: WidgetsResponse | undefined, down: boolean): Reading['omens']['markets'] {
-  // No widgets data: whether markets are configured is unknown, so show no section.
-  if (down || !widgets) return null;
+  if (down) return null;
+  // No widgets data yet: whether markets are configured is unknown, so one group is reserved.
+  if (!widgets) return { loading: true };
   const mine = widgets.standalone.filter((w) => w.type === 'coinmarketcap') ?? [];
   if (mine.length === 0) return null;
   const lines = mine
@@ -572,7 +576,12 @@ function markets(widgets: WidgetsResponse | undefined, down: boolean): Reading['
   return mine.some((w) => isFailed(w.state)) ? { unavailable: true } : null;
 }
 
-function hostOmen(f: Figures | null, straining: boolean): Reading['omens']['host'] {
+function hostOmen(
+  f: Figures | null,
+  straining: boolean,
+  loading: boolean,
+): Reading['omens']['host'] {
+  if (loading) return { loading: true };
   if (!f) return { unavailable: true };
   const parts: string[] = [];
   if (f.cpu !== null) parts.push(`CPU ${Math.round(f.cpu)}%`);
@@ -587,7 +596,8 @@ function hostOmen(f: Figures | null, straining: boolean): Reading['omens']['host
 
 function sky(widgets: WidgetsResponse | undefined, down: boolean): Reading['omens']['sky'] {
   if (down) return { unavailable: true };
-  const w = widgets?.weather;
+  if (!widgets) return { loading: true };
+  const w = widgets.weather;
   if (!w) return null;
   const text = weatherText(w, true);
   if (text !== null) return { text: `${text}.` };
@@ -613,6 +623,8 @@ export function deriveReading(input: ReadingInput): Reading {
     input.status?.docker === 'unreachable' ||
     (services !== undefined && s.visible.length === 0);
   const pending = !blind && (services === undefined || status === undefined);
+  // Still on its way: no data and not failing. (An unavailable source reads as such, not as loading.)
+  const loading = (source: Source) => input[source] === undefined && !unavailable.has(source);
 
   const failed = cron?.jobs.filter((j) => j.result === 'failed') ?? [];
   const down = blind || pending ? 0 : s.visibleDown.length + s.hiddenDown.length;
@@ -632,7 +644,7 @@ export function deriveReading(input: ReadingInput): Reading {
     hours: hours(cron, now, unavailable.has('cron')),
     omens: {
       markets: markets(widgets, unavailable.has('widgets')),
-      host: hostOmen(figures, straining),
+      host: hostOmen(figures, straining, loading('system')),
       sky: sky(widgets, unavailable.has('widgets')),
     },
     foot: {
@@ -648,7 +660,8 @@ export function deriveReading(input: ReadingInput): Reading {
       long: false,
       segments: [plain('Reading the signs…')],
       colour: DASH,
-      circle: { shown: null, rows: [] },
+      // Services known, status not: the real chips with idle dots. Nothing known: a placeholder.
+      circle: services ? circle(services, status, widgets) : { loading: true },
     };
   }
 

@@ -6,6 +6,7 @@ import type { Chip, ChipState, CircleGroup } from '@/lib/client/reading';
 import { cn } from '@/lib/utils';
 import { Heading, Quiet } from './heading';
 import { REGION } from './focus-region';
+import { Bar } from './placeholder';
 
 const DOT: Record<ChipState, string> = {
   ok: 'bg-ok',
@@ -122,6 +123,35 @@ function Group({
   );
 }
 
+const PLACEHOLDER_CHIPS = 6;
+
+/** A block of a fixed height for the circle when not even the services are known. */
+function Placeholder({ touch }: { touch: boolean }) {
+  return (
+    <div
+      aria-hidden
+      data-slot="circle-placeholder"
+      className={cn(
+        'grid h-[200px] content-start gap-[6px]',
+        touch ? 'grid-cols-2' : 'grid-cols-3',
+      )}
+    >
+      {Array.from({ length: PLACEHOLDER_CHIPS }, (_, i) => (
+        <div
+          key={i}
+          className={cn(
+            'flex items-center gap-[9px] rounded-[12px] border border-line/60 bg-surface/60 px-[10px] py-[7px] motion-safe:animate-pulse',
+            touch ? 'min-h-11' : 'h-[38px]',
+          )}
+        >
+          <Bar className="size-[22px] rounded-full" />
+          <Bar className="w-3/5" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** The services as chips, grouped; one-service groups share a row. */
 export function Circle({
   onOpenService,
@@ -137,6 +167,14 @@ export function Circle({
     return (
       <section id="ov-circle" tabIndex={-1} className={cn(REGION, 'mt-10 lg:mt-[22px]')}>
         <Quiet>The circle — not answering</Quiet>
+      </section>
+    );
+  }
+  if ('loading' in circle) {
+    return (
+      <section id="ov-circle" tabIndex={-1} aria-busy="true" className={REGION}>
+        <Heading>The circle</Heading>
+        <Placeholder touch={touch} />
       </section>
     );
   }

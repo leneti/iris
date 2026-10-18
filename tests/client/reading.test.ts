@@ -862,3 +862,86 @@ describe('resilience', () => {
     expect(hourWord(21)).toBe('21');
   });
 });
+
+describe('loading', () => {
+  const without = (...keys: (keyof ReadingInput)[]): ReadingInput => {
+    const i = calm();
+    for (const k of keys) delete i[k];
+    return i;
+  };
+
+  test('no cron answer yet is loading hours, not an empty list and not unavailable', () => {
+    expect(read(without('cron')).hours).toEqual({ loading: true });
+  });
+
+  test('a cron answer with no jobs is an empty list, not loading', () => {
+    const i = { ...calm(), cron: { ...calm().cron!, jobs: [] } };
+    expect(read(i).hours).toEqual({ rows: [{ kind: 'now', time: '13:00' }] });
+  });
+
+  test('a failing cron source is unavailable, whether or not it ever answered', () => {
+    const down = new Set<Source>(['cron']);
+    expect(read({ ...without('cron'), unavailable: down }).hours).toEqual({ unavailable: true });
+    expect(read({ ...calm(), unavailable: down }).hours).toEqual({ unavailable: true });
+  });
+
+  test('no system answer yet is a loading host omen; a failing one is unavailable', () => {
+    expect(read(without('system')).omens.host).toEqual({ loading: true });
+    const down = new Set<Source>(['system']);
+    expect(read({ ...without('system'), unavailable: down }).omens.host).toEqual({
+      unavailable: true,
+    });
+    expect(read(withSystem(calm(), { state: 'unreachable' })).omens.host).toEqual({
+      unavailable: true,
+    });
+  });
+
+  test('no widgets answer yet loads markets and sky; a failing source does not', () => {
+    const r = read(without('widgets'));
+    expect(r.omens.markets).toEqual({ loading: true });
+    expect(r.omens.sky).toEqual({ loading: true });
+    const down = read({ ...without('widgets'), unavailable: new Set<Source>(['widgets']) });
+    expect(down.omens.markets).toBeNull();
+    expect(down.omens.sky).toEqual({ unavailable: true });
+  });
+
+  test('widgets that answered with no markets or weather are absent, not loading', () => {
+    const i = { ...calm(), widgets: { ...calm().widgets!, standalone: [], weather: null } };
+    const r = read(i);
+    expect(r.omens.markets).toBeNull();
+    expect(r.omens.sky).toBeNull();
+  });
+
+  test('the sections load on their own: one answer does not wait for the others', () => {
+    const r = read(without('cron', 'widgets'));
+    expect(r.pending).toBe(false);
+    expect(r.hours).toEqual({ loading: true });
+    expect(r.omens.markets).toEqual({ loading: true });
+    expect(r.omens.host).toMatchObject({ word: 'Calm' });
+    expect(r.circle).toMatchObject({ shown: 3 });
+  });
+
+  test('services known and status not: the real chips, all idle', () => {
+    const r = read(without('status'));
+    expect(r.pending).toBe(true);
+    if (!('rows' in r.circle)) throw new Error('expected chips');
+    const chips = r.circle.rows.flatMap((row) =>
+      row.kind === 'group' ? row.group.chips : row.groups.flatMap((g) => g.chips),
+    );
+    expect(chips.map((c) => c.id)).toEqual(['alpha', 'beta', 'gamma']);
+    expect(chips.every((c) => c.state === 'idle')).toBe(true);
+    expect(r.circle.shown).toBe(3);
+  });
+
+  test('no services at all: a placeholder block for the circle', () => {
+    expect(read(without('services')).circle).toEqual({ loading: true });
+    expect(read(without('services', 'status')).circle).toEqual({ loading: true });
+    expect(read({ now: at(13), unavailable: new Set() }).circle).toEqual({ loading: true });
+  });
+
+  test('an outage is still an outage: unavailable services are not loading', () => {
+    const r = read({ ...without('services'), unavailable: new Set<Source>(['services']) });
+    expect(r.circle).toEqual({ unavailable: true });
+    expect(r.pending).toBe(false);
+  });
+});
