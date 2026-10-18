@@ -1,6 +1,7 @@
 import 'server-only';
 
-const MOBILE_UA = /Mobi|Android|iPhone/;
+// Android tablets leave `Mobi` out of the user agent; iPads say neither `iPhone` nor `iPod`.
+const MOBILE_UA = /Mobi|iPhone|iPod/;
 
 /**
  * Whether the request comes from a phone, for the first render only: the client hint when the

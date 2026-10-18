@@ -22,6 +22,13 @@ describe('isPhoneRequest', () => {
     expect(request({ 'user-agent': ua })).toBe(true);
   });
 
+  test.each([
+    'Mozilla/5.0 (Linux; Android 15; Tablet) AppleWebKit/537.36 Chrome/140.0 Safari/537.36',
+    'Mozilla/5.0 (iPad; CPU OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1',
+  ])('a tablet user agent without a hint is not a phone: %s', (ua) => {
+    expect(request({ 'user-agent': ua })).toBe(false);
+  });
+
   test('a desktop user agent, or none, is not a phone', () => {
     expect(request({ 'user-agent': 'Mozilla/5.0 (X11; Linux x86_64) Chrome/140.0' })).toBe(false);
     expect(request({})).toBe(false);
