@@ -376,6 +376,8 @@ export type FixtureOptions = {
   hostStatusFile?: string;
   /** A patched variant of the base data; undefined serves the base data unchanged. */
   scenario?: Scenario;
+  /** Hold every upstream reply back this many milliseconds (not the fixture apps). */
+  delayMs?: number;
   log?: (line: string) => void;
 };
 
@@ -384,6 +386,7 @@ function listen(
   host: string,
   port: number,
   counts: { total: number; paths: Record<string, number> },
+  delayMs = 0,
 ): Promise<http.Server> {
   const server = http.createServer((incoming, res) => {
     const url = new URL(incoming.url ?? '/', 'http://fixture.invalid');
@@ -402,7 +405,11 @@ function listen(
       query: url.searchParams,
       headers: incoming.headers,
     });
-    res.writeHead(reply.status, reply.headers ?? {}).end(reply.body ?? '');
+    const send = (): void => {
+      res.writeHead(reply.status, reply.headers ?? {}).end(reply.body ?? '');
+    };
+    if (delayMs > 0) setTimeout(send, delayMs);
+    else send();
   });
   return new Promise((resolve, reject) => {
     server.once('error', reject);
@@ -437,6 +444,7 @@ export async function startFixtures(options: FixtureOptions = {}): Promise<Fixtu
         host,
         options.port?.[name] ?? DEFAULT_PORTS[name],
         counts,
+        options.delayMs,
       );
       ports[name] = (servers[name].address() as AddressInfo).port;
     }
@@ -500,8 +508,23 @@ export async function startFixtures(options: FixtureOptions = {}): Promise<Fixtu
 if (process.argv[1] !== undefined && fileURLToPath(import.meta.url) === process.argv[1]) {
   const statusFile = process.env.IRIS_HOST_STATUS_FILE;
   const scenario = parseScenario(process.env.IRIS_FIXTURE_SCENARIO);
+  // IRIS_FIXTURE_PORT_BASE moves the five upstreams to base..base+4 and starts no app frames, for
+  // a second stack beside `yarn dev:fixtures`; point the IRIS_*_URL variables and iris.yaml there.
+  const base = Number(process.env.IRIS_FIXTURE_PORT_BASE ?? '');
+  const names = Object.keys(DEFAULT_PORTS) as FixtureName[];
+  const shifted = Number.isInteger(base) && base > 0;
+  const delayMs = Number(process.env.IRIS_FIXTURE_DELAY_MS ?? '0');
   const fixtures = await startFixtures({
-    lanApps: 'default',
+    lanApps: shifted ? 'none' : 'default',
+    ...(shifted
+      ? {
+          port: Object.fromEntries(names.map((n, i) => [n, base + i])) as Record<
+            FixtureName,
+            number
+          >,
+        }
+      : {}),
+    ...(delayMs > 0 ? { delayMs } : {}),
     scenario,
     ...(statusFile ? { hostStatusFile: statusFile } : {}),
     log: (line) => console.log(line),
