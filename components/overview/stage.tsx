@@ -171,6 +171,9 @@ export function Stage({
         data-slot="reading"
         className={cn(
           'mt-[10px] text-center font-serif leading-[1.28] tracking-[-.005em] text-balance',
+          // The desktop hero is centred, so a clause arriving late (the weather) would move the
+          // ball. Four lines at the largest size are held; a longer reading still grows.
+          !phone && 'lg:min-h-[154px]',
           phone ? 'text-[25px]' : reading.long ? 'text-[26px]' : 'text-[28px] lg:text-[30px]',
         )}
       >

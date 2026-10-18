@@ -94,6 +94,11 @@ describe('the reading', () => {
   const all = () =>
     withSystem(withJob(withDown(calm(), 'alpha'), 'feed-sync', { result: 'failed' }), { cpu: 90 });
 
+  test('the desktop reading holds four lines, so a late clause does not move the ball', () => {
+    show(read(all()));
+    expect(slot('reading').className).toContain('lg:min-h-[154px]');
+  });
+
   test("the reading's targets are focusable", () => {
     show(read(all()));
     const targets = slot('reading').querySelectorAll('a, button');
