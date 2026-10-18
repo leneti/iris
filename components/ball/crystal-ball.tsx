@@ -17,6 +17,7 @@ import {
 } from './math';
 import { buildPalette, mixPalette, type Palette, parseColor } from './palette';
 import { buildDust, buildStrands } from './particles';
+import { type BallVariant, SIZE } from './size';
 import {
   compositeFragment,
   dustFragment,
@@ -28,8 +29,10 @@ import {
 
 export type CrystalBallProps = BallState & {
   hoverStrength: number;
-  variant: 'desktop' | 'phone';
+  variant: BallVariant;
   onContextLost: () => void;
+  /** Called once, after the first frame has been drawn. */
+  onFirstFrame?: () => void;
 };
 
 // The "plasma" preset, with the values the redesign overrides (07 passes these).
@@ -43,7 +46,6 @@ const PLASMA = {
   dustSpeed: 1,
   particleShape: 'square',
 } as const;
-const SIZE = { desktop: 0.86, phone: 0.82 } as const;
 const PARTICLES = { desktop: 15000, phone: 9000 } as const;
 
 const MOTIONS = { rise: 0, fall: 1, drift: 2, orbit: 3 } as const;
@@ -101,16 +103,20 @@ export default function CrystalBall({
   hoverStrength,
   variant,
   onContextLost,
+  onFirstFrame,
 }: CrystalBallProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const targetRef = useRef<Target | null>(null);
   const wakeRef = useRef<(() => void) | null>(null);
   const lostRef = useRef(onContextLost);
+  const firstFrameRef = useRef(onFirstFrame);
+  const framedRef = useRef(false);
 
   const palette = useMemo(() => buildPalette(parseColor(color, FALLBACK_PINK)), [color]);
 
   useEffect(() => {
     lostRef.current = onContextLost;
+    firstFrameRef.current = onFirstFrame;
     targetRef.current = {
       palette,
       motion,
@@ -649,6 +655,10 @@ export default function CrystalBall({
 
       compositeUniforms.uLight.value = 0;
       renderer.render({ scene: compositeMesh, clear: false });
+      if (!framedRef.current) {
+        framedRef.current = true;
+        firstFrameRef.current?.();
+      }
 
       const settling =
         Math.abs(target - heat.power) > CONVERGED ||

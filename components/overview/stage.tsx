@@ -143,7 +143,10 @@ export function Stage({
             phone ? 'size-[300px] -ml-[150px]' : 'size-[420px] -ml-[210px]',
           )}
         >
-          <SectionBoundary name="ball" fallback={<StaticBall color={reading.ball.color} />}>
+          <SectionBoundary
+            name="ball"
+            fallback={<StaticBall color={reading.ball.color} variant={variant} />}
+          >
             <Ball {...ball} />
           </SectionBoundary>
         </div>
