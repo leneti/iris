@@ -152,7 +152,7 @@ scripts/dev.sh yarn verify         # lint, format check, typecheck, tests, build
 
 `IRIS_FIXTURE_PORT_BASE=47600` starts the five upstreams on 47600-47604 without app frames (point the `IRIS_*_URL` variables and the `iris.yaml` URLs there) and `IRIS_FIXTURE_DELAY_MS=800` holds every upstream reply back, to test a slow host beside a running `dev:fixtures`.
 
-`scripts/dev.sh yarn cls [url]` measures Cumulative Layout Shift of a running Iris (default `http://localhost:3100/`) at 1440x900 and at a 390x844 phone, and prints the top shifting nodes. Run it against a production build (`yarn build`, then `next start -p 3100`). It exits 1 above `IRIS_CLS_MAX` (default 0.05). It uses a Chromium already in the Playwright cache, or the binary in `IRIS_CLS_CHROMIUM`; it never downloads one.
+`scripts/dev.sh yarn cls [url]` measures Cumulative Layout Shift of a running Iris (default `http://localhost:3100/`) at 1440x900 and at a 390x844 phone, and prints the top shifting nodes. Run it against a production build (`yarn build`, then `next start -p 3100`). It exits 1 above `IRIS_CLS_MAX` (default 0.05), and on any page error or console error (a hydration mismatch is one). Each run starts with no cookies in the browser zone `IRIS_CLS_TIMEZONE` (default `Pacific/Auckland`), which should differ from the server's. It uses a Chromium already in the Playwright cache, or the binary in `IRIS_CLS_CHROMIUM`; it never downloads one.
 
 ## Updates
 

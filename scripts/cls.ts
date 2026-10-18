@@ -2,7 +2,10 @@
 // Run against a production build (`yarn build && yarn start`), not `next dev`: dev is not realistic.
 // Uses a Chromium already on disk (never downloads one): IRIS_CLS_CHROMIUM, else the newest in
 // the Playwright cache (PLAYWRIGHT_BROWSERS_PATH or ~/.cache/ms-playwright).
-// IRIS_CLS_MAX sets the limit (default 0.05); the exit code is 1 when a viewport is above it.
+// IRIS_CLS_MAX sets the limit (default 0.05); the exit code is 1 when a viewport is above it, or
+// when a page throws or logs a console error (a hydration mismatch is one: React error #418).
+// Each context starts with no cookies and a browser time zone (IRIS_CLS_TIMEZONE, default
+// Pacific/Auckland) that is not the server's, so the first-visit greeting must hydrate cleanly.
 import { existsSync, readdirSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
@@ -11,15 +14,17 @@ import { chromium, type BrowserContextOptions } from 'playwright-core';
 const url = process.argv[2] ?? 'http://localhost:3100/';
 const max = Number(process.env.IRIS_CLS_MAX ?? '0.05');
 const SETTLE_MS = 2000;
+const timezoneId = process.env.IRIS_CLS_TIMEZONE ?? 'Pacific/Auckland';
 
 type Shift = { value: number; at: number; nodes: { selector: string; value: number }[] };
 
 const viewports: { name: string; options: BrowserContextOptions }[] = [
-  { name: 'desktop 1440x900', options: { viewport: { width: 1440, height: 900 } } },
+  { name: 'desktop 1440x900', options: { viewport: { width: 1440, height: 900 }, timezoneId } },
   {
     name: 'phone 390x844',
     options: {
       viewport: { width: 390, height: 844 },
+      timezoneId,
       deviceScaleFactor: 3,
       isMobile: true,
       hasTouch: true,
@@ -103,6 +108,11 @@ try {
   for (const { name, options } of viewports) {
     const context = await browser.newContext(options);
     const page = await context.newPage();
+    const problems: string[] = [];
+    page.on('pageerror', (error) => problems.push(`pageerror: ${error.message}`));
+    page.on('console', (message) => {
+      if (message.type() === 'error') problems.push(`console.error: ${message.text()}`);
+    });
     await page.addInitScript(observe);
     await page.goto(url, { waitUntil: 'networkidle' });
     await page.waitForTimeout(SETTLE_MS);
@@ -111,7 +121,7 @@ try {
 
     const cls = shifts.reduce((sum, s) => sum + s.value, 0);
     const over = cls > max;
-    failed ||= over;
+    failed ||= over || problems.length > 0;
     console.log(
       `\n${name}: CLS ${cls.toFixed(4)} ${over ? 'FAIL' : 'ok'} (${shifts.length} shifts)`,
     );
@@ -124,6 +134,7 @@ try {
     }
     for (const [selector, value] of [...byNode].sort((a, b) => b[1] - a[1]).slice(0, 8))
       console.log(`  ${value.toFixed(4)}  ${selector}`);
+    for (const problem of problems) console.log(`  FAIL ${problem.slice(0, 300)}`);
     for (const s of shifts.slice(0, 5))
       console.log(
         `  @${s.at}ms ${s.value.toFixed(4)} ${s.nodes.map((n) => n.selector).join(', ')}`,
