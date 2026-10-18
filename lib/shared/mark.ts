@@ -9,7 +9,9 @@ const PINK_SOFT = '#ff9fe6';
 const RIM_HOT = '#f9b5ea';
 
 const C = 32;
-const R = 22;
+// The ball's radius: on the square it sits on the dark ground; round, it is the whole icon, with
+// just enough room left for the rim's glow.
+const RADIUS = { square: 22, round: 25.5 } as const;
 
 // A fixed seed, so every build draws the same dust.
 function random(seed: number) {
@@ -21,7 +23,7 @@ function random(seed: number) {
 }
 
 /** Dust as circles: dense low in the ball, thinning upward, all inside the rim. */
-function dust() {
+function dust(R: number) {
   const next = random(7);
   const dots: string[] = [];
   const inner = R - 2;
@@ -43,10 +45,16 @@ function dust() {
 }
 
 /**
- * The mark as an SVG document on a 64 unit square. `rounded` gives the browser favicon its own
- * corners; the Apple touch icon stays square, since iOS masks it.
+ * The mark as an SVG document on a 64 unit square. `round` is the browser favicon: the ball alone on
+ * a clear ground, its inside filled dark so it reads on a light tab bar. `square` is the Apple touch
+ * icon, on the dark ground edge to edge, since iOS masks it and would turn a clear ground black.
  */
-export function markSvg({ rounded }: { rounded: boolean }) {
+export function markSvg({ shape }: { shape: 'round' | 'square' }) {
+  const R = RADIUS[shape];
+  const ground =
+    shape === 'square'
+      ? `<rect width="64" height="64" fill="${BG}"/><circle cx="${C}" cy="${C}" r="${R + 8}" fill="url(#haze)"/>`
+      : `<circle cx="${C}" cy="${C}" r="${R}" fill="${BG}"/>`;
   return [
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">',
     '<defs>',
@@ -55,9 +63,8 @@ export function markSvg({ rounded }: { rounded: boolean }) {
     '<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="2.2"/></filter>',
     `<clipPath id="inside"><circle cx="${C}" cy="${C}" r="${R}"/></clipPath>`,
     '</defs>',
-    `<rect width="64" height="64" rx="${rounded ? 14 : 0}" fill="${BG}"/>`,
-    `<circle cx="${C}" cy="${C}" r="${R + 8}" fill="url(#haze)"/>`,
-    `<g clip-path="url(#inside)"><rect x="${C - R}" y="${C - R}" width="${R * 2}" height="${R * 2}" fill="url(#pool)"/>${dust()}</g>`,
+    ground,
+    `<g clip-path="url(#inside)"><rect x="${C - R}" y="${C - R}" width="${R * 2}" height="${R * 2}" fill="url(#pool)"/>${dust(R)}</g>`,
     `<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${PINK}" stroke-width="5" filter="url(#glow)"/>`,
     `<circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="${RIM_HOT}" stroke-width="3"/>`,
     '</svg>',
