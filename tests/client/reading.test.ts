@@ -310,6 +310,50 @@ describe('greeting', () => {
   test("00:30 shares the previous evening's pick", () => {
     expect(greeting(at(0, 30, 18))).toBe(greeting(at(23, 30, 17)));
   });
+
+  describe('in a time zone', () => {
+    const utc = (h: number, m = 0, day = 17) => new Date(Date.UTC(2026, 9, day, h, m));
+
+    test('the band is the hour there, whatever the machine says', () => {
+      // 13:00 UTC: 02:00 the next day in Auckland (+13), 09:00 in New York (-4), 13:00 in London.
+      expect(SMALL).toContain(greeting(utc(13), 'Pacific/Auckland'));
+      expect(MORNING).toContain(greeting(utc(13), 'America/New_York'));
+      expect(AFTERNOON).toContain(greeting(utc(13), 'Europe/London'));
+      expect(AFTERNOON).toContain(greeting(utc(13), 'UTC'));
+    });
+
+    test('band edges are read in the zone', () => {
+      // Tokyo is UTC+9.
+      expect(MORNING).toContain(greeting(utc(1, 59), 'Asia/Tokyo'));
+      expect(AFTERNOON).toContain(greeting(utc(2, 0), 'Asia/Tokyo'));
+      expect(EVENING).toContain(greeting(utc(12, 59), 'Asia/Tokyo'));
+      expect(LATE).toContain(greeting(utc(13, 0), 'Asia/Tokyo'));
+      expect(SMALL).toContain(greeting(utc(19, 59), 'Asia/Tokyo'));
+      expect(MORNING).toContain(greeting(utc(20, 0), 'Asia/Tokyo'));
+    });
+
+    test("00:30 there shares the previous evening's pick", () => {
+      // 15:30 UTC on the 17th is 00:30 on the 18th in Tokyo; 14:30 UTC is 23:30 on the 17th.
+      expect(greeting(utc(15, 30), 'Asia/Tokyo')).toBe(greeting(utc(14, 30), 'Asia/Tokyo'));
+    });
+
+    test('the date is the date there: the same instant can pick differently', () => {
+      const seen = new Set<string>();
+      for (let d = 1; d <= 14; d++) seen.add(greeting(utc(13, 0, d), 'Europe/London'));
+      expect(seen.size).toBeGreaterThanOrEqual(2);
+    });
+
+    test('an unknown zone falls back to the machine clock', () => {
+      expect(greeting(at(13, 0), 'Not/AZone')).toBe(greeting(at(13, 0)));
+    });
+
+    test('deriveReading passes the zone to the sentence', () => {
+      const asia = text(read(calm({ now: utc(13), timeZone: 'Pacific/Auckland' })));
+      const london = text(read(calm({ now: utc(13), timeZone: 'Europe/London' })));
+      expect(SMALL.some((g) => asia.startsWith(g))).toBe(true);
+      expect(AFTERNOON.some((g) => london.startsWith(g))).toBe(true);
+    });
+  });
 });
 
 describe('circle', () => {

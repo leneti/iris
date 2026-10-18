@@ -1,4 +1,5 @@
 import { render } from '@testing-library/react';
+import { renderToString } from 'react-dom/server';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 import { ReadingProvider, useReading } from '@/components/reading/reading-context';
 import type { Reading } from '@/lib/client/reading';
@@ -25,14 +26,14 @@ vi.mock('@/lib/client/api', () => ({
   useWidgets: () => hooks.widgets,
 }));
 
-function readings(services?: ServicesResponse) {
+function readings(services?: ServicesResponse, props: { serverNow?: number } = {}) {
   const seen: Reading[] = [];
   function Probe() {
     seen.push(useReading());
     return null;
   }
   render(
-    <ReadingProvider services={services}>
+    <ReadingProvider services={services} {...props}>
       <Probe />
       <Probe />
     </ReadingProvider>,
@@ -91,6 +92,36 @@ describe('ReadingProvider', () => {
     const services = servicesResponse([group('Media', [svc('a', 'Alpha')])]);
     hooks.status = { data: statusResponse({ a: 'healthy' }) };
     const [r] = readings(services);
+    expect(JSON.stringify(r!.circle)).toContain('Alpha');
+  });
+
+  test('the server render reads at the server clock, in the server zone', () => {
+    const services = servicesResponse([group('Media', [svc('a', 'Alpha')])]);
+    hooks.status = { data: statusResponse({ a: 'healthy' }) };
+    // 13:00 UTC is 02:00 in Auckland and 13:00 in London.
+    const serverNow = Date.UTC(2026, 9, 17, 13, 0);
+    function Sentence() {
+      return <>{useReading().segments[0]!.text.trim()}</>;
+    }
+    const html = (zone: string) =>
+      renderToString(
+        <ReadingProvider services={services} serverNow={serverNow} serverTimeZone={zone}>
+          <Sentence />
+        </ReadingProvider>,
+      );
+    expect(['Deep space silence.', 'Quiet hours.', 'Even the cron jobs are asleep.']).toContain(
+      html('Pacific/Auckland'),
+    );
+    expect(['Good afternoon.', 'Afternoon!', 'Mid-day quadrant reached.']).toContain(
+      html('Europe/London'),
+    );
+  });
+
+  test('seeded data is not pending on the first render', () => {
+    const services = servicesResponse([group('Media', [svc('a', 'Alpha')])]);
+    hooks.status = { data: statusResponse({ a: 'healthy' }) };
+    const [r] = readings(services, { serverNow: Date.now() });
+    expect(r!.pending).toBe(false);
     expect(JSON.stringify(r!.circle)).toContain('Alpha');
   });
 });

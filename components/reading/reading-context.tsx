@@ -4,7 +4,7 @@ import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { POLL_MS, useCron, useServices, useStatus, useSystem, useWidgets } from '@/lib/client/api';
 import { deriveReading, type Reading, type Source } from '@/lib/client/reading';
 import { isUnavailable, lastOk } from '@/lib/client/source-health';
-import { useNow } from '@/lib/client/use-client';
+import { useNow, useTimeZone } from '@/lib/client/use-client';
 import type { ServicesResponse } from '@/lib/shared/contract';
 
 export const ReadingStateContext = createContext<Reading | null>(null);
@@ -23,9 +23,15 @@ const URLS: Record<Source, string> = {
  */
 export function ReadingProvider({
   services,
+  serverNow,
+  serverTimeZone,
   children,
 }: {
   services: ServicesResponse | undefined;
+  /** The server's clock (ms) the first render uses, so it matches the HTML. */
+  serverNow?: number;
+  /** The zone the server rendered the greeting for. */
+  serverTimeZone?: string;
   children: ReactNode;
 }) {
   const status = useStatus();
@@ -33,7 +39,8 @@ export function ReadingProvider({
   const system = useSystem();
   const widgets = useWidgets();
   const servicesPoll = useServices();
-  const now = useNow(30_000);
+  const now = useNow(30_000, serverNow);
+  const timeZone = useTimeZone(serverTimeZone);
 
   const failing: Record<Source, { hasData: boolean; failing: boolean }> = {
     services: { hasData: services !== undefined, failing: servicesPoll.error !== undefined },
@@ -61,9 +68,10 @@ export function ReadingProvider({
         system: system.data,
         widgets: widgets.data,
         now: new Date(now),
+        timeZone,
         unavailable: new Set(key === '' ? [] : (key.split(',') as Source[])),
       }),
-    [services, status.data, cron.data, system.data, widgets.data, now, key],
+    [services, status.data, cron.data, system.data, widgets.data, now, timeZone, key],
   );
 
   return <ReadingStateContext.Provider value={reading}>{children}</ReadingStateContext.Provider>;

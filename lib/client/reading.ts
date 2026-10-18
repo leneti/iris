@@ -24,6 +24,8 @@ export type ReadingInput = {
   system?: SystemResponse;
   widgets?: WidgetsResponse;
   now: Date;
+  /** The viewer's IANA zone, for the greeting; the machine's own when absent. */
+  timeZone?: string;
   unavailable: ReadonlySet<Source>;
 };
 
@@ -125,11 +127,49 @@ function fnv1a(s: string): number {
 
 const two = (n: number) => String(n).padStart(2, '0');
 
-/** Stable within a band, different from day to day. 00:00-01:59 belongs to the evening before. */
-export function greeting(now: Date): string {
-  const b = band(now.getHours());
-  const key = new Date(now.getTime() - 2 * 3_600_000);
-  const date = `${key.getFullYear()}-${two(key.getMonth() + 1)}-${two(key.getDate())}`;
+type Clock = { hour: number; date: string };
+
+const zoned = new Map<string, Intl.DateTimeFormat>();
+
+/** Hour and calendar date of `at` in `timeZone`, or in the machine's own zone when there is none. */
+function clockIn(at: Date, timeZone: string | undefined): Clock {
+  if (timeZone !== undefined) {
+    try {
+      let format = zoned.get(timeZone);
+      if (!format) {
+        format = new Intl.DateTimeFormat('en-GB', {
+          timeZone,
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          hourCycle: 'h23',
+        });
+        zoned.set(timeZone, format);
+      }
+      const parts = format.formatToParts(at);
+      const part = (type: string) => parts.find((p) => p.type === type)?.value;
+      return {
+        hour: Number(part('hour')),
+        date: `${part('year')}-${part('month')}-${part('day')}`,
+      };
+    } catch {
+      // An unknown zone reads the clock the way no zone does.
+    }
+  }
+  return {
+    hour: at.getHours(),
+    date: `${at.getFullYear()}-${two(at.getMonth() + 1)}-${two(at.getDate())}`,
+  };
+}
+
+/**
+ * Stable within a band, different from day to day. 00:00-01:59 belongs to the evening before.
+ * `timeZone` is the viewer's IANA zone; without one the machine's own is used.
+ */
+export function greeting(now: Date, timeZone?: string): string {
+  const b = band(clockIn(now, timeZone).hour);
+  const { date } = clockIn(new Date(now.getTime() - 2 * 3_600_000), timeZone);
   const pool = POOLS[b];
   return pool[fnv1a(`${date}|${b}`) % pool.length] ?? pool[0];
 }
@@ -275,6 +315,7 @@ const compare = (a: number, b: number) => (a < b ? -1 : a > b ? 1 : 0);
 
 type Ctx = {
   now: Date;
+  timeZone: string | undefined;
   blind: boolean;
   wrong: boolean;
   seen: Seen;
@@ -322,7 +363,7 @@ function lead(c: Ctx): Segment[] {
   if (c.blind) {
     return c.wrong
       ? [wrong, ...failures(c), plain(` ${BLIND}`)]
-      : [plain(`${greeting(c.now)} ${BLIND}`)];
+      : [plain(`${greeting(c.now, c.timeZone)} ${BLIND}`)];
   }
   if (visibleDown.length > 0) {
     const first = visibleDown[0];
@@ -351,7 +392,7 @@ function lead(c: Ctx): Segment[] {
     ];
   }
   if (c.failed.length > 0) return [wrong, ...failures(c), plain(' '), ...allWell(c)];
-  return [plain(`${greeting(c.now)} `), ...allWell(c)];
+  return [plain(`${greeting(c.now, c.timeZone)} `), ...allWell(c)];
 }
 
 function hostSentence(c: Ctx): Segment[] {
@@ -613,6 +654,7 @@ export function deriveReading(input: ReadingInput): Reading {
 
   const ctx: Ctx = {
     now,
+    timeZone: input.timeZone,
     blind,
     wrong,
     seen: s,

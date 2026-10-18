@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { prefs, subscribePrefs } from './prefs';
+import { browserTimeZone, rememberTimeZone } from './time-zone';
 
 const noop = () => () => {};
 
@@ -55,12 +56,35 @@ export function usePref<T>(key: string, fallback: T): T {
   return useMemo(() => (raw === null ? fallback : prefs.get(key, fallback)), [raw, key]);
 }
 
-/** The current time in ms, refreshed every `periodMs`; for "5 min ago" text. */
-export function useNow(periodMs = 30_000): number {
-  const [now, setNow] = useState(() => Date.now());
+/**
+ * The current time in ms, refreshed every `periodMs`; for "5 min ago" text. `initial` is the
+ * server's clock: the first render uses it, so the HTML matches, and the browser's clock takes
+ * over as soon as the page is mounted.
+ */
+export function useNow(periodMs = 30_000, initial?: number): number {
+  const [now, setNow] = useState(() => initial ?? Date.now());
   useEffect(() => {
+    // Leaving the server's clock for the browser's is the one thing an effect is for here.
+    // oxlint-disable-next-line react-hooks/set-state-in-effect
+    if (initial !== undefined) setNow(Date.now());
     const timer = setInterval(() => setNow(Date.now()), periodMs);
     return () => clearInterval(timer);
-  }, [periodMs]);
+  }, [periodMs, initial]);
   return now;
+}
+
+/**
+ * The viewer's IANA zone. The first render returns `initial`, the zone the server rendered for;
+ * once mounted it is the browser's own, which is also stored for the next request.
+ */
+export function useTimeZone(initial?: string): string | undefined {
+  const zone = useSyncExternalStore(
+    noop,
+    () => browserTimeZone() ?? initial,
+    () => initial,
+  );
+  useEffect(() => {
+    if (zone !== undefined) rememberTimeZone(zone);
+  }, [zone]);
+  return zone;
 }

@@ -18,6 +18,7 @@ import { PhoneShell } from '@/components/phone/phone-shell';
 import { JobsView } from '@/components/jobs/jobs-view';
 import { Overview } from '@/components/overview/overview';
 import { ReadingProvider } from '@/components/reading/reading-context';
+import { SeedProvider, type ShellSeed } from './seed';
 import { DesktopTopBar } from './top-bar';
 import { TabBar, builtinName, type TabItem } from './tab-bar';
 import { useShell } from './use-shell';
@@ -25,20 +26,42 @@ import { useShell } from './use-shell';
 const PHONE_QUERY = '(max-width: 639px)';
 const DEFAULT_PHONE_MAX_LIVE = 3;
 
-/** True below 640 px. False on the server, so the first client render matches it. */
-export function useIsPhone(): boolean {
-  return useMedia(PHONE_QUERY);
+/**
+ * True below 640 px. The server cannot measure the screen: `phoneHint` (from the request's
+ * headers) is what it and the first client render assume, and the real query takes over after.
+ */
+export function useIsPhone(phoneHint = false): boolean {
+  return useMedia(PHONE_QUERY, phoneHint);
 }
 
-export function AppShell({
-  mode,
-  phoneMaxLive = DEFAULT_PHONE_MAX_LIVE,
-}: {
+type ShellProps = {
   mode: AddressMode;
   /** `phone.maxLiveFrames` from iris.yaml: the live-frame limit below 640 px. */
   phoneMaxLive?: number;
-}) {
-  const isPhone = useIsPhone();
+  /** The server's data and clock, so the first render is the finished Overview. */
+  seed?: ShellSeed;
+  /** The viewer's zone from the `iris-tz` cookie, for the greeting. */
+  timeZone?: string;
+  /** The request looks like it comes from a phone. */
+  phoneHint?: boolean;
+};
+
+export function AppShell({ seed, ...props }: ShellProps) {
+  return (
+    <SeedProvider seed={seed}>
+      <Shell serverNow={seed?.now} {...props} />
+    </SeedProvider>
+  );
+}
+
+function Shell({
+  mode,
+  phoneMaxLive = DEFAULT_PHONE_MAX_LIVE,
+  timeZone,
+  phoneHint = false,
+  serverNow,
+}: Omit<ShellProps, 'seed'> & { serverNow?: number }) {
+  const isPhone = useIsPhone(phoneHint);
   const shell = useShell(mode, isPhone ? phoneMaxLive : DEFAULT_MAX_LIVE);
   const hostname = useHostname();
   const protocol = useProtocol();
@@ -176,7 +199,7 @@ export function AppShell({
   );
 
   return (
-    <ReadingProvider services={shell.services}>
+    <ReadingProvider services={shell.services} serverNow={serverNow} serverTimeZone={timeZone}>
       {isPhone ? (
         phone
       ) : (
