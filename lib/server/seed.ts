@@ -1,4 +1,5 @@
 import 'server-only';
+import { ENDPOINTS } from '@/lib/shared/endpoints';
 import { getConfigWatcher } from './config/services';
 import { getCronResponse } from './cron/response';
 import { loadEnv, type ServerEnv } from './env';
@@ -65,13 +66,13 @@ let env: ServerEnv | undefined;
 export function getSeed(now: number = Date.now()): Promise<Seed> {
   return buildSeed(now, {
     instant: {
-      '/api/services': () => buildServicesResponse(getState(), now),
-      '/api/status': () => buildStatusResponse(getState(), now),
+      [ENDPOINTS.services]: () => buildServicesResponse(getState(), now),
+      [ENDPOINTS.status]: () => buildStatusResponse(getState(), now),
     },
     budgeted: {
-      '/api/cron': () => getCronResponse(new Date(now)),
-      '/api/system': () => getSystem(new Date(now)),
-      '/api/widgets': () => {
+      [ENDPOINTS.cron]: () => getCronResponse(new Date(now)),
+      [ENDPOINTS.system]: () => getSystem(new Date(now)),
+      [ENDPOINTS.widgets]: () => {
         env ??= loadEnv();
         return getWidgets(getState(), getConfigWatcher().get().iris.config, env, now);
       },

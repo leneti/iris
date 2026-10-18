@@ -6,15 +6,16 @@ import { deriveReading, type Reading, type Source } from '@/lib/client/reading';
 import { isUnavailable, lastOk } from '@/lib/client/source-health';
 import { useNow, useTimeZone } from '@/lib/client/use-client';
 import type { ServicesResponse } from '@/lib/shared/contract';
+import { ENDPOINTS } from '@/lib/shared/endpoints';
 
 export const ReadingStateContext = createContext<Reading | null>(null);
 
 const URLS: Record<Source, string> = {
-  services: '/api/services',
-  status: '/api/status',
-  cron: '/api/cron',
-  system: '/api/system',
-  widgets: '/api/widgets',
+  services: ENDPOINTS.services,
+  status: ENDPOINTS.status,
+  cron: ENDPOINTS.cron,
+  system: ENDPOINTS.system,
+  widgets: ENDPOINTS.widgets,
 };
 
 /**

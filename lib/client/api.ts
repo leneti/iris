@@ -9,6 +9,7 @@ import {
   WidgetsResponse,
   parseTolerant,
 } from '@/lib/shared/contract';
+import { ENDPOINTS } from '@/lib/shared/endpoints';
 import { markOk } from './source-health';
 
 /** Browser polling intervals in milliseconds (Global Constraints, Timing). */
@@ -51,9 +52,10 @@ function useEndpoint<T>(url: string, schema: z.ZodType<T>, ms: number): SWRRespo
   return useSWR<T, Error>(url, () => fetchValidated(schema, url), pollOptions(ms));
 }
 
-export const useServices = () => useEndpoint('/api/services', ServicesResponse, POLL_MS.services);
-export const useStatus = () => useEndpoint('/api/status', StatusResponse, POLL_MS.status);
-export const useCron = () => useEndpoint('/api/cron', CronResponse, POLL_MS.cron);
-export const useSystem = () => useEndpoint('/api/system', SystemResponse, POLL_MS.system);
-export const useStreams = () => useEndpoint('/api/streams', StreamsResponse, POLL_MS.streams);
-export const useWidgets = () => useEndpoint('/api/widgets', WidgetsResponse, POLL_MS.widgets);
+export const useServices = () =>
+  useEndpoint(ENDPOINTS.services, ServicesResponse, POLL_MS.services);
+export const useStatus = () => useEndpoint(ENDPOINTS.status, StatusResponse, POLL_MS.status);
+export const useCron = () => useEndpoint(ENDPOINTS.cron, CronResponse, POLL_MS.cron);
+export const useSystem = () => useEndpoint(ENDPOINTS.system, SystemResponse, POLL_MS.system);
+export const useStreams = () => useEndpoint(ENDPOINTS.streams, StreamsResponse, POLL_MS.streams);
+export const useWidgets = () => useEndpoint(ENDPOINTS.widgets, WidgetsResponse, POLL_MS.widgets);
