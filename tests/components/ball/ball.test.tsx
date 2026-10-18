@@ -107,6 +107,7 @@ describe('Ball', () => {
       withWebGL2();
       const { container } = render(<Ball {...base} />);
       await screen.findByText('', { selector: '[data-slot="crystal-ball"]' });
+      act(() => stub.frame?.());
       expect(canvas(container).className).toContain('motion-reduce:transition-none');
       expect(still(container).className).toContain('motion-reduce:transition-none');
     });
@@ -135,6 +136,20 @@ describe('Ball', () => {
       act(() => stub.lose?.());
       expect(canvas(container)).toBeNull();
       expect(still(container).className).not.toContain('opacity-0');
+    });
+
+    test('the static ball has no delay or fade while it is the one on show', async () => {
+      withWebGL2();
+      const { container } = render(<Ball {...base} />);
+      await screen.findByText('', { selector: '[data-slot="crystal-ball"]' });
+      const slow = ['delay-300', 'duration-[900ms]', 'transition-opacity'];
+      // Waiting for the first frame, and after a lost context: back at once.
+      for (const name of slow) expect(still(container).className.split(' ')).not.toContain(name);
+      act(() => stub.frame?.());
+      for (const name of slow) expect(still(container).className.split(' ')).toContain(name);
+      act(() => stub.lose?.());
+      for (const name of slow) expect(still(container).className.split(' ')).not.toContain(name);
+      expect(still(container).className.split(' ')).not.toContain('opacity-0');
     });
 
     test('without WebGL2 there is no canvas to fade in', () => {

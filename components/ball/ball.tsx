@@ -32,8 +32,11 @@ export function Ball(props: BallProps) {
         color={props.color}
         variant={props.variant}
         className={cn(
-          'absolute inset-0 transition-opacity duration-[900ms] delay-300 motion-reduce:transition-none motion-reduce:delay-0',
-          shown && 'opacity-0',
+          'absolute inset-0',
+          // A transition uses the style it ends in. Only the fade-out has a delay and a
+          // duration: when the canvas goes away (a lost context) the static ball returns at once.
+          shown &&
+            'opacity-0 transition-opacity duration-[900ms] delay-300 motion-reduce:transition-none motion-reduce:delay-0',
         )}
       />
       {live && (
