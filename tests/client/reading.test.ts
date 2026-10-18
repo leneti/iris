@@ -876,7 +876,14 @@ describe('loading', () => {
 
   test('a cron answer with no jobs is an empty list, not loading', () => {
     const i = { ...calm(), cron: { ...calm().cron!, jobs: [] } };
-    expect(read(i).hours).toEqual({ rows: [{ kind: 'now', time: '13:00' }] });
+    // `calm().now` is local time; the row reads it in the cron zone.
+    const london = new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/London',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).format(calm().now);
+    expect(read(i).hours).toEqual({ rows: [{ kind: 'now', time: london }] });
   });
 
   test('a failing cron source is unavailable, whether or not it ever answered', () => {

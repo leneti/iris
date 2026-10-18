@@ -71,7 +71,8 @@ afterEach(() => {
 
 describe('the server-rendered Overview', () => {
   test('a full seed gives the circle and the real sentence, not the pending text', () => {
-    const html = renderToString(tree({ mode: 'lan', seed: full }));
+    // The page always passes a zone; 13:00 UTC is the afternoon.
+    const html = renderToString(tree({ mode: 'lan', seed: full, timeZone: 'UTC' }));
     expect(html).not.toContain('Reading the signs');
     for (const name of ['Alpha', 'Beta', 'Gamma']) expect(html).toContain(name);
     expect(html).toMatch(/Good afternoon\.|Afternoon!|Mid-day quadrant reached\./);
