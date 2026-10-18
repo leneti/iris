@@ -3148,6 +3148,7 @@ __metadata:
     ogl: "npm:1.0.11"
     oxfmt: "npm:0.71.0"
     oxlint: "npm:1.86.0"
+    playwright-core: "npm:1.58.2"
     radix-ui: "npm:1.6.7"
     react: "npm:19.3.0"
     react-dom: "npm:19.3.0"
@@ -3832,6 +3833,15 @@ __metadata:
   version: 4.0.7
   resolution: "picomatch@npm:4.0.7"
   checksum: 10c0/beb6ae02c43ae44e84883b90830196d9046b1726ead292adcf7f57945e0bb0d992d68563d87e03b484b6f3c9a5c6defda7523477f047d7f0e663f126cc01787f
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.58.2":
+  version: 1.58.2
+  resolution: "playwright-core@npm:1.58.2"
+  bin:
+    playwright-core: cli.js
+  checksum: 10c0/5aa15b2b764e6ffe738293a09081a6f7023847a0dbf4cd05fe10eed2e25450d321baf7482f938f2d2eb330291e197fa23e57b29a5b552b89927ceb791266225b
   languageName: node
   linkType: hard
 
