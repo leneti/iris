@@ -36,7 +36,7 @@ export type Target =
 export type Segment = { text: string; kind?: 'fact' | 'bad' | 'strain'; target?: Target };
 export type BallState = {
   color: '#f25bd0' | '#ff7a6b';
-  motion: 'drift' | 'fall';
+  motion: 'rise' | 'fall';
   crackle: number;
   sparks: number;
   flares: number;
@@ -260,10 +260,10 @@ function ballFor(f: Figures | null, wrong: boolean): BallState {
   const c = clamp(f?.cpu ?? 0, 0, 100) / 100;
   return {
     color: wrong ? CORAL : PINK,
-    motion: wrong ? 'fall' : 'drift',
+    motion: wrong ? 'fall' : 'rise',
     crackle: 0.12 + 0.88 * c,
     sparks: 0.2 + 0.8 * c,
-    flares: 0.3 + 0.7 * c,
+    flares: 0.4 + 0.6 * c,
     speed: 0.8 + 1.4 * c,
     fill: clamp(f?.memory ?? 0, 0, 100) / 100,
   };

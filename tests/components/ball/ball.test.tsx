@@ -34,7 +34,7 @@ vi.mock('@/components/ball/crystal-ball', async () => {
 
 const base: BallProps = {
   color: '#f25bd0',
-  motion: 'drift',
+  motion: 'rise',
   crackle: 0.3,
   sparks: 0.4,
   flares: 0.5,

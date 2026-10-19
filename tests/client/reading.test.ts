@@ -41,7 +41,7 @@ describe('reading text', () => {
     expect(r.wrong).toBe(false);
     expect(r.pending).toBe(false);
     expect(r.eyebrow).toBe('the reading');
-    expect(r.ball).toMatchObject({ color: '#f25bd0', motion: 'drift' });
+    expect(r.ball).toMatchObject({ color: '#f25bd0', motion: 'rise' });
     expect(r.colour).toBe('4/4 well');
     expect(r.segments.find((s) => s.text === 'All 3 of your services')).toMatchObject({
       kind: 'fact',
@@ -262,8 +262,8 @@ describe('ball', () => {
     expect(b0.sparks).toBeCloseTo(0.2);
     expect(b50.sparks).toBeCloseTo(0.6);
     expect(b100.sparks).toBeCloseTo(1);
-    expect(b0.flares).toBeCloseTo(0.3);
-    expect(b50.flares).toBeCloseTo(0.65);
+    expect(b0.flares).toBeCloseTo(0.4);
+    expect(b50.flares).toBeCloseTo(0.7);
     expect(b100.flares).toBeCloseTo(1);
     expect(b0.speed).toBeCloseTo(0.8);
     expect(b50.speed).toBeCloseTo(1.5);
@@ -275,7 +275,7 @@ describe('ball', () => {
 
   test('missing cpu and memory give the resting ball', () => {
     const b = read(withSystem(calm(), { cpu: null, memory: null })).ball;
-    expect(b).toMatchObject({ fill: 0, motion: 'drift', color: '#f25bd0' });
+    expect(b).toMatchObject({ fill: 0, motion: 'rise', color: '#f25bd0' });
     expect(b.crackle).toBeCloseTo(0.12);
     expect(b.speed).toBeCloseTo(0.8);
   });
@@ -682,7 +682,7 @@ describe('resilience', () => {
     expect(r.pending).toBe(true);
     expect(r.segments).toEqual([{ text: 'Reading the signs…' }]);
     expect(r.wrong).toBe(false);
-    expect(r.ball).toMatchObject({ color: '#f25bd0', motion: 'drift' });
+    expect(r.ball).toMatchObject({ color: '#f25bd0', motion: 'rise' });
   });
 
   test('every source unavailable does not throw and says it cannot see the services', () => {

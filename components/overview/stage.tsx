@@ -124,7 +124,7 @@ export function Stage({
       <div
         className={cn(
           'relative mt-2 overflow-hidden lg:mt-0 lg:overflow-visible',
-          phone ? 'h-[300px]' : 'h-[420px]',
+          phone ? 'h-[350px]' : 'h-[420px]',
         )}
       >
         <div
@@ -140,7 +140,7 @@ export function Stage({
           data-slot="ballbox"
           className={cn(
             'absolute top-0 left-1/2',
-            phone ? 'size-[300px] -ml-[150px]' : 'size-[420px] -ml-[210px]',
+            phone ? 'size-[350px] -ml-[175px]' : 'size-[420px] -ml-[210px]',
           )}
         >
           <SectionBoundary

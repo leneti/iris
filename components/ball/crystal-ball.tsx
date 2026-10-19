@@ -37,7 +37,7 @@ export type CrystalBallProps = BallState & {
 
 // The "plasma" preset, with the values the redesign overrides (07 passes these).
 const PLASMA = {
-  strands: 5,
+  strands: 2,
   glow: 0.9,
   haze: 0.7,
   depth: 0.6,
@@ -46,7 +46,10 @@ const PLASMA = {
   dustSpeed: 1,
   particleShape: 'square',
 } as const;
-const PARTICLES = { desktop: 15000, phone: 9000 } as const;
+// The most grains each variant holds; how many show follows the memory fill (DUST_SHOWN).
+const PARTICLES = { desktop: 18000, phone: 11000 } as const;
+// The share of the grains on show, from an empty memory to a full one.
+const DUST_SHOWN = { empty: 0.2, full: 1 } as const;
 
 const MOTIONS = { rise: 0, fall: 1, drift: 2, orbit: 3 } as const;
 const SHAPES = { square: 0, round: 1 } as const;
@@ -244,6 +247,7 @@ export default function CrystalBall({
       uTones: { value: new Array<number>(15).fill(1) },
       uRimTone: { value: [1, 1, 1] } as Uniform<number[]>,
       uShape: { value: 0 },
+      uShown: { value: 1 },
     };
 
     const stirUniforms = {
@@ -623,6 +627,8 @@ export default function CrystalBall({
       dustUniforms.uTones.value = palette.tones.flat();
       dustUniforms.uRimTone.value = palette.rim;
       dustUniforms.uShape.value = SHAPES[PLASMA.particleShape];
+      dustUniforms.uShown.value =
+        DUST_SHOWN.empty + (DUST_SHOWN.full - DUST_SHOWN.empty) * clamp(s.fill, 0, 1);
 
       const layer = dust;
       if (layer && stirMesh && (stirEnergy > 0.002 || kick)) stirring = SETTLE_SECONDS;

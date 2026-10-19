@@ -32,7 +32,7 @@ export const buildStrands = (): StrandData => {
       data.phases.push(random() * Math.PI * 2);
     });
     for (let j = 0; j < 3; j++) {
-      data.flareHarmonics.push(4 + Math.floor(random() * 6));
+      data.flareHarmonics.push(6 + Math.floor(random() * 7));
       data.flareRates.push((0.4 + random() * 0.8) * (random() < 0.5 ? -1 : 1));
       data.flarePhases.push(random() * Math.PI * 2);
     }

@@ -273,6 +273,7 @@ uniform float uReveal;
 uniform float uEncode;
 uniform vec3 uTones[5];
 uniform vec3 uRimTone;
+uniform float uShown;
 
 out vec3 vColor;
 out float vSize;
@@ -300,18 +301,20 @@ void main() {
   float order = (home.y + 1.0) * 0.5 * 0.55 + random(id * 7u + 8u) * 0.25;
   float reveal = smoothstep(order, order + 0.2, uReveal * 1.0);
   float alpha = random(id * 7u + 9u) < 0.5 || home.w > 3.5 ? 1.0 : 0.6;
+  // Only a share of the grains is on show; the rest fade out as the share falls past them.
+  float kept = 1.0 - smoothstep(uShown - 0.04, uShown, random(id * 3u + 90001u));
 
   float size = seed.x * uPointScale * (0.35 + 0.95 * life) * depthSize * mix(0.5, 1.0, reveal);
   vec2 screen = uCenter + p.xy * uRadius;
   gl_Position = vec4(screen / uViewport * 2.0 - 1.0, 0.0, 1.0);
   float px = size * uDpr;
-  gl_PointSize = px + 2.0;
+  gl_PointSize = kept > 0.0 ? px + 2.0 : 0.0;
   vSize = px;
 
   int tone = int(home.w + 0.5);
   float rimLit = smoothstep(0.8, 0.97, length(p.xy));
   vec3 color = uTones[tone] + uRimTone * rimLit * rimLit * 0.12;
-  vColor = color * alpha * fade * twinkle * depthLight * reveal * inside * sqrt(spread) * uEncode;
+  vColor = color * alpha * fade * twinkle * depthLight * reveal * inside * sqrt(spread) * kept * uEncode;
 }
 `;
 
