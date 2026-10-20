@@ -56,6 +56,8 @@ export type CircleRow =
   | { kind: 'group'; group: CircleGroup }
   | { kind: 'pair'; groups: CircleGroup[] };
 export type Meter = { label: string; value: string; percent: number | null; hot: boolean };
+/** The fullest disk: its printed figure, the bar's width, and used of total when known. */
+export type Storage = { value: string; percent: number; space: string | null; hot: boolean };
 export type HourRow =
   | { kind: 'done' | 'fail' | 'idle'; time: string; name: string; note: string }
   | { kind: 'gap'; text: string }
@@ -91,7 +93,7 @@ export type Reading = {
     host:
       | { unavailable: true }
       | { loading: true }
-      | { word: 'Calm' | 'Straining'; parts: string[] };
+      | { word: 'Calm' | 'Straining'; parts: string[]; storage: Storage | null };
     sky: { unavailable: true } | { loading: true } | { text: string } | null;
   };
   foot: { links: { name: string; url: string }[]; quiet: string[] };
@@ -578,6 +580,21 @@ function markets(widgets: WidgetsResponse | undefined, down: boolean): Reading['
   return mine.some((w) => isFailed(w.state)) ? { unavailable: true } : null;
 }
 
+/** The fullest disk as a meter; hot on the same "over 90%" as the straining sentence. */
+function storageOf(disks: Figures['disks']): Storage | null {
+  if (disks.length === 0) return null;
+  const d = disks.reduce((a, b) => (b.percent > a.percent ? b : a));
+  return {
+    value: `${Math.round(d.percent)}%`,
+    percent: clamp(d.percent, 0, 100),
+    space:
+      d.used !== null && d.total !== null
+        ? `${formatBytes(d.used)} of ${formatBytes(d.total)}`
+        : null,
+    hot: Math.round(d.percent) > 90,
+  };
+}
+
 function hostOmen(
   f: Figures | null,
   straining: boolean,
@@ -588,18 +605,9 @@ function hostOmen(
   const parts: string[] = [];
   if (f.cpu !== null) parts.push(`CPU ${Math.round(f.cpu)}%`);
   if (f.memory !== null) parts.push(`memory ${Math.round(f.memory)}%`);
-  if (f.disks.length > 0) {
-    const d = f.disks.reduce((a, b) => (b.percent > a.percent ? b : a));
-    // The fullest disk's space too, when Glances sent both figures.
-    const space =
-      d.used !== null && d.total !== null
-        ? ` (${formatBytes(d.used)} of ${formatBytes(d.total)})`
-        : '';
-    parts.push(`storage ${Math.round(d.percent)}%${space}`);
-  }
   if (f.temp !== null) parts.push(`${Math.round(f.temp)}°C`);
   if (f.uptime !== null) parts.push(`up ${formatDuration(f.uptime)}`);
-  return { word: straining ? 'Straining' : 'Calm', parts };
+  return { word: straining ? 'Straining' : 'Calm', parts, storage: storageOf(f.disks) };
 }
 
 function sky(widgets: WidgetsResponse | undefined, down: boolean): Reading['omens']['sky'] {

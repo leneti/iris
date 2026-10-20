@@ -1,6 +1,7 @@
 'use client';
 
 import { useReading } from '@/components/reading/reading-context';
+import type { Storage } from '@/lib/client/reading';
 import { cn } from '@/lib/utils';
 import { REGION } from './focus-region';
 import { Heading, Quiet } from './heading';
@@ -20,9 +21,37 @@ function Line() {
   );
 }
 
+const PINK_FILL =
+  'bg-[linear-gradient(90deg,rgb(242_91_208/.55),var(--color-pink))] shadow-[0_0_10px_var(--color-pink-glow)]';
+
+/** The fullest disk as a bar under the host's figures; coral like the meters when wrong. */
+function StorageBar({ storage, wrong }: { storage: Storage; wrong: boolean }) {
+  return (
+    <div
+      data-slot="storage"
+      className="mt-[10px] flex items-center gap-3 font-mono text-xs whitespace-nowrap"
+    >
+      <span className="tracking-[.06em] text-faint">storage</span>
+      <i
+        aria-hidden
+        className="relative block h-2 min-w-[60px] flex-1 overflow-hidden rounded-full bg-surface-2"
+      >
+        <i
+          data-slot="storage-fill"
+          style={{ width: `${storage.percent}%` }}
+          className={cn('absolute inset-y-0 left-0 rounded-full', wrong ? 'bg-down' : PINK_FILL)}
+        />
+      </i>
+      <b className={cn('font-medium', storage.hot ? 'text-warn' : 'text-text')}>{storage.value}</b>
+      {storage.space && <span className="text-muted">{storage.space}</span>}
+    </div>
+  );
+}
+
 /** Markets, the host and the sky, in the order they matter. */
 export function Omens({ touch: _touch = false }: { touch?: boolean }) {
-  const { markets, host, sky } = useReading().omens;
+  const { omens, wrong } = useReading();
+  const { markets, host, sky } = omens;
   const busy =
     (markets !== null && 'loading' in markets) ||
     'loading' in host ||
@@ -65,17 +94,22 @@ export function Omens({ touch: _touch = false }: { touch?: boolean }) {
         ) : 'unavailable' in host ? (
           <Quiet>—</Quiet>
         ) : (
-          <div className={OMEN}>
-            {host.word}
-            {host.parts.length > 0 ? ': ' : ''}
-            {host.parts.map((part, i) => (
-              <span key={part}>
-                {i > 0 && ', '}
-                <span className={NUM}>{part}</span>
-              </span>
-            ))}
-            .
-          </div>
+          <>
+            <div className={OMEN}>
+              {host.word}
+              {host.parts.length > 0 ? ': ' : ''}
+              {host.parts.map((part, i) => (
+                <span key={part}>
+                  {i > 0 && (
+                    <span className="font-mono text-[14px] whitespace-pre text-faint"> | </span>
+                  )}
+                  <span className={NUM}>{part}</span>
+                </span>
+              ))}
+              .
+            </div>
+            {host.storage && <StorageBar storage={host.storage} wrong={wrong} />}
+          </>
         )}
       </div>
       {sky !== null && (

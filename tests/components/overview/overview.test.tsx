@@ -295,6 +295,23 @@ describe('the omens', () => {
     expect(document.getElementById('ov-host')?.textContent).toContain('Calm: ');
     expect(document.getElementById('ov-sky')?.textContent).toContain('Cloudy over Hometown');
   });
+
+  test('the host separates its figures with bars and draws storage as a meter', () => {
+    show(
+      read(
+        withSystem(calm(), {
+          disks: [{ label: 'Media disk', percent: 93, usedBytes: 18e12, totalBytes: 20e12 }],
+        }),
+      ),
+    );
+    const host = document.getElementById('ov-host');
+    expect(host?.textContent).toContain('CPU 23% | memory 61% | 54°C | up 12 d 4 h.');
+    expect(host?.textContent).not.toContain('storage 93%');
+    const fill = host?.querySelector<HTMLElement>('[data-slot="storage-fill"]');
+    expect(fill?.style.width).toBe('93%');
+    expect(host?.textContent).toContain('18 TB of 20 TB');
+    expect(screen.getByText('93%').className).toContain('text-warn');
+  });
 });
 
 describe('the footer', () => {

@@ -636,7 +636,7 @@ describe('omens', () => {
     expect(read(i).omens.markets).toEqual({ unavailable: true });
   });
 
-  test('host omen lists CPU, memory, highest disk, temperature and uptime; omits a missing figure', () => {
+  test('host omen lists CPU, memory, temperature and uptime; storage is the fullest disk, apart', () => {
     const full = read(
       withSystem(calm(), {
         disks: [
@@ -647,13 +647,18 @@ describe('omens', () => {
     ).omens.host;
     expect(full).toEqual({
       word: 'Calm',
-      parts: ['CPU 23%', 'memory 61%', 'storage 86%', '54°C', 'up 12 d 4 h'],
+      parts: ['CPU 23%', 'memory 61%', '54°C', 'up 12 d 4 h'],
+      storage: { value: '86%', percent: 86, space: null, hot: false },
     });
     const partial = read(withSystem(calm(), { cpu: null, temp: null, disks: [] })).omens.host;
-    expect(partial).toEqual({ word: 'Calm', parts: ['memory 61%', 'up 12 d 4 h'] });
+    expect(partial).toEqual({
+      word: 'Calm',
+      parts: ['memory 61%', 'up 12 d 4 h'],
+      storage: null,
+    });
   });
 
-  test('host omen gives the fullest disk its used and total space when Glances sends them', () => {
+  test('host storage gives used and total space when Glances sends both', () => {
     const host = read(
       withSystem(calm(), {
         disks: [
@@ -662,14 +667,27 @@ describe('omens', () => {
         ],
       }),
     ).omens.host;
-    expect(host).toEqual({
-      word: 'Calm',
-      parts: ['CPU 23%', 'memory 61%', 'storage 86% (430 GB of 500 GB)', '54°C', 'up 12 d 4 h'],
+    expect('storage' in host && host.storage).toEqual({
+      value: '86%',
+      percent: 86,
+      space: '430 GB of 500 GB',
+      hot: false,
     });
     const noTotal = read(
       withSystem(calm(), { disks: [{ label: 'Cache', percent: 86, usedBytes: 430e9 }] }),
     ).omens.host;
-    expect('parts' in noTotal && noTotal.parts).toContain('storage 86%');
+    expect('storage' in noTotal && noTotal.storage && noTotal.storage.space).toBeNull();
+  });
+
+  test('host storage is hot over 90% as printed, and the bar is clamped', () => {
+    const at = (percent: number) => {
+      const host = read(withSystem(calm(), { disks: [{ label: 'Media disk', percent }] })).omens
+        .host;
+      return 'storage' in host ? host.storage : undefined;
+    };
+    expect(at(90.4)).toMatchObject({ value: '90%', hot: false });
+    expect(at(90.6)).toMatchObject({ value: '91%', hot: true });
+    expect(at(104)).toMatchObject({ percent: 100 });
   });
 
   test('sky omen has no time-of-day phrase', () => {
