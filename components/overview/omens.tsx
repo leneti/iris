@@ -42,7 +42,13 @@ function StorageBar({ storage, wrong }: { storage: Storage; wrong: boolean }) {
           className={cn('absolute inset-y-0 left-0 rounded-full', wrong ? 'bg-down' : PINK_FILL)}
         />
       </i>
-      <b className={cn('font-medium', storage.hot ? 'text-warn' : 'text-text')}>{storage.value}</b>
+      {/* "used" says which end of the bar is filled. */}
+      <span>
+        <b className={cn('font-medium', storage.hot ? 'text-warn' : 'text-text')}>
+          {storage.value}
+        </b>{' '}
+        <span className="text-faint">used</span>
+      </span>
       {storage.space && <span className="text-muted">{storage.space}</span>}
     </div>
   );

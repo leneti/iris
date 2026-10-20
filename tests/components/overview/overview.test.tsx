@@ -309,6 +309,7 @@ describe('the omens', () => {
     expect(host?.textContent).not.toContain('storage 93%');
     const fill = host?.querySelector<HTMLElement>('[data-slot="storage-fill"]');
     expect(fill?.style.width).toBe('93%');
+    expect(host?.textContent).toContain('93% used');
     expect(host?.textContent).toContain('18 TB of 20 TB');
     expect(screen.getByText('93%').className).toContain('text-warn');
   });
