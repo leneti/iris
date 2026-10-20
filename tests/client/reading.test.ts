@@ -653,6 +653,25 @@ describe('omens', () => {
     expect(partial).toEqual({ word: 'Calm', parts: ['memory 61%', 'up 12 d 4 h'] });
   });
 
+  test('host omen gives the fullest disk its used and total space when Glances sends them', () => {
+    const host = read(
+      withSystem(calm(), {
+        disks: [
+          { label: 'Media disk', percent: 40, usedBytes: 1.6e12, totalBytes: 4e12 },
+          { label: 'Cache', percent: 86, usedBytes: 430e9, totalBytes: 500e9 },
+        ],
+      }),
+    ).omens.host;
+    expect(host).toEqual({
+      word: 'Calm',
+      parts: ['CPU 23%', 'memory 61%', 'storage 86% (430 GB of 500 GB)', '54°C', 'up 12 d 4 h'],
+    });
+    const noTotal = read(
+      withSystem(calm(), { disks: [{ label: 'Cache', percent: 86, usedBytes: 430e9 }] }),
+    ).omens.host;
+    expect('parts' in noTotal && noTotal.parts).toContain('storage 86%');
+  });
+
   test('sky omen has no time-of-day phrase', () => {
     const sky = read(calm()).omens.sky;
     expect(sky).toEqual({ text: 'Cloudy over Hometown, 15°C.' });

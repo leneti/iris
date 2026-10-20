@@ -75,7 +75,12 @@ export function systemOf(
   fig: {
     cpu?: number | null;
     memory?: number | null;
-    disks?: { label: string; percent: number | null }[];
+    disks?: {
+      label: string;
+      percent: number | null;
+      usedBytes?: number | null;
+      totalBytes?: number | null;
+    }[];
     temp?: number | null;
     uptime?: number | null;
     state?: SystemResponse['source']['state'];
@@ -95,7 +100,7 @@ export function systemOf(
       level: 'ok',
     },
     memory: { percent: has('memory') ? (fig.memory ?? null) : 61, ...none },
-    disks: (fig.disks ?? [{ label: 'Media disk', percent: 40 }]).map((d) => ({ ...d, ...none })),
+    disks: (fig.disks ?? [{ label: 'Media disk', percent: 40 }]).map((d) => ({ ...none, ...d })),
     network: { rxBitsPerSec: null, txBitsPerSec: null },
     temperature: {
       label: 'CPU',

@@ -1,6 +1,6 @@
 // The reading: one pure derivation from the five polled responses to everything the Overview
 // draws (sentence, meters, ball, circle, hours, omens, footer). No React, no `server-only`.
-import { clock, formatDuration } from './format';
+import { clock, formatBytes, formatDuration } from './format';
 import { isDown } from './health';
 import type { Source } from './source-health';
 import { formatStat, isFailed } from './stats';
@@ -214,7 +214,7 @@ type Figures = {
   memory: number | null;
   temp: number | null;
   uptime: number | null;
-  disks: { label: string; percent: number }[];
+  disks: { label: string; percent: number; used: number | null; total: number | null }[];
 };
 
 /** Figures from a system response that is there and says it is ok; otherwise all missing. */
@@ -227,7 +227,9 @@ function figuresOf(system: SystemResponse | undefined): Figures | null {
     uptime: num(system.uptimeSeconds),
     disks: system.disks.flatMap((d) => {
       const percent = num(d.percent);
-      return percent === null ? [] : [{ label: d.label, percent }];
+      return percent === null
+        ? []
+        : [{ label: d.label, percent, used: num(d.usedBytes), total: num(d.totalBytes) }];
     }),
   };
 }
@@ -587,7 +589,13 @@ function hostOmen(
   if (f.cpu !== null) parts.push(`CPU ${Math.round(f.cpu)}%`);
   if (f.memory !== null) parts.push(`memory ${Math.round(f.memory)}%`);
   if (f.disks.length > 0) {
-    parts.push(`storage ${Math.round(Math.max(...f.disks.map((d) => d.percent)))}%`);
+    const d = f.disks.reduce((a, b) => (b.percent > a.percent ? b : a));
+    // The fullest disk's space too, when Glances sent both figures.
+    const space =
+      d.used !== null && d.total !== null
+        ? ` (${formatBytes(d.used)} of ${formatBytes(d.total)})`
+        : '';
+    parts.push(`storage ${Math.round(d.percent)}%${space}`);
   }
   if (f.temp !== null) parts.push(`${Math.round(f.temp)}°C`);
   if (f.uptime !== null) parts.push(`up ${formatDuration(f.uptime)}`);
