@@ -427,7 +427,9 @@ describe('layout', () => {
   test('the desktop grid fits without clipping', () => {
     const { container } = show();
     expect(container.firstElementChild?.className).toContain('lg:overflow-hidden');
-    expect(container.firstElementChild?.className).toContain('lg:grid-cols-[620px_minmax(0,1fr)]');
+    expect(container.firstElementChild?.className).toContain(
+      'lg:grid-cols-[minmax(0,1fr)_620px_minmax(0,1380px)_minmax(0,1fr)]',
+    );
     expect(slot('overview-hero').className).toContain('lg:overflow-y-auto');
     expect(slot('overview-rest').className).toContain('lg:overflow-y-auto');
     expect(slot('overview-two').className).toContain('grid');
@@ -436,8 +438,12 @@ describe('layout', () => {
   test('wide screens keep it centred; the right side follows its own width', () => {
     const { container } = show();
     const root = container.firstElementChild?.className ?? '';
-    expect(root).toContain('lg:max-w-[1680px]');
-    expect(root).toContain('lg:mx-auto');
+    // 620 + 1380: at most 2000 px, with equal empty margins either side.
+    expect(root).toContain('620px_minmax(0,1380px)');
+    // The hero reaches into the left margin, so the haze is not cut at its edge.
+    expect(slot('overview-hero').className).toContain('lg:-ml-[120px]');
+    expect(slot('overview-hero').className).toContain('lg:col-start-2');
+    expect(slot('overview-rest').className).toContain('lg:col-start-3');
     expect(slot('overview-rest').className).toContain('@container');
     expect(slot('overview-two').className).toContain('@min-[720px]:grid-cols-2');
     expect(slot('overview-two').className).not.toContain('md:grid-cols-2');

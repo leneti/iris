@@ -16,11 +16,13 @@ export { focusRegion } from './focus-region';
  */
 export function Overview({ onOpenService }: { onOpenService: (id: string) => void }) {
   const [hover, setHover] = useState(false);
+  // On wide screens the two panels (620 + up to 1380 px) sit between equal empty margins. The
+  // hero reaches 120 px into the left margin, so its haze is not cut at the panel's edge.
   return (
-    <div className="h-full lg:mx-auto lg:grid lg:max-w-[1680px] lg:grid-cols-[620px_minmax(0,1fr)] lg:overflow-hidden">
+    <div className="h-full lg:grid lg:grid-cols-[minmax(0,1fr)_620px_minmax(0,1380px)_minmax(0,1fr)] lg:overflow-hidden">
       <div
         data-slot="overview-hero"
-        className="px-4 pb-6 lg:flex lg:min-h-0 lg:flex-col lg:justify-center lg:overflow-x-hidden lg:overflow-y-auto lg:border-r lg:border-line lg:pr-9 lg:pb-4 lg:pl-11"
+        className="px-4 pb-6 lg:col-start-2 lg:row-start-1 lg:-ml-[120px] lg:flex lg:min-h-0 lg:flex-col lg:justify-center lg:overflow-x-hidden lg:overflow-y-auto lg:border-r lg:border-line lg:pr-9 lg:pb-4 lg:pl-[164px]"
       >
         <SectionBoundary name="stage">
           <Stage onOpenService={onOpenService} hover={hover} />
@@ -28,7 +30,7 @@ export function Overview({ onOpenService }: { onOpenService: (id: string) => voi
       </div>
       <div
         data-slot="overview-rest"
-        className="@container px-4 lg:flex lg:min-h-0 lg:flex-col lg:overflow-y-auto lg:px-6 xl:pr-11 xl:pl-10"
+        className="@container px-4 lg:col-start-3 lg:row-start-1 lg:flex lg:min-h-0 lg:flex-col lg:overflow-y-auto lg:px-6 xl:pr-11 xl:pl-10"
       >
         <SectionBoundary name="circle">
           <Circle onOpenService={onOpenService} onHover={setHover} />
