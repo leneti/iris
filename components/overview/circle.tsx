@@ -8,6 +8,9 @@ import { Heading, Quiet } from './heading';
 import { REGION } from './focus-region';
 import { Bar } from './placeholder';
 
+/** Away from the phone, as many columns as the Overview's right side has room for. */
+const WIDE = 'grid-cols-1 @min-[300px]:grid-cols-2 @min-[540px]:grid-cols-3';
+
 const DOT: Record<ChipState, string> = {
   ok: 'bg-ok',
   warn: 'bg-warn',
@@ -103,12 +106,7 @@ function Group({
       <h4 className="mb-[6px] font-mono text-[11px] font-medium tracking-[.08em] text-faint lowercase lg:mb-1">
         {group.name}
       </h4>
-      <div
-        className={cn(
-          'grid gap-[6px]',
-          single ? 'grid-cols-1' : touch ? 'grid-cols-2' : 'grid-cols-3',
-        )}
-      >
+      <div className={cn('grid gap-[6px]', single ? 'grid-cols-1' : touch ? 'grid-cols-2' : WIDE)}>
         {group.chips.map((chip) => (
           <ChipView
             key={chip.id}
@@ -131,10 +129,7 @@ function Placeholder({ touch }: { touch: boolean }) {
     <div
       aria-hidden
       data-slot="circle-placeholder"
-      className={cn(
-        'grid h-[200px] content-start gap-[6px]',
-        touch ? 'grid-cols-2' : 'grid-cols-3',
-      )}
+      className={cn('grid h-[200px] content-start gap-[6px]', touch ? 'grid-cols-2' : WIDE)}
     >
       {Array.from({ length: PLACEHOLDER_CHIPS }, (_, i) => (
         <div
@@ -202,7 +197,7 @@ export function Circle({
           <div
             key={i}
             data-slot="pair"
-            className={cn('grid gap-x-[6px]', touch ? 'grid-cols-2' : 'grid-cols-3')}
+            className={cn('grid gap-x-[6px]', touch ? 'grid-cols-2' : WIDE)}
           >
             {row.groups.map((group) => (
               <Group

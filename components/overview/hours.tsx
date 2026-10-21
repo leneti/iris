@@ -42,7 +42,9 @@ function Row({ row }: { row: HourRow }) {
         {row.time}
       </span>
       <span className={cn('min-w-0 flex-1', failed && 'text-down')}>{row.name}</span>
-      <small className={cn('font-mono text-xs', failed ? 'text-down' : 'text-faint')}>
+      <small
+        className={cn('font-mono text-xs whitespace-nowrap', failed ? 'text-down' : 'text-faint')}
+      >
         {row.note}
       </small>
     </li>

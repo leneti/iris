@@ -433,6 +433,24 @@ describe('layout', () => {
     expect(slot('overview-two').className).toContain('grid');
   });
 
+  test('wide screens keep it centred; the right side follows its own width', () => {
+    const { container } = show();
+    const root = container.firstElementChild?.className ?? '';
+    expect(root).toContain('lg:max-w-[1680px]');
+    expect(root).toContain('lg:mx-auto');
+    expect(slot('overview-rest').className).toContain('@container');
+    expect(slot('overview-two').className).toContain('@min-[720px]:grid-cols-2');
+    expect(slot('overview-two').className).not.toContain('md:grid-cols-2');
+    for (const group of document.querySelectorAll('#ov-circle [data-slot="group"] > div')) {
+      expect(group.className).toMatch(/grid-cols-1( |$)/);
+    }
+    const multi = [...document.querySelectorAll('#ov-circle [data-slot="group"] > div')].filter(
+      (el) => el.className.includes('@min-[540px]:grid-cols-3'),
+    );
+    expect(multi.length).toBeGreaterThan(0);
+    for (const el of multi) expect(el.className).toContain('@min-[300px]:grid-cols-2');
+  });
+
   test('no Now playing, no old panels', () => {
     show();
     expect(screen.queryByText('Now playing')).toBeNull();

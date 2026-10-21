@@ -29,12 +29,12 @@ function StorageBar({ storage, wrong }: { storage: Storage; wrong: boolean }) {
   return (
     <div
       data-slot="storage"
-      className="mt-[10px] flex items-center gap-3 font-mono text-xs whitespace-nowrap"
+      className="mt-[10px] flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-xs whitespace-nowrap"
     >
       <span className="tracking-[.06em] text-faint">storage</span>
       <i
         aria-hidden
-        className="relative block h-2 min-w-[60px] flex-1 overflow-hidden rounded-full bg-surface-2"
+        className="relative block h-2 min-w-[60px] flex-[1_1_140px] overflow-hidden rounded-full bg-surface-2"
       >
         <i
           data-slot="storage-fill"
@@ -42,14 +42,16 @@ function StorageBar({ storage, wrong }: { storage: Storage; wrong: boolean }) {
           className={cn('absolute inset-y-0 left-0 rounded-full', wrong ? 'bg-down' : PINK_FILL)}
         />
       </i>
-      {/* "used" says which end of the bar is filled. */}
-      <span>
-        <b className={cn('font-medium', storage.hot ? 'text-warn' : 'text-text')}>
-          {storage.value}
-        </b>{' '}
-        <span className="text-faint">used</span>
+      {/* "used" says which end of the bar is filled; the figures drop under the bar when short of room. */}
+      <span className="flex gap-x-3">
+        <span>
+          <b className={cn('font-medium', storage.hot ? 'text-warn' : 'text-text')}>
+            {storage.value}
+          </b>{' '}
+          <span className="text-faint">used</span>
+        </span>
+        {storage.space && <span className="text-muted">{storage.space}</span>}
       </span>
-      {storage.space && <span className="text-muted">{storage.space}</span>}
     </div>
   );
 }
@@ -107,9 +109,12 @@ export function Omens({ touch: _touch = false }: { touch?: boolean }) {
               {host.parts.map((part, i) => (
                 <span key={part}>
                   {i > 0 && (
-                    <span className="font-mono text-[14px] whitespace-pre text-faint"> | </span>
+                    <span className="font-mono text-[14px] whitespace-pre-wrap text-faint">
+                      {' '}
+                      |{' '}
+                    </span>
                   )}
-                  <span className={NUM}>{part}</span>
+                  <span className={cn(NUM, 'whitespace-nowrap')}>{part}</span>
                 </span>
               ))}
               .
