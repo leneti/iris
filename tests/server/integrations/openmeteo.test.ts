@@ -24,7 +24,7 @@ const LON = -0.582614;
 const env = loadEnv({});
 const T0 = new Date('2026-10-16T12:00:00.000Z').getTime();
 const ROUTE = (tz = 'Europe%2FLondon', unit = 'celsius') =>
-  `/v1/forecast?latitude=0.74&longitude=-0.58&current=temperature_2m,weather_code,is_day&timezone=${tz}&temperature_unit=${unit}`;
+  `/v1/forecast?latitude=0.74&longitude=-0.58&current=temperature_2m,weather_code,is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=${tz}&temperature_unit=${unit}&wind_speed_unit=${unit === 'celsius' ? 'ms' : 'mph'}`;
 
 function config(weather: Record<string, unknown> | null = {}): IrisConfig {
   const base = defaultIrisConfig();
@@ -74,9 +74,12 @@ describe('openmeteo', () => {
     expect(url.pathname).toBe('/v1/forecast');
     expect(url.searchParams.get('latitude')).toBe('0.74');
     expect(url.searchParams.get('longitude')).toBe('-0.58');
-    expect(url.searchParams.get('current')).toBe('temperature_2m,weather_code,is_day');
+    expect(url.searchParams.get('current')).toBe(
+      'temperature_2m,weather_code,is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m',
+    );
     expect(url.searchParams.get('timezone')).toBe('Europe/London');
     expect(url.searchParams.get('temperature_unit')).toBe('celsius');
+    expect(url.searchParams.get('wind_speed_unit')).toBe('ms');
     expect(calls[0]!.url).not.toContain('0.736291');
     expect(calls[0]!.url).not.toContain('0.582614');
   });
@@ -85,10 +88,12 @@ describe('openmeteo', () => {
     const calls = serve({});
     await get(config({ units: 'imperial', latitude: -0.001, longitude: 0.004, timezone: 'auto' }));
     expect(calls[0]!.url).toContain('latitude=0.00&longitude=0.00');
-    expect(calls[0]!.url).toContain('timezone=auto&temperature_unit=fahrenheit');
+    expect(calls[0]!.url).toContain(
+      'timezone=auto&temperature_unit=fahrenheit&wind_speed_unit=mph',
+    );
   });
 
-  test('the response holds label, temperature, condition and day flag, and no coordinates (11.9)', async () => {
+  test('the response holds label, temperature, condition, day flag and wind, and no coordinates (11.9)', async () => {
     serve({ [ROUTE()]: fixture('openmeteo/forecast.json') });
     const res = WidgetsResponse.parse(await get());
     expect(res.weather).toEqual({
@@ -99,6 +104,10 @@ describe('openmeteo', () => {
       unit: 'celsius',
       condition: 'cloudy',
       isDay: true,
+      windSpeed: 3.4,
+      windGusts: 6.1,
+      windDirection: 225,
+      windUnit: 'm/s',
     });
     const body = JSON.stringify(res);
     for (const n of ['0.736291', '-0.582614', '0.74', '-0.58', '0.736', '0.583'])
@@ -109,7 +118,14 @@ describe('openmeteo', () => {
   test('fahrenheit and night', async () => {
     serve({
       [ROUTE('Europe%2FLondon', 'fahrenheit')]: JSON.stringify({
-        current: { temperature_2m: 59.4, weather_code: 61, is_day: 0 },
+        current: {
+          temperature_2m: 59.4,
+          weather_code: 61,
+          is_day: 0,
+          wind_speed_10m: 12.3,
+          wind_direction_10m: 90,
+          wind_gusts_10m: 20.1,
+        },
       }),
     });
     expect((await get(config({ units: 'imperial' }))).weather).toMatchObject({
@@ -117,6 +133,23 @@ describe('openmeteo', () => {
       unit: 'fahrenheit',
       condition: 'rain',
       isDay: false,
+      windSpeed: 12.3,
+      windGusts: 20.1,
+      windDirection: 90,
+      windUnit: 'mph',
+    });
+  });
+
+  test('a reply without wind still gives the weather, with the wind null', async () => {
+    serve({
+      [ROUTE()]: JSON.stringify({ current: { temperature_2m: 15.2, weather_code: 3, is_day: 1 } }),
+    });
+    expect((await get()).weather).toMatchObject({
+      temperature: 15.2,
+      windSpeed: null,
+      windGusts: null,
+      windDirection: null,
+      windUnit: 'm/s',
     });
   });
 

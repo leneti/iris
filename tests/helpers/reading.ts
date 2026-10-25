@@ -168,6 +168,10 @@ export function widgetsOf(): WidgetsResponse {
       unit: 'celsius',
       condition: 'cloudy',
       isDay: true,
+      windSpeed: 3.4,
+      windGusts: 6.1,
+      windDirection: 225,
+      windUnit: 'm/s',
     },
   };
 }

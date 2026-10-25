@@ -4,7 +4,7 @@ import { clock, formatBytes, formatDuration } from './format';
 import { isDown } from './health';
 import type { Source } from './source-health';
 import { formatStat, isFailed } from './stats';
-import { conditionWord } from './weather';
+import { compassPoint, conditionWord, isWindy } from './weather';
 import type {
   CronJob,
   CronResponse,
@@ -418,10 +418,30 @@ function hostSentence(c: Ctx): Segment[] {
     : [plain(' '), fact('The host is calm', target), plain('.')];
 }
 
-function weatherText(w: WidgetsResponse['weather'], unit: boolean): string | null {
+/** The full wind for the sky omen: ", wind 5 m/s from the SW (gusts 9)"; "" when unknown. */
+function windFull(w: NonNullable<WidgetsResponse['weather']>): string {
+  if (w.windSpeed === null) return '';
+  const speed = Math.round(w.windSpeed);
+  if (speed === 0) return ', no wind';
+  const from = w.windDirection === null ? '' : ` from the ${compassPoint(w.windDirection)}`;
+  const gusts =
+    w.windGusts !== null && Math.round(w.windGusts) > speed
+      ? ` (gusts ${Math.round(w.windGusts)})`
+      : '';
+  return `, wind ${speed} ${w.windUnit}${from}${gusts}`;
+}
+
+/** The reading's short wind: ", windy from the SW" when it is windy, else "". */
+function windShort(w: NonNullable<WidgetsResponse['weather']>): string {
+  if (!isWindy(w)) return '';
+  return w.windDirection === null ? ', windy' : `, windy from the ${compassPoint(w.windDirection)}`;
+}
+
+function weatherText(w: WidgetsResponse['weather'], full: boolean): string | null {
   if (!w || w.state !== 'ok' || w.temperature === null) return null;
-  const deg = unit ? (w.unit === 'celsius' ? '°C' : '°F') : '°';
-  return `${conditionWord(w.condition)} over ${w.label}, ${Math.round(w.temperature)}${deg}`;
+  const deg = full ? (w.unit === 'celsius' ? '°C' : '°F') : '°';
+  const wind = full ? windFull(w) : windShort(w);
+  return `${conditionWord(w.condition)} over ${w.label}, ${Math.round(w.temperature)}${deg}${wind}`;
 }
 
 function weatherSentence(c: Ctx): Segment[] {

@@ -2,12 +2,22 @@
   "latitude": 0.736,
   "longitude": -0.583,
   "timezone": "Europe/London",
-  "current_units": { "temperature_2m": "°C", "weather_code": "wmo code", "is_day": "" },
+  "current_units": {
+    "temperature_2m": "°C",
+    "weather_code": "wmo code",
+    "is_day": "",
+    "wind_speed_10m": "m/s",
+    "wind_direction_10m": "°",
+    "wind_gusts_10m": "m/s"
+  },
   "current": {
     "time": "2026-10-16T12:00",
     "interval": 900,
     "temperature_2m": 15.2,
     "weather_code": 3,
-    "is_day": 1
+    "is_day": 1,
+    "wind_speed_10m": 3.4,
+    "wind_direction_10m": 225,
+    "wind_gusts_10m": 6.1
   }
 }

@@ -692,12 +692,54 @@ describe('omens', () => {
 
   test('sky omen has no time-of-day phrase', () => {
     const sky = read(calm()).omens.sky;
-    expect(sky).toEqual({ text: 'Cloudy over Hometown, 15°C.' });
+    expect(sky).toEqual({ text: 'Cloudy over Hometown, 15°C, wind 3 m/s from the SW (gusts 6).' });
     const i = calm();
     if (!i.widgets?.weather) throw new Error('weather');
     i.widgets.weather.unit = 'fahrenheit';
+    i.widgets.weather.windUnit = 'mph';
     i.widgets.weather.isDay = false;
-    expect(read(i).omens.sky).toEqual({ text: 'Cloudy over Hometown, 15°F.' });
+    expect(read(i).omens.sky).toEqual({
+      text: 'Cloudy over Hometown, 15°F, wind 3 mph from the SW (gusts 6).',
+    });
+  });
+
+  type Wind = Partial<NonNullable<NonNullable<ReadingInput['widgets']>['weather']>>;
+  const withWind = (wind: Wind) => {
+    const i = calm();
+    if (!i.widgets?.weather) throw new Error('weather');
+    Object.assign(i.widgets.weather, wind);
+    return read(i);
+  };
+
+  test('sky omen wind: gusts only when stronger, no direction, still air, unknown wind', () => {
+    expect(withWind({ windGusts: 3.2 }).omens.sky).toEqual({
+      text: 'Cloudy over Hometown, 15°C, wind 3 m/s from the SW.',
+    });
+    expect(withWind({ windGusts: null, windDirection: null }).omens.sky).toEqual({
+      text: 'Cloudy over Hometown, 15°C, wind 3 m/s.',
+    });
+    expect(withWind({ windSpeed: 0.4, windGusts: 1 }).omens.sky).toEqual({
+      text: 'Cloudy over Hometown, 15°C, no wind.',
+    });
+    expect(withWind({ windSpeed: null }).omens.sky).toEqual({
+      text: 'Cloudy over Hometown, 15°C.',
+    });
+  });
+
+  test('the reading names the wind only when it is windy', () => {
+    const end = (wind: Wind) => text(withWind(wind)).split('calm. ')[1];
+    expect(end({})).toBe('Cloudy over Hometown, 15°.');
+    expect(end({ windSpeed: 7.9, windGusts: 14.9 })).toBe('Cloudy over Hometown, 15°.');
+    expect(end({ windSpeed: 8 })).toBe('Cloudy over Hometown, 15°, windy from the SW.');
+    expect(end({ windGusts: 15, windDirection: 10 })).toBe(
+      'Cloudy over Hometown, 15°, windy from the N.',
+    );
+    expect(end({ windSpeed: 18, windUnit: 'mph', windDirection: null })).toBe(
+      'Cloudy over Hometown, 15°, windy.',
+    );
+    expect(end({ windSpeed: 17, windGusts: 33, windUnit: 'mph' })).toBe(
+      'Cloudy over Hometown, 15°.',
+    );
   });
 
   test('null weather omits the sentence and the omen', () => {

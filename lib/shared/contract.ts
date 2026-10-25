@@ -345,6 +345,11 @@ export const Weather = obj({
     ])
     .nullable(),
   isDay: z.boolean().nullable(),
+  windSpeed: n,
+  windGusts: n,
+  /** Degrees the wind blows from, 0 = north. */
+  windDirection: n,
+  windUnit: z.enum(['m/s', 'mph']),
 });
 export type Weather = z.infer<typeof Weather>;
 

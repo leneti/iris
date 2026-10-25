@@ -13,6 +13,10 @@ const schema = z.object({
     temperature_2m: z.number().finite(),
     weather_code: z.number(),
     is_day: z.union([z.literal(0), z.literal(1)]),
+    // Wind is extra: a reply without it still gives the weather.
+    wind_speed_10m: z.number().finite().nullish(),
+    wind_direction_10m: z.number().finite().nullish(),
+    wind_gusts_10m: z.number().finite().nullish(),
   }),
 });
 
@@ -57,25 +61,31 @@ export type WeatherSpec = {
   timezone: string;
   units: 'metric' | 'imperial';
 };
-export type Reading = Pick<Weather, 'temperature' | 'unit' | 'condition' | 'isDay'>;
+export type Reading = Omit<Weather, 'state' | 'fetchedAt' | 'label'>;
 
 /** The request builder: the only place coordinates become text. */
 export function forecastPath(spec: WeatherSpec): string {
-  const unit = spec.units === 'imperial' ? 'fahrenheit' : 'celsius';
+  const imperial = spec.units === 'imperial';
   return (
     `/v1/forecast?latitude=${round2(spec.latitude)}&longitude=${round2(spec.longitude)}` +
-    `&current=temperature_2m,weather_code,is_day&timezone=${encodeURIComponent(spec.timezone)}` +
-    `&temperature_unit=${unit}`
+    `&current=temperature_2m,weather_code,is_day,wind_speed_10m,wind_direction_10m,wind_gusts_10m` +
+    `&timezone=${encodeURIComponent(spec.timezone)}` +
+    `&temperature_unit=${imperial ? 'fahrenheit' : 'celsius'}&wind_speed_unit=${imperial ? 'mph' : 'ms'}`
   );
 }
 
 export async function readWeather(ctx: AdapterContext, spec: WeatherSpec): Promise<Reading> {
   const { current } = parseReply(await ctx.get(forecastPath(spec)), schema);
+  const imperial = spec.units === 'imperial';
   return {
     temperature: current.temperature_2m,
-    unit: spec.units === 'imperial' ? 'fahrenheit' : 'celsius',
+    unit: imperial ? 'fahrenheit' : 'celsius',
     condition: conditionOf(current.weather_code),
     isDay: current.is_day === 1,
+    windSpeed: current.wind_speed_10m ?? null,
+    windGusts: current.wind_gusts_10m ?? null,
+    windDirection: current.wind_direction_10m ?? null,
+    windUnit: imperial ? 'mph' : 'm/s',
   };
 }
 
